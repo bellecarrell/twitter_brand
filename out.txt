@@ -1,0 +1,20 @@
+before script
+after
+before script
+after
+before script
+can write to stdout in out file too
+after
+before script
+after
+before script
+after
+before script
+after
+before script
+before script
+before script
+before script
+after
+before script
+before script
