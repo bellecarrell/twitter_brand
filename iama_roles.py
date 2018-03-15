@@ -44,25 +44,30 @@ if __name__ == '__main__':
     chunks = grab_user_data(twitter_dir, user_filename)
 
     logging.info("number of non-empty descriptions: {}".format(len(chunks)))
+    with gzip.open(twitter_dir, 'rt') as f:
+    #with open(twitter_dir, 'r') as f:
+        for line in f:
 
-    for i, chunk in enumerate(chunks):
+            logging.info('reading data')
 
-        logging.info(chunk)
+            chunk = re.findall(r'"text":.*?"(.+?)"', data)
 
-        if i % 100 == 0:
-            logging.info("description {} being processed".format(i))
+            logging.info(chunk)
 
-        for role1, role2 in re.findall(r'I am a ([a-zA-Z]{3,15})|I\'m a ([a-zA-Z]{3-15})', chunk):
-            logging.info(role1)
-            users_by_role[role1.lower()] += 1
-            logging.info(role1)
-            users_by_role[role1.lower()] += 1
+            if i % 100 == 0:
+                logging.info("description {} being processed".format(i))
 
-    print(users_by_role.most_common(200))
+            for role1, role2 in re.findall(r'I am a ([a-zA-Z]{3,15})|I\'m a ([a-zA-Z]{3-15})', chunk):
+                logging.info(role1)
+                users_by_role[role1.lower()] += 1
+                logging.info(role1)
+                users_by_role[role1.lower()] += 1
 
-    with open(user_filename, 'w+') as f:
-         for k, v in users_by_role.most_common(200):
-             f.write(k + '\t' + str(v) + '\n')
+        print(users_by_role.most_common(200))
+
+        with open(user_filename, 'w+') as f:
+             for k, v in users_by_role.most_common(200):
+                 f.write(k + '\t' + str(v) + '\n')
 
 
 

@@ -16,6 +16,6 @@ rm _user.txt
 
 echo 'before script'
 
-${HOME}/base_counts.py ${TWITTER_PATH} ${HOME}
+${HOME}/iama_roles.py ${TWITTER_PATH} ${HOME}
 
 echo 'after'
