@@ -3,7 +3,7 @@
 ## Dependencies ##
 
 - [Python 2.7](http://www.python.org/download/releases/2.7/)
-- [tweepy](https://github.com/tweepy/tweepy), included locally
+- [tweepy](https://github.com/tweepy/tweepy)
 
 ## Scripts ##
 
