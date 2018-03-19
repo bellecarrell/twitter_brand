@@ -38,7 +38,6 @@ if __name__ == '__main__':
 
                     for chunk in chunks:
 
-
                         for role1, role2 in re.findall(r"I am a ([a-zA-Z]{3,15})|I'm a ([a-zA-Z]{3,15})", chunk):
                             if role1:
                                 logging.info(role1)

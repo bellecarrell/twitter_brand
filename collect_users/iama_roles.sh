@@ -6,10 +6,10 @@
 #$ -l num_proc=1
 #$ -N test
 #$ -S /bin/bash
-#$ -o out.txt
-#$ -e err.txt
+#$ -o $out/out.txt
+#$ -e $out/err.txt
 
-TWITTER_PATH=$in
-OUT_DIR=$out
+TWITTER_PATH=$one
+OUT_DIR=$two
 
 ./iama_roles.py ${TWITTER_PATH} ${OUT_DIR}
