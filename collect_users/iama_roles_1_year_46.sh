@@ -5,7 +5,7 @@
 TWITTER_YEAR_DIR=$1
 OUT_DIR=$2
 
-for i in 1 2 3
+for i in 4 5 6
 do
         mkdir -p $OUT_DIR/$i
         qsub -q all.q -cwd -v one=$TWITTER_YEAR_DIR/$i,two=$OUT_DIR/$i ./iama_roles.sh
