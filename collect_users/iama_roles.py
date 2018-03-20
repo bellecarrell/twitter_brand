@@ -35,18 +35,22 @@ if __name__ == '__main__':
             with gzip.open(os.path.join(dirpath, filename), 'rt') as f:
                 for line in f:
                     chunks = re.findall(r'"text":.*?"(.+?)"', line)
+                    print("in line processing")
 
                     for chunk in chunks:
 
                         for role1, role2 in re.findall(r"I am a ([a-zA-Z]{3,15})|I'm a ([a-zA-Z]{3,15})", chunk):
                             if role1:
+                                print("i_ama match")
                                 logging.info(role1)
                                 users_by_role[role1.lower()] += 1
                             if role2:
+                                print("i'm a match")
                                 logging.info(role2)
                                 users_by_role[role2.lower()] += 1
 
     with open(out, 'w+') as f:
+        print("writing to file")
         for k, v in users_by_role.items():
             f.write(k + '\t' + str(v) + '\n')
 
