@@ -6,8 +6,8 @@
 #$ -l num_proc=1
 #$ -N test
 #$ -S /bin/bash
-#$ -o $two/out.txt
-#$ -e $two/err.txt
+#$ -o out.txt
+#$ -e err.txt
 
 TWITTER_PATH=$one
 OUT_DIR=$two

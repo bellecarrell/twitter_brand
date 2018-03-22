@@ -19,8 +19,11 @@ if __name__ == '__main__':
             with open(os.path.join(root, file), "r") as f:
                 for line in f:
                     role, count = line.split('\t')
-                    iama_roles[role] += count
+                    iama_roles[role] += int(count)
 
     iama_roles_sorted = sorted(iama_roles, key=iama_roles.get, reverse=True)
 
+    with open(out, 'w+') as f:
+        for role in iama_roles_sorted:
+            f.write(role + '\t' + str(iama_roles[role]) + '\n')
 
