@@ -28,7 +28,8 @@ if __name__ == '__main__':
     total_bigrams = Counter()
     total_trigrams = Counter()
 
-    text_p = re.compile(r'"text":.*?"(.+?)"')
+    user_p = re.compile(r'"user":.*?{(.+?)}')
+    desc_p = re.compile(r'"description":.*?"(.+?)"')
     iama_p = re.compile(r"I am a (\w+\W\w+\W\w+)|I'm a (\w+\W\w+\W\w+)")
 
     for dirpath, _, filenames in os.walk(twitter_dir):
