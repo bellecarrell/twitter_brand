@@ -10,6 +10,6 @@
 #$ -e err.txt
 
 IAMA_OUT=/exp/acarrell/twitter_brand/collect_users
-AGG_OUT=/exp/acarrell/twitter_brand/aggregate_out/iama_agg_out.txt
+AGG_OUT=/exp/acarrell/twitter_brand/aggregate_out/
 
 ./collect_iama_counts.py ${IAMA_OUT} ${AGG_OUT}
