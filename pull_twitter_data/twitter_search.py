@@ -1,9 +1,8 @@
 #!/usr/bin/python
 
-import pdb, gzip, os, platform, random, re, sys, time, urllib.request, urllib.error, urllib.parse, webbrowser, json
+import pdb, gzip, os, platform, random, re, sys, time, webbrowser, json
 import pickle, smtplib, traceback
 
-from http.client import IncompleteRead
 from optparse import OptionParser
 
 import twitterUtils
@@ -301,13 +300,13 @@ class NetSampler:
           self._collectIds(self.api.followers_ids,
                            username, self.followerOutFile)
           self.limit = self.api.rate_limit_status()
-        except urllib.error.URLError as ex:
-          print((username + ':', ex))
-          self._updateErr(username, str(ex))
-          emailAlert(runningErrMsgs + '\nPress enter to reconnect!!!')
-          zzz(SNOOZE)
-          input('Press enter to reconnect')
-          self.api = API(getKeyAndAuth())
+        #except urllib.error.URLError as ex:
+        #  print((username + ':', ex))
+        #  self._updateErr(username, str(ex))
+        #  emailAlert(runningErrMsgs + '\nPress enter to reconnect!!!')
+        #  zzz(SNOOZE)
+        #  input('Press enter to reconnect')
+        #  self.api = API(getKeyAndAuth())
         except TweepError as ex:
           print((username + ':', ex))
           self._updateErr(username, str(ex))
@@ -644,15 +643,15 @@ class KeywordStreamer:
         else:
           self.stream.filter(follow=[int(k) for k in self.kws],
                              locations=LOCATIONS)
-      except IncompleteRead as ex:
-        try:
-          tb = traceback.format_exc()
-        except:
-          tb = ''
-        emailAlert("%s: %s\n%s\n\n" % (getTimeString(),
-                   str(sys.exc_info()) + "\nStill ticking!", tb))
-        zzz(SNOOZE)
-        goForIt = True
+      #except IncompleteRead as ex:
+      #  try:
+      #    tb = traceback.format_exc()
+      #  except:
+      #    tb = ''
+      #  emailAlert("%s: %s\n%s\n\n" % (getTimeString(),
+      #             str(sys.exc_info()) + "\nStill ticking!", tb))
+      #  zzz(SNOOZE)
+      #  goForIt = True
       except:
         try:
           tb = traceback.format_exc()
