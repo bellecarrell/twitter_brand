@@ -5,6 +5,8 @@
 #$ -l h_vmem=2g
 #$ -l num_proc=1
 #$ -N getInfos
+#$ -o out.txt
+#$ -e err.txt
 #$ -S /bin/bash
 
 KEY=$1

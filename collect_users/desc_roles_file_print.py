@@ -19,8 +19,10 @@ if __name__ == '__main__':
     twitter_dir: Directory containing items 
     user_dir: Directory to put user data file in
     """
-    in_dir = sys.argv[1]
+    #in_dir = sys.argv[1]
+    filepath = sys.argv[1]
     out_dir = sys.argv[2]
+    out_f = sys.argv[3]
 
     logging.info('-'*20)
     logging.info("sending data to: " + out_dir)
@@ -37,35 +39,34 @@ if __name__ == '__main__':
     id_p = re.compile(r'"id_str":.*?"(.+?)"', re.S)
 
     roles_ids = defaultdict(set)
+    out = open(out_f, 'w+')
 
-    for dirpath, _, filenames in os.walk(in_dir):
-        for filename in filenames:
-            with gzip.open(os.path.join(dirpath, filename), 'rt') as f:
-                try:
-                    for line in f:
-                    #line = f.read()
-                    #if line:
-                        users = user_p.findall(line)
+    with gzip.open(filepath, 'rt') as f:
+        try:
+            for line in f:
+            #line = f.read()
+            #if line:
+                users = user_p.findall(line)
 
-                        for user in users:
+                for user in users:
 
-                            desc = re.findall(desc_p, user)
+                    desc = re.findall(desc_p, user)
 
-                            user_id = re.findall(id_p, user)
+                    user_id = re.findall(id_p, user)
 
-                            if len(desc) > 0 and len(user_id) > 0:
-                                desc = desc[0]
-                                user_id = user_id[0]
+                    if len(desc) > 0 and len(user_id) > 0:
+                        desc = desc[0]
+                        user_id = user_id[0]
 
-                                for role in artist_roles:
-                                    if role in desc:
-                                        logging.info("user_id " + user_id)
-                                        logging.info("desc " + desc)
-                                        roles_ids[role].add(user_id)
+                        for role in artist_roles:
+                            if role in desc:
+                                roles_ids[role].add(user_id)
+                                out.write(role + "\t" + desc + '\n')
 
+        except IOError as e:
+            logging.info(e)
 
-                except IOError as e:
-                    logging.info(e)
+    out.close()
 
     role_counts = Counter()
 
@@ -77,7 +78,7 @@ if __name__ == '__main__':
 
         role_file = out_dir + role + '.txt'
         with open(role_file, 'a+') as f:
-            for user_id in ids:
+            for id in ids:
                 f.write(user_id + "\n")
 
     artist_out = open(out_dir + "artist_roles.p", 'wb+')
