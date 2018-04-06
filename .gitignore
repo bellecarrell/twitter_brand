@@ -1,2 +1,4 @@
 .history
 *.pyc
+access_tokens/
+keys/
