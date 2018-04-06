@@ -1,4 +1,4 @@
 .history
 *.pyc
-access_tokens/
-keys/
+~/PycharmProjects/twitter_brand/pull_twitter_data/access_tokens/
+~/PycharmProjects/twitter_brand/pull_twitter_data/keys/
