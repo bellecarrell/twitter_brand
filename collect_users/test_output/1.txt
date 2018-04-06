@@ -1,5 +1,0 @@
-poet	artist poet skater hater
-artist	artist poet skater hater
-poet	like horses poet rapper
-rapper	like horses poet rapper
-freelance	watcha doin in my waters? freelance

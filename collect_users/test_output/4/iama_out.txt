@@ -1,6 +1,0 @@
-maneater	3
-cheetah	3
-sailor	3
-handyman	3
-ghost	3
-fetus	3

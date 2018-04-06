@@ -5,7 +5,7 @@ import pickle, smtplib, traceback
 
 from optparse import OptionParser
 
-import twitterUtils
+import twitterUtils as twitterUtils
 
 from tweepy import OAuthHandler, API, TweepError
 from tweepy.streaming import StreamListener, Stream
