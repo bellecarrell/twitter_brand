@@ -1,2 +1,4 @@
 .history
 *.pyc
+pull_twitter_data/keys/
+pull_twitter_data/access_tokens/
