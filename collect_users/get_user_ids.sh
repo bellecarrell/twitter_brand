@@ -12,4 +12,4 @@
 TWITTER_PATH=$one
 OUT_DIR=$two
 
-./desc_roles.py ${TWITTER_PATH} ${OUT_DIR}
+desc_roles.py ${TWITTER_PATH} ${OUT_DIR}
