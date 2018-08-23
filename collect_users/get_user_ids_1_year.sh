@@ -3,10 +3,10 @@
 # in JSON format.
 
 TWITTER_YEAR_DIR=/twitter/current/sample/2017
-OUT_DIR=/exp/acarrell/twitter_brand
+OUT_DIR=/exp/acarrell/twitter_brand/seed_unfiltered_users
 
 for i in 01 02 03 04 05 06 07 08 09 10 11 12
 do
        mkdir -p $OUT_DIR/$i
-       qsub -q all.q -cwd -v one=$TWITTER_YEAR_DIR/$i,two=$OUT_DIR/$i/ ./desc_roles.sh
+       qsub -q all.q -cwd -v one=$TWITTER_YEAR_DIR/$i,two=$OUT_DIR/$i/ ./get_user_ids.sh
 done

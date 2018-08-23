@@ -1,97 +1,111 @@
 #!/usr/bin/env python
 
-import sys
-from collections import Counter, defaultdict
-import os
+import argparse
 import gzip
-import re
+import io
 import logging
-import pickle
+import os
+from collections import defaultdict
+import sys
+sys.path.append('/home/hltcoe/acarrell/PycharmProjects/twitter_brand/')
+import ijson
+
+from configs.config import *
 
 logging.basicConfig(level=logging.INFO)
 
-if __name__ == '__main__':
-    """
-    Reads in Twitter stream from specified dir and counts freqs of all "I am a/I'm a" matches
-    unigrams, bigrams, and trigrams
 
-    Args:
-    twitter_dir: Directory containing items 
-    user_dir: Directory to put user data file in
-    """
-    in_dir = sys.argv[1]
-    out_dir = sys.argv[2]
+def all_occupations(occupations_by_sector):
+    all_occupations = []
+    for sector in occupations_by_sector.keys():
+        all_occupations = all_occupations + occupations_by_sector[sector]
+    return all_occupations
 
-    logging.info('-'*20)
-    logging.info("sending data to: " + out_dir)
 
-    # unis = total_unigrams.keys()
-    # bis = total_bigrams.keys()
-    # tris = total_trigrams.keys()
-
-    artist_roles = ['designer', 'poet', 'rapper', 'writer', 'singer', 'musician', 'actor',
-                    'artist', 'dancer', 'freelance', 'photographer', 'journalist', 'reporter']
-
-    user_p = re.compile(r'"user":.*?\{(.+?)\}',re.S)
-    desc_p = re.compile(r'"description":.*?"(.+?)"', re.S)
-    id_p = re.compile(r'"id_str":.*?"(.+?)"', re.S)
-
-    roles_ids = defaultdict(set)
+def get_user_ids_from_input(in_dir, occupations, args):
+    occupations_ids = defaultdict(set)
+    occupations_counts = defaultdict(int)
+    occupations_desc = defaultdict(set)
 
     for dirpath, _, filenames in os.walk(in_dir):
         for filename in filenames:
             with gzip.open(os.path.join(dirpath, filename), 'rt') as f:
                 try:
                     for line in f:
-                    #line = f.read()
-                    #if line:
-                        users = user_p.findall(line)
-
-                        for user in users:
-
-                            desc = re.findall(desc_p, user)
-
-                            user_id = re.findall(id_p, user)
-
-                            if len(desc) > 0 and len(user_id) > 0:
-                                desc = desc[0]
-                                user_id = user_id[0]
-
-                                for role in artist_roles:
-                                    if role in desc:
-                                        logging.info("user_id " + user_id)
-                                        logging.info("desc " + desc)
-                                        roles_ids[role].add(user_id)
-
-
-                except IOError as e:
+                        line_as_file = io.StringIO(line)
+                        # Use a new parser for each line
+                        if line_as_file:
+                            try:
+                                users = ijson.items(line_as_file, 'user')
+                                for user in users:
+                                    if user['description']:
+                                        user_description_lower = user['description'].lower()
+                                        for occupation in occupations:
+                                            if occupation in user_description_lower:
+                                                user_id = str(user['id'])
+                                                occupations_ids[occupation].add(user_id)
+                                                if args.stats:
+                                                    occupations_counts[occupation] = len(occupations_ids[occupation])
+                                                    if occupations_counts[occupation] % 5 == 0:
+                                                        occupations_desc[occupation].add(user_description_lower)
+                            except ijson.common.IncompleteJSONError as e:
+                                pass
+                except (IOError, EOFError) as e:
                     logging.info(e)
+    return occupations_ids, occupations_counts, occupations_desc
 
-    role_counts = Counter()
 
-    for role in roles_ids.keys():
+def write_user_ids_to_out(out_dir, occupations_ids, occupations_counts, occupations_desc, args):
+    counts_fn = out_dir + 'counts.txt'
+    counts_file = open(counts_fn, 'a+')
 
-        ids = roles_ids[role]
+    for occupation in occupations_ids.keys():
 
-        role_counts[role] = len(ids)
+        ids = occupations_ids[occupation]
 
-        role_file = out_dir + role + '.txt'
-        with open(role_file, 'a+') as f:
+        id_file = out_dir + occupation + '_ids.txt'
+        with open(id_file, 'a+') as f:
             for user_id in ids:
                 f.write(user_id + "\n")
 
-    artist_out = open(out_dir + "artist_roles.p", 'wb+')
+        if args.stats:
+            desc = occupations_desc[occupation]
+
+            desc_file = out_dir + occupation + '_descriptions.txt'
+            with open(desc_file, 'a+') as f:
+                for description in desc:
+                    f.write(description + "\n")
+
+            counts_file.write(occupation + '\t' + str(occupations_counts[occupation]) + '\n')
+
+    counts_file.close()
 
 
-    pickle.dump(role_counts, artist_out)
+if __name__ == '__main__':
+    """
+    Gets IDs of users who self-describe as any of
+    the occupations listed in the config file.
+    """
 
-    artist_out.close()
-    roles_sorted = sorted(role_counts, key=roles_ids.get, reverse=True)
+    parser = argparse.ArgumentParser()
+    parser = add_input_output_args(parser)
+    parser = add_descriptive_stats_flag(parser)
 
-    logging.info("roles: {}".format([(role, role_counts[role]) for role in roles_sorted]))
+    args = parser.parse_args()
+    # todo: generalize by adding mode arg
+    occupation_section = 'SEED_OCCUPATIONS'
 
-    artist_kv_out = out_dir + "artist_roles.tsv"
+    config = configparser_for_file('collect_users.ini')
 
-    with open(artist_kv_out, 'w+') as f:
-        for role in roles_sorted:
-            f.write(role + "\t" + str(role_counts[role]) + "\n")
+    in_dir = args.input
+    out_dir = args.output
+
+    logging.info('-' * 20)
+    logging.info("sending data to: " + out_dir)
+
+    occupations_by_sector = occupations_by_sector(config, occupation_section)
+    occupations = all_occupations(occupations_by_sector)
+
+    occupations_ids, occupations_counts, occupations_desc = get_user_ids_from_input(in_dir, occupations, args)
+
+    write_user_ids_to_out(out_dir, occupations_ids, occupations_counts, occupations_desc, args)
