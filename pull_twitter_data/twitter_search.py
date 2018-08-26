@@ -644,8 +644,8 @@ class Collect:
           tdict['collected_at_unix_timestamp'] = curr_time
           out_file.write(json.dumps(tdict).strip() + '\n')
         
+        print('%s to %s\tdumped\n' % (start_user, user))
         start_user = user
-      print('%s to %s\tdumped\n' % (start_user, user))
 
 class KeywordStreamer:
   '''
