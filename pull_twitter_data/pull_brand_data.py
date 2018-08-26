@@ -25,32 +25,32 @@ def getTimeString():
                                 t.tm_min, t.tm_sec)
 
 def make_dirs(job):
-  job_dir = os.path.join(TOP_DIR, job)
-  if not os.path.exists(job_dir):
-    os.mkdir(job_dir)
-  
-  time_stamp = time.time()
-  time_dir = os.path.join(job_dir, '{}'.format(time_stamp))
+  time_stamp = int(time.time())
+  time_dir = os.path.join(TOP_DIR, '{}'.format(time_stamp))
   if not os.path.exists(time_dir):
     os.mkdir(time_dir)
   
-  info_dir = os.path.join(time_dir, 'user_information')
-  tweet_dir = os.path.join(time_dir, 'user_timeline')
+  job_dir = os.path.join(time_dir, job)
+  if not os.path.exists(job_dir):
+    os.mkdir(job_dir)
+  
+  info_dir = os.path.join(job_dir, 'user_information')
+  tweet_dir = os.path.join(job_dir, 'user_timeline')
   #network_dir = os.path.join(time_dir, 'networks')
-
+  
   for d in [info_dir, tweet_dir]:
     if not os.path.exists(d):
       os.mkdir(d)
+  
+  return job_dir
 
-  return time_dir
-
-def pull_data(kw_path, time_dir):
-  info_dir = os.path.join(time_dir, 'user_information')
-  tweet_dir = os.path.join(time_dir, 'user_timeline')
-
+def pull_data(kw_path, job_dir):
+  info_dir = os.path.join(job_dir, 'user_information')
+  tweet_dir = os.path.join(job_dir, 'user_timeline')
+  
   os.system('python twitter_search.py get_user_information --accesstoken {} --keypath {} --kwpath {} --outdir {}'.format(ACCESS_TOKEN_PATH, KEY_PATH, kw_path, info_dir))
   
-  os.system('python twitter_search.py user_timeline --accesstoken {} --keypath {} --kwpath {} --outdir {} --numtocache 3200'.format(ACCESS_TOKEN_PATH, KEY_PATH, kw_path, tweet_dir))
+  os.system('python twitter_search.py user_timeline --accesstoken {} --keypath {} --kwpath {} --outdir {} --numtocache 200'.format(ACCESS_TOKEN_PATH, KEY_PATH, kw_path, tweet_dir))
 
 for p in os.listdir(BRAND_USER_DIR):
   m = brand_user_re.match(p)
@@ -59,6 +59,6 @@ for p in os.listdir(BRAND_USER_DIR):
   else:
     continue
   
-  time_dir = make_dirs(job)
-  pull_data(os.path.join(BRAND_USER_DIR, p), time_dir)
+  job_dir = make_dirs(job)
+  pull_data(os.path.join(BRAND_USER_DIR, p), job_dir)
   print('Finished pulling data for "{}" users'.format(job))

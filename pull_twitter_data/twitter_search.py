@@ -622,7 +622,7 @@ class Collect:
         batchedStatuses += userAllStatuses
         if (i % maxBatchedUsers) == 0:
           with gzip.open(os.path.join(OUT_DIR,
-                                      '{}_to_{}.statuses.json.gz'.format(start_user, user)),
+                                      '{}_to_{}.{}.statuses.json.gz'.format(start_user, user, getTimeString())),
                          'wt') as out_file:
             curr_time = time.time()
             for t in batchedStatuses:
@@ -636,8 +636,8 @@ class Collect:
           batchedStatuses = []
         
       with gzip.open(os.path.join(OUT_DIR,
-                                  '{}_to_{}.statuses.json.gz'.format(start_user,
-                                                                  user)), 'wt') as out_file:
+                                  '{}_to_{}.{}.statuses.json.gz'.format(start_user,
+                                                                        user, getTimeString())), 'wt') as out_file:
         curr_time = time.time()
         for t in batchedStatuses:
           tdict = t._json
