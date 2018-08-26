@@ -1,15 +1,12 @@
 #!/usr/bin/env python
 
-import argparse
 import gzip
 import io
 import logging
-import os
-from collections import defaultdict
 import sys
 sys.path.append('/home/hltcoe/acarrell/PycharmProjects/twitter_brand/')
 import ijson
-
+import re
 from configs.config import *
 
 logging.basicConfig(level=logging.INFO)
@@ -27,31 +24,45 @@ def get_user_ids_from_input(in_dir, occupations, args):
     occupations_counts = defaultdict(int)
     occupations_desc = defaultdict(set)
 
+    user_p = re.compile(r'"user":.*?\{(.+?)\}',re.S)
+    desc_p = re.compile(r'"description":.*?"(.+?)"', re.S)
+    id_p = re.compile(r'"id_str":.*?"(.+?)"', re.S)
+
     for dirpath, _, filenames in os.walk(in_dir):
         for filename in filenames:
             with gzip.open(os.path.join(dirpath, filename), 'rt') as f:
                 try:
+                    count = 0
                     for line in f:
-                        line_as_file = io.StringIO(line)
                         # Use a new parser for each line
-                        if line_as_file:
+                        if line:
                             try:
-                                users = ijson.items(line_as_file, 'user')
+                                #users = ijson.items(line_as_file, 'user')
+                                users = user_p.findall(line)
                                 for user in users:
-                                    if user['description']:
-                                        user_description_lower = user['description'].lower()
+
+                                    desc = re.findall(desc_p, user)
+                                    user_id = re.findall(id_p, user)
+
+                                    #if user['description']:
+                                    if len(desc) > 0 and len(user_id) > 0:
+                                        #user_description_lower = user['description'].lower()
+                                        user_description_lower = desc[0].lower()
+                                        user_id = user_id[0]
                                         for occupation in occupations:
                                             if occupation in user_description_lower:
-                                                user_id = str(user['id'])
+                                                #user_id = str(user['id'])
+                                                count +=1
                                                 occupations_ids[occupation].add(user_id)
                                                 if args.stats:
-                                                    occupations_counts[occupation] = len(occupations_ids[occupation])
-                                                    if occupations_counts[occupation] % 5 == 0:
+                                                    if count % 5 == 0:
                                                         occupations_desc[occupation].add(user_description_lower)
                             except ijson.common.IncompleteJSONError as e:
                                 pass
-                except (IOError, EOFError) as e:
+                except (IOError, EOFError, Exception) as e:
                     logging.info(e)
+    for occupation in occupations:
+        occupations_counts[occupation] = len(occupations_ids[occupation])
     return occupations_ids, occupations_counts, occupations_desc
 
 
@@ -107,5 +118,8 @@ if __name__ == '__main__':
     occupations = all_occupations(occupations_by_sector)
 
     occupations_ids, occupations_counts, occupations_desc = get_user_ids_from_input(in_dir, occupations, args)
+
+    logging.info('-' * 20)
+    logging.info("writing " + str(len(occupations_ids)) + " ids")
 
     write_user_ids_to_out(out_dir, occupations_ids, occupations_counts, occupations_desc, args)
