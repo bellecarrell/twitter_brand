@@ -61,4 +61,4 @@ for p in os.listdir(BRAND_USER_DIR):
   
   time_dir = make_dirs(job)
   pull_data(os.path.join(BRAND_USER_DIR, p), time_dir)
-  
+  print('Finished pulling data for "{}" users'.format(job))
