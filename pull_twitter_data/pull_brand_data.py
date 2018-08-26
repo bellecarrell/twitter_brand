@@ -30,7 +30,7 @@ def make_dirs(job):
     os.mkdir(job_dir)
   
   time_stamp = time.time()
-  time_dir = os.path.join(job_dir, time_stamp)
+  time_dir = os.path.join(job_dir, '{}'.format(time_stamp))
   if not os.path.exists(time_dir):
     os.mkdir(time_dir)
   
