@@ -50,7 +50,7 @@ def pull_data(kw_path, job_dir):
   
   os.system('python twitter_search.py get_user_information --accesstoken {} --keypath {} --kwpath {} --outdir {}'.format(ACCESS_TOKEN_PATH, KEY_PATH, kw_path, info_dir))
   
-  os.system('python twitter_search.py user_timeline --accesstoken {} --keypath {} --kwpath {} --outdir {} --numtocache 200'.format(ACCESS_TOKEN_PATH, KEY_PATH, kw_path, tweet_dir))
+  #os.system('python twitter_search.py user_timeline --accesstoken {} --keypath {} --kwpath {} --outdir {} --numtocache 200'.format(ACCESS_TOKEN_PATH, KEY_PATH, kw_path, tweet_dir))
 
 for p in os.listdir(BRAND_USER_DIR):
   m = brand_user_re.match(p)
