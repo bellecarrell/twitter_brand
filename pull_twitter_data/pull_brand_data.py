@@ -7,12 +7,16 @@ Adrian Benton
 
 import os, re, time
 
-TOP_DIR = '/export/b08/abenton/twitter_brand_data/'
+TOP_DIR = '/exp/abenton/twitter_brand_data/'
 #if not os.path.exists(TOP_DIR): os.mkdir(TOP_DIR)
 
 KEY = 'dl1'
-KEY_PATH = '/export/b08/abenton/twitter_collection/access_tokens/keys_{}.txt'.format(KEY)
-ACCESS_TOKEN_PATH = '/export/b08/abenton/twitter_collection/access_tokens/access_token_{}.txt'.format(KEY)
+KEY_PATH = '/exp/abenton/twitter_collection/keys/{}_keys.txt'.format(KEY)
+ACCESS_TOKEN_PATH = '/exp/abenton/twitter_collection/access_tokens/access_token_{}.txt'.format(KEY)
+
+BRAND_USER_DIR = '/exp/abenton/twitter_collection/brand_lists/'
+
+brand_user_re = re.compile('(?P<job>\w+)\.users\.txt')
 
 def getTimeString():
   t = time.localtime()
@@ -47,10 +51,6 @@ def pull_data(kw_path, time_dir):
   os.system('python twitter_search.py get_user_information --accesstoken {} --keypath {} --kwpath {} --outdir {}'.format(ACCESS_TOKEN_PATH, KEY_PATH, kw_path, info_dir))
   
   os.system('python twitter_search.py user_timeline --accesstoken {} --keypath {} --kwpath {} --outdir {} --numtocache 3200'.format(ACCESS_TOKEN_PATH, KEY_PATH, kw_path, tweet_dir))
-
-BRAND_USER_DIR = '/export/b08/abenton/brand_users/'
-
-brand_user_re = re.compile('(?P<job>\w+)\.users.txt')
 
 for p in os.listdir(BRAND_USER_DIR):
   m = brand_user_re.match(p)
