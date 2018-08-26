@@ -3,7 +3,7 @@
 import pdb, gzip, os, platform, random, re, sys, time, webbrowser, json
 import pickle, smtplib, traceback
 
-from optparse import OptionParser
+import argparse
 
 import twitterUtils as twitterUtils
 
@@ -31,11 +31,11 @@ LOCATIONS = None
 NUM_TO_CACHE = 200
 
 # Who to e-mail when an error occurs.
-ADMIN_EMAILS = ['foo.bar@blah']
+ADMIN_EMAILS = ['admin.email@blah']
 
-SCRIPT_EMAIL = 'tweet.scooper@gmail.com'
-SCRIPT_USERNAME = 'tweet.scooper'
-SCRIPT_PW = 'YTtDZB3j'
+SCRIPT_EMAIL = 'script.email@blah'
+SCRIPT_USERNAME = 'email_username'
+SCRIPT_PW = 'email_pw'
 
 # Standard number of seconds to wait between API calls.
 SNOOZE = 3
@@ -47,6 +47,32 @@ ITER_SNOOZE = 10
 #COLLECT_FRIENDS = True
 #COLLECT_FOLLOWERS = True
 
+METHOD_NAMES = ['keyword_stream', 'user_stream', 'network_sample',
+                'get_user_ids', 'get_user_information', 'tweet_keyword_search',
+                'user_timeline', 'get_retweets', 'hydrate_tweets',
+                'tweet_geo_search']
+
+def get_snooze_from_method(method, rsc):
+  if method == 'network_sample':
+    o = rsc['friend']['/friends/ids']
+  elif method in {'get_user_ids', 'get_user_information'}:
+    o = rsc['users']['/users/lookup']
+  elif method == 'tweet_keyword_search':
+    o = rsc['search']['/search/tweets']
+  elif method == 'user_timeline':
+    o = rsc['statuses']['/statuses/user_timeline']
+  elif method == 'get_retweets':
+    o = rsc['statuses']['/statuses/retweets/:id']
+  elif method == 'hydrate_tweets':
+    o = rsc['statuses']['/statuses/lookup']
+  elif method == 'tweet_geo_search':
+    o = rsc['geo']['/geo/search']
+  else:
+    print('No limit for {}'.format())
+    return 1
+  
+  return  (60*15) // o['limit']
+
 def emailAlert(msg):
   '''
   Sends a short email to all administrators describing what went
@@ -55,24 +81,6 @@ def emailAlert(msg):
   
   print('Error!', msg)
   print('Not emailing, doesn\'t work on grid')
-  
-  '''
-  print(( 'Sending message:', msg))
-  mailserver = smtplib.SMTP('smtp.gmail.com')
-  mailserver.ehlo()
-  mailserver.starttls()
-  mailserver.login(SCRIPT_USERNAME, SCRIPT_PW)
-  try:
-    msg = 'Trouble on %s\n\n%s' % (os.uname(), msg)
-  except:
-    msg = 'Trouble on %s\n\n%s' % (platform.platform(), msg)
-  for admin in ADMIN_EMAILS:
-    headers = "From: %s\nTo: %s\nSubject: Trouble's afoot...\n\n" % (
-              SCRIPT_EMAIL, admin)
-    message = headers + msg
-    mailserver.sendmail(SCRIPT_EMAIL, admin, message)
-  mailserver.close()
-  '''
 
 def getTimeString():
   t = time.localtime()
@@ -119,7 +127,7 @@ def doOAuthDance(consumer_key, consumer_secret):
     return None
   
   # Save the access token for later use
-  accessFile = open(ACCESS_TOKEN_PATH, 'w')
+  accessFile = open(ACCESS_TOKEN_PATH, 'wt')
   accessFile.write('%s\n%s' % (auth.access_token.key, auth.access_token.secret))
   accessFile.close()
   
@@ -129,7 +137,7 @@ def getKeyAndAuth():
   '''
   Returns the proper authentication.  Relies on the keys stored in KEY_PATH.
   '''
-  keyFile = open(KEY_PATH, 'r')
+  keyFile = open(KEY_PATH, 'rt')
   consumer_key = keyFile.readline().strip()
   consumer_secret = keyFile.readline().strip()
   keyFile.close()
@@ -186,7 +194,7 @@ class NetSampler:
                    (NetSampler.followerOutRe.match(f) or NetSampler.friendOutRe.match(f))]
     collected = set()
     for p in outputFiles:
-      f = open(p)
+      f = open(p, 'rt')
       for ln in f:
         flds = ln.strip().split()
         if len(flds) > 1:
@@ -195,7 +203,7 @@ class NetSampler:
     return collected
   
   def _getUsernames(self, userPath):
-    userFile = open(userPath, 'r')
+    userFile = open(userPath, 'rt')
     usernames = [line.strip().replace('@', '')
                  for line in userFile if line.strip()]
     userFile.close()
@@ -295,8 +303,8 @@ class NetSampler:
         #  continue
         
         try:
-          #self._collectIds(self.api.friends_ids,
-          #                 username, self.friendOutFile)
+          self._collectIds(self.api.friends_ids,
+                           username, self.friendOutFile)
           self._collectIds(self.api.followers_ids,
                            username, self.followerOutFile)
           self.limit = self.api.rate_limit_status()
@@ -353,10 +361,12 @@ class TermListener (StreamListener):
   def _dumpTweets(self):
     print((getTimeString(), 'Number of tweets:', self.i))
     currTime = getTimeString()
-    pickleFile = gzip.open(os.path.join(OUT_DIR, '%s_to_%s.pickle.gz' %
-                          (self.startTime, currTime)), 'wb')
-    pickle.dump(self.tweets, pickleFile)
-    pickleFile.close()
+    with gzip.open(os.path.join(OUT_DIR,
+                                        '{}_to_{}.json.gz'.format(
+                                          self.startTime, currTime
+                                        )), 'wt') as out_file:
+      for t in self.tweets:
+        out_file.write(json.dumps(t._json) + '\n')
     
     self.startTime = currTime
     self.time = time.time()
@@ -372,6 +382,13 @@ def getIds(usernamePath):
   f.close()
   
   return [(o.screen_name, o.name, i) for i, o in getUserData(users)]
+
+def writeIds(username_path, out_path):
+  ret_list = getIds(username_path)
+  
+  outFile = open(out_path, 'wt')
+  outFile.write('\n'.join(['{}\t{}\t{}'.format(*vs) for vs in userIds]))
+  outFile.close()
 
 def _mkBunches(xs, step=100):
   bunches = []
@@ -456,7 +473,7 @@ def getUserData(users):
   return userInfo
 
 def kwSearch(kwPath, since_id):
-  kwFile = open(kwPath, 'r')
+  kwFile = open(kwPath, 'rt')
   kws = [line.strip().replace('@', '') for line in kwFile if line.strip()]
   kwFile.close()
   
@@ -489,9 +506,12 @@ def kwSearch(kwPath, since_id):
       except Exception as ex:
         print(ex)
         break
-    outFile = gzip.open(os.path.join(OUT_DIR, kw + '.pickle.gz'), 'wb')
-    pickle.dump(kwResults, outFile)
-    outFile.close()
+
+    
+    with gzip.open(os.path.join(OUT_DIR,
+                                '{}.json.gz'.format(kw)), 'wt') as out_file:
+      for t in kwResults:
+        out_file.write(json.dumps(t._json).strip() + '\n')
 
 class Collect:
   '''
@@ -512,7 +532,7 @@ class Collect:
     currentPercentage = 0
     total = len(totalUsers)
     
-    maxBatchedUsers = 500
+    maxBatchedUsers = 50
     
     batchedStatuses = []
     
@@ -598,23 +618,34 @@ class Collect:
         except Exception as e:
           print(e)
           zzz(2*SNOOZE)
-      
-      batchedStatuses += userAllStatuses
-      if (i % maxBatchedUsers) == 0:
-        outFile = gzip.open(os.path.join(OUT_DIR,
-                                         '%s_%s_statuses.pickle.gz' % (start_user, user)), 'wb')
-        pickle.dump(batchedStatuses, outFile)
-        outFile.close()
-        print('%s to %s\tdumped\n' % (start_user, user))
         
-        start_user = None
-        batchedStatuses = []
-    
-    outFile = gzip.open(os.path.join(OUT_DIR, '%s_%s_statuses.pickle.gz' %
-                                     (start_user, user)), 'wb')
-    pickle.dump(batchedStatuses, outFile)
-    outFile.close()
-    print('%s to %s\tdumped\n' % (start_user, user))
+        batchedStatuses += userAllStatuses
+        if (i % maxBatchedUsers) == 0:
+          with gzip.open(os.path.join(OUT_DIR,
+                                      '{}_to_{}.{}.statuses.json.gz'.format(start_user, user, getTimeString())),
+                         'wt') as out_file:
+            curr_time = time.time()
+            for t in batchedStatuses:
+              tdict = t._json
+              tdict['collected_at_unix_timestamp'] = curr_time
+              out_file.write(json.dumps(tdict).strip() + '\n')
+          
+          print('%s to %s\tdumped\n' % (start_user, user))
+          
+          start_user = user
+          batchedStatuses = []
+        
+      with gzip.open(os.path.join(OUT_DIR,
+                                  '{}_to_{}.{}.statuses.json.gz'.format(start_user,
+                                                                        user, getTimeString())), 'wt') as out_file:
+        curr_time = time.time()
+        for t in batchedStatuses:
+          tdict = t._json
+          tdict['collected_at_unix_timestamp'] = curr_time
+          out_file.write(json.dumps(tdict).strip() + '\n')
+        
+        print('%s to %s\tdumped\n' % (start_user, user))
+        start_user = user
 
 class KeywordStreamer:
   '''
@@ -662,57 +693,56 @@ class KeywordStreamer:
         zzz(SNOOZE)
         goForIt = True
 
-def getStatuses(statusIdPath):
+def getStatuses(statusIdPath, retrieve_by_batch=True):
   '''
   Retrieve hydrated tweets from tweet ID.
   '''
   
-  idFile = open(statusIdPath, 'r')
+  idFile = open(statusIdPath, 'rt')
   ids = [int(line.strip()) for line in idFile if line.strip()]
   idFile.close()
   
   api = API(getKeyAndAuth(), api_root='/1.1')
   
-  batch = []
-  
-  for statusId in ids:
-    
-    try:
-      status = api.get_status(statusId)
-    except Exception as e:
-      print('Error getting ID %d -- ' % (statusId), e)
-      batch.append((statusId, str(e)))
-      zzz(SNOOZE)
+  with gzip.open(os.path.join(OUT_DIR, 'statuses.{}_{}.json.gz'.format(ids[0],
+                                                                       ids[1])),
+                 'wt') as out_file:
+    if retrieve_by_batch:
+      id_batches = [ids[idx:(idx+100)] for idx
+                    in range(0, len(ids)+100, 100) if idx < len(ids)]
       
-      continue
-    
-    batch.append(status)
-    
-    print('Grabbed status ID: %d' % (statusId))
-    #print batch[-1]
-    
-    if len(batch) >= 10:
-      outFile = gzip.open(os.path.join(OUT_DIR,
-                                       '%d.pickle.gz' % (statusId)), 'w')
-      pickle.dump(batch, outFile)
-      outFile.close()
-      
-      batch = []
-    
-    zzz(SNOOZE)
-  
-  if batch:
-    outFile = gzip.open(os.path.join(OUT_DIR,
-                                     '%d.pickle.gz' % (statusId)), 'w')
-    pickle.dump(batch, outFile)
-    outFile.close()
+      for ids in id_batches:
+        sobjs = api.statuses_lookup(ids)
+        for o in sobjs:
+          out_file.write(json.dumps(o._json), 'wt')
+        
+        print('Grabbed ids {} to {} -- {} found'.format(ids[0],
+                                                        ids[1],
+                                                        len(sobjs)))
+        zzz(SNOOZE)
+    else:
+      for statusId in ids:
+        try:
+          status = api.get_status(statusId)
+        except Exception as e:
+          print('Error getting ID %d -- ' % (statusId), e)
+          
+          out_file.write(json.dumps({'error':str(e),
+                                     'id':statusId}).strip() + '\n')
+          zzz(SNOOZE)
+        
+          continue
+        
+        out_file.write(json.dumps({'error':str(e),
+                                   'id':statusId}).strip() + '\n')
+        zzz(SNOOZE)
 
 def getRTs(statusIdPath):
   '''
   Runs through a list of status IDs and grabs up to 100 of their RTs.
   '''
   
-  idFile = open(statusIdPath, 'r')
+  idFile = open(statusIdPath, 'rt')
   ids = [int(line.strip()) for line in idFile if line.strip()]
   idFile.close()
   
@@ -724,16 +754,16 @@ def getRTs(statusIdPath):
     gotIt = False
     while not gotIt:
       try:
-        if os.path.exists(os.path.join(OUT_DIR, '%d.pickle.gz' % (statusId))):
+        if os.path.exists(os.path.join(OUT_DIR, '%d.rts.json.gz' % (statusId))):
           gotIt = True
           continue
         
         rts = api.retweets(id=statusId, count=100)
         gotIt = True
-        outFile = gzip.open(os.path.join(OUT_DIR,
-                                         '%d.pickle.gz' % (statusId)), 'wb')
-        pickle.dump(rts, outFile)
-        outFile.close()
+        with gzip.open(os.path.join(OUT_DIR,
+                                         '%d.rts.json.gz' % (statusId)), 'wt') as out_file:
+          for rt in rts:
+            out_file.write(json.dumps(rt._json).strip() + '\n')
         print(getTimeString(), ': %d RTs for %d' % (len(rts), statusId))
       except Exception as e:
         if (('reason' in e.__dict__) and
@@ -745,6 +775,11 @@ def getRTs(statusIdPath):
         else:
           print(e)
           print('Cannot find:', statusId)
+          with gzip.open(os.path.join(OUT_DIR,
+                                      '%d.rts.json.gz' % (statusId)), 'wt') as out_file:
+            out_file.write(json.dumps({'id':statusId, 'error':str(e)}).strip()
+                           + '\n')
+          
           gotIt = True
       zzz(SNOOZE)
 
@@ -783,9 +818,9 @@ def getGeoLocations(geoQueryPath):
           zzz(SNOOZE)
           continue
         
-        outFile = open(os.path.join(OUT_DIR, '%f.%f.pickle' % (lat, lng)), 'w')
-        pickle.dump(places, outFile)
-        outFile.close()
+        with open(os.path.join(OUT_DIR, '%f.%f.json' % (lat, lng)), 'w') as out_file:
+          for p in places:
+            out_file.write(json.dumps(p._json).strip() + '\n')
         
         notFinished = False
         
@@ -794,7 +829,7 @@ def getGeoLocations(geoQueryPath):
   else:
     for q in queries:
       notFinished = True
-      outPath = os.path.join(OUT_DIR, '%s.pickle' %
+      outPath = os.path.join(OUT_DIR, '%s.json' %
                              (q.lower().replace(',', '_')
                                        .replace('"', '')
                                        .replace('/', '_')))
@@ -810,9 +845,9 @@ def getGeoLocations(geoQueryPath):
           zzz(SNOOZE)
           continue
         
-        outFile = open(outPath, 'w')
-        pickle.dump(places, outFile)
-        outFile.close()
+        with open(outPath, 'wt') as out_file:
+          for p in places:
+            out_file.write(json.dumps(p._json).strip() + '\n')
         
         notFinished = False
         print('Wrote out <%s>' % (q))
@@ -823,153 +858,142 @@ def _parseLocString(locStr):
   assert (len(latLongs) % 4 == 0) and (len(latLongs) > 0)
   return [float(v) for v in latLongs]
 
+def collect_user_information(args):
+  usernameFile = open(args.kwPath, 'rt')
+  users = [line.strip().replace('@', '') for line in usernameFile
+           if line.strip()]
+  usernameFile.close()
+  
+  bunches = _mkBunches(users)
+  
+  todo = True
+  while todo or args.iter:
+    todo = False
+    for bunch in bunches:
+      infos = getUserData(bunch)
+      
+      with gzip.open(os.path.join(OUT_DIR,
+                                  'userInfo_{}_to_{}.{}.json.gz'.format(
+                                    bunch[0], bunch[-1], getTimeString())),
+                     'wt') as out_file:
+        
+        for uid, uobj in infos:
+          user_dict = uobj._json
+          user_dict['collected_at_unix_timestamp'] = time.time()
+          out_file.write(json.dumps(user_dict).strip() + '\n')
+    if args.iter:
+      zzz(ITER_SNOOZE)
+
+def branch_on_method(args):
+  global SNOOZE
+  
+  api = API(getKeyAndAuth())
+  limit = api.rate_limit_status()
+
+  optimal_snooze = get_snooze_from_method(args.method, limit['resources'])
+  print('Setting snooze time to {}'.format(optimal_snooze))
+  SNOOZE = optimal_snooze
+  
+  if args.method in {'keyword_stream', 'user_stream'}:
+    streamer = KeywordStreamer(args.kwPath)
+    streamer.streamTweets( args.method == 'keyword_stream' )
+  elif args.method == 'network_sample':
+    netSampler = NetSampler(args.kwPath, iterate=args.iter)
+    netSampler.sampleNetwork()
+  elif args.method == 'get_user_ids':
+    out_path = os.path.join(OUT_DIR, 'user_ids.txt')
+    idx = 1
+    while os.path.exists(out_path):
+      out_path = os.path.join(OUT_DIR, 'user_ids.{}.txt'.format(idx))
+    
+    writeIds(args.kwPath, out_path)
+  elif args.method == 'get_user_information':
+    collect_user_information(args)
+  elif args.method == 'tweet_keyword_search':
+    if not args.sinceId:
+      print('Must input "since status ID" when searching.')
+    else:
+      kwSearch(args.kwPath, args.sinceId)
+  elif args.method == 'user_timeline':
+    statusCollecter = Collect()
+    statusCollecter.getPastTweets()
+  elif args.method == 'get_retweets':
+    getRTs(args.kwPath)
+  elif args.method == 'hydrate_tweets':
+    getStatuses(args.kwPath)
+  elif args.method == 'tweet_geo_search':
+    getGeoLocations(args.kwPath)
+
 if __name__ == '__main__':
-  parser = OptionParser()
-  parser.add_option('--keypath', dest='keyPath',
+  parser = argparse.ArgumentParser(description='Pull Twitter data')
+  parser.add_argument('method', metavar='METHOD', choices=METHOD_NAMES,
+                      help='function to call')
+  parser.add_argument('--keypath', dest='keyPath',
                     help='specifies KEY_PATH, containing the consumer' +
-                         ' key and secret to use', metavar='KEY_PATH')
-  parser.add_option('-a', '--accesstoken', dest='accessToken',
+                         ' key and secret to use', metavar='KEY_PATH',
+                    required=True)
+  parser.add_argument('-a', '--accesstoken', dest='accessToken',
                     help='specifies ACCESS_TOKEN_PATH, the file where' +
                          ' the access token will be saved/used in the future.',
-                         metavar='ACCESS_TOKEN_PATH')
-  parser.add_option('--sinceid', dest='sinceId',
+                    metavar='ACCESS_TOKEN_PATH',
+                    required=True)
+  parser.add_argument('--sinceid', dest='sinceId', type=int,
                     help='used when searching for tweets with keywords.  The' +
                          ' minimum status ID to start searching from.',
                     metavar='SINCE_ID')
-  parser.add_option('--kwpath', dest='kwPath',
+  parser.add_argument('--kwpath', dest='kwPath',
                     help='specifies KW_PATH, containing all the terms/users' +
-                         ' to search for.', metavar='KW_PATH')
-  parser.add_option('-o', '--outdir', dest='outDir',
+                         ' to search for.', metavar='KW_PATH', required=True)
+  parser.add_argument('-o', '--outdir', dest='outDir',
                     help='specifies the OUT_DIR where files will be dumped',
-                    metavar='OUT_DIR')
-  parser.add_option('--numtocache', dest='numToCache', type='int', default=100,
+                    metavar='OUT_DIR', required=True)
+  parser.add_argument('--numtocache', dest='numToCache', type=int, default=100,
                     help='when streaming tweets, will wait for NUM_TO_CACHE' +
                          ' messages before writing to disk.  When collecting' +
                          ' past user tweets, will find up to NUM_TO_CACHE' +
                          ' most recent tweets.',
                     metavar='NUM_TO_CACHE')
-  parser.add_option('--iter', dest='iter', action='store_true', default=False,
+  parser.add_argument('--iter', dest='iter', action='store_true', default=False,
                     help='this flag causes the script to continuously sample' +
                     ' data when grabbing user information or networks.')
-  parser.add_option('-l', '--location', dest='location',
+  parser.add_argument('-l', '--location', dest='location',
                     help='a comma-separated list of four lat-long floats.' +
                          '  This retrieves tweets from these' +
                          ' geo-coded regions. Specify the SW point first.',
                     metavar='LOCATION')
-  parser.add_option('-k', '--kwstream', action='store_true',
-                    dest='kw_search', default=False,
-                    help='search for tweets mentioning a keyword')
-  parser.add_option('-u', '--userfollow', action='store_true',
-                    dest='user_follow', default=False,
-                    help='follow a set of users')
-  parser.add_option('-n', '--netsample', action='store_true',
-                    dest='net_sample', default=False,
-                    help='sample networks for a collection of users')
-  parser.add_option('-g', '--getids', action='store_true',
-                    dest='get_ids', default=False,
-                    help='gets and dumps the IDs for a list of usernames')
-  parser.add_option('-i', '--info', action='store_true', dest='get_info',
-                    default=False,
-                    help='gets and dumps the user info for a list of users')
-  parser.add_option('-s', '--search', action='store_true', dest='search_kws',
-                    default=False,
-                    help='''searches for tweets containing keywords.  Must
-                            be used in conjunction with --sinceid.
-                         ''')
-  parser.add_option('-p', '--pasttweets', action='store_true',
-                           dest='retrieve_user_timeline', default=False,
-                           help='gets and dumps all tweets ' + 
-                                   'made by a list of users')
-  parser.add_option('-r', '--retweets', action='store_true',
-                    dest='retrieve_retweets', default=False,
-                    help='gets and dumps all retweets for a list of ' +
-                         'status IDs')
-  parser.add_option('--statuses', action='store_true',
-                    dest='retrieve_statuses', default=False,
-                    help='gets actual statuses for a set of IDs')
-  parser.add_option('--geosearch', action='store_true',
-                    dest='geo_search', default=False,
-                    help='Gets locations from query string')
-  (options, args) = parser.parse_args()
+  parser.add_argument('--snooze',
+                    dest='snooze', default=SNOOZE, type=int,
+                    help='Seconds to wait between API calls.')
+  parser.add_argument('--itersnooze', type=int,
+                    dest='itersnooze', default=ITER_SNOOZE,
+                    help='Seconds to wait between iterations over users (tracking network/user information)')
+  args = parser.parse_args()
   
-  if options.keyPath:
-    KEY_PATH = options.keyPath
-  if options.accessToken:
-    ACCESS_TOKEN_PATH = options.accessToken
-  if options.kwPath:
-    KW_PATH = options.kwPath
-  if options.outDir:
-    OUT_DIR = options.outDir
-  if options.numToCache:
-    NUM_TO_CACHE = int(options.numToCache)
-  if options.location:
-    LOCATIONS = _parseLocString(options.location)
+  if args.keyPath:
+    KEY_PATH = args.keyPath
+  if args.accessToken:
+    ACCESS_TOKEN_PATH = args.accessToken
+  if args.kwPath:
+    KW_PATH = args.kwPath
+  if args.outDir:
+    OUT_DIR = args.outDir
+  if args.numToCache:
+    NUM_TO_CACHE = int(args.numToCache)
+  if args.location:
+    LOCATIONS = _parseLocString(args.location)
+
+  SNOOZE = args.snooze
+  ITER_SNOOZE = args.itersnooze
   
-  try:
+  if not os.path.exists(OUT_DIR):
     os.mkdir(OUT_DIR)
-  except:
-    pass
   
   try:
-    if options.net_sample:
-      netSampler = NetSampler(KW_PATH, iterate=options.iter)
-      netSampler.sampleNetwork()
-    elif options.user_follow:
-      streamer = KeywordStreamer(KW_PATH)
-      streamer.streamTweets(False)
-    elif options.kw_search:
-      streamer = KeywordStreamer(KW_PATH)
-      streamer.streamTweets(True)
-    elif options.get_ids:
-      userIds = getIds(KW_PATH)
-      
-      #import pdb; pdb.set_trace()
-      outFile = open(os.path.join(OUT_DIR, 'user_ids.txt'), 'w')
-      outFile.write('\n'.join(['\t'.join([str(v) for v in p])
-                                          for p in userIds]))
-      outFile.close()
-    elif options.get_info:
-      usernameFile = open(KW_PATH, 'r')
-      users = [line.strip().replace('@', '') for line in usernameFile
-                                                  if line.strip()]
-      usernameFile.close()
-      
-      bunches = _mkBunches(users)
-      
-      todo = True
-      while todo or options.iter:
-        todo = False
-        for bunch in bunches:
-          infos = getUserData(bunch)
-          
-          outFile = gzip.open(os.path.join(OUT_DIR,
-                         'userInfo_%s_to_%s_%s.pickle.gz' %
-                         (bunch[0], bunch[-1], getTimeString())), 'wb')
-          pickle.dump([i for u, i in infos], outFile)
-          outFile.close()
-        if options.iter:
-          zzz(ITER_SNOOZE)
-    elif options.search_kws:
-      if not options.sinceId:
-        print('Must input "since status ID" when searching.')
-      else:
-        kwSearch(KW_PATH, int(options.sinceId))
-    elif options.retrieve_user_timeline:
-      statusCollecter = Collect()
-      statusCollecter.getPastTweets()
-    elif options.retrieve_retweets:
-      getRTs(KW_PATH)
-    elif options.retrieve_statuses:
-      getStatuses(KW_PATH)
-    elif options.geo_search:
-      getGeoLocations(KW_PATH)
-    else:
-      print('Need to at least pass -k, -u, -g, -p, -i, -s, -r, or -n.\n \
-             Call with --help for list of options')
+    branch_on_method(args)
   except Exception as ex:
-      try:
-        tb = str(traceback.format_exc())
-      except:
-        tb = ''
-      emailAlert('%s\n%s\n%s\n\n' % (str(sys.exc_info()), tb, str(ex)))
+    try:
+      tb = str(traceback.format_exc())
+    except:
+      tb = ''
+    emailAlert('%s\n%s\n%s\n\n' % (str(sys.exc_info()), tb, str(ex)))
   
