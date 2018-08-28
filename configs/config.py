@@ -22,6 +22,9 @@ def add_descriptive_stats_flag(parser):
     parser.add_argument("--stats", help="calculate helpful stats such as counts and write to file", action="store_true")
     return parser
 
+def add_occupation_mode(parser):
+    parser.add_argument("--om", help='select which occupation section', choices=['SEED_OCCUPATIONS', 'BLOGGER_ONLY'])
+    return parser
 
 def configparser_for_file(filename):
     """

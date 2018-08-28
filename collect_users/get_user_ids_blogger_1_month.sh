@@ -11,7 +11,7 @@
 
 source activate /home/hltcoe/acarrell/.conda/envs/py3
 
-TWITTER_PATH=$one
-OUT_DIR=$two
+TWITTER_PATH=/twitter/current/sample/2018/07/
+OUT_DIR=/exp/acarrell/twitter_brand/blogger_1_month/
 
-python get_user_ids.py ${TWITTER_PATH} ${OUT_DIR} --stats
+python get_user_ids.py ${TWITTER_PATH} ${OUT_DIR} --stats --om BLOGGER_ONLY

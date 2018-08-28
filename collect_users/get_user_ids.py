@@ -23,8 +23,9 @@ def get_user_ids_from_input(in_dir, occupations, args):
     occupations_ids = defaultdict(set)
     occupations_counts = defaultdict(int)
     occupations_desc = defaultdict(set)
+    occupations_json = defaultdict(set)
 
-    user_p = re.compile(r'"user":.*?\{(.+?)\}',re.S)
+    user_p = re.compile(r'("user":.*?\{.+?\})',re.S)
     desc_p = re.compile(r'"description":.*?"(.+?)"', re.S)
     id_p = re.compile(r'"id_str":.*?"(.+?)"', re.S)
 
@@ -57,16 +58,17 @@ def get_user_ids_from_input(in_dir, occupations, args):
                                                 if args.stats:
                                                     if count % 5 == 0:
                                                         occupations_desc[occupation].add(user_description_lower)
+                                                        occupations_json[occupation].add(user)
                             except ijson.common.IncompleteJSONError as e:
                                 pass
                 except (IOError, EOFError, Exception) as e:
                     logging.info(e)
     for occupation in occupations:
         occupations_counts[occupation] = len(occupations_ids[occupation])
-    return occupations_ids, occupations_counts, occupations_desc
+    return occupations_ids, occupations_counts, occupations_desc, occupations_json
 
 
-def write_user_ids_to_out(out_dir, occupations_ids, occupations_counts, occupations_desc, args):
+def write_user_ids_to_out(out_dir, occupations_ids, occupations_counts, occupations_desc, occupations_json, args):
     counts_fn = out_dir + 'counts.txt'
     counts_file = open(counts_fn, 'a+')
 
@@ -87,6 +89,13 @@ def write_user_ids_to_out(out_dir, occupations_ids, occupations_counts, occupati
                 for description in desc:
                     f.write(description + "\n")
 
+            jsons = occupations_json[occupation]
+
+            json_file = out_dir + occupation + '_json.txt'
+            with open(json_file, 'a+') as f:
+                for json in jsons:
+                    f.write(json + "\n")
+
             counts_file.write(occupation + '\t' + str(occupations_counts[occupation]) + '\n')
 
     counts_file.close()
@@ -101,15 +110,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser = add_input_output_args(parser)
     parser = add_descriptive_stats_flag(parser)
+    parser = add_occupation_mode(parser)
 
     args = parser.parse_args()
-    # todo: generalize by adding mode arg
-    occupation_section = 'SEED_OCCUPATIONS'
+
 
     config = configparser_for_file('collect_users.ini')
 
     in_dir = args.input
     out_dir = args.output
+    occupation_section = args.om
 
     logging.info('-' * 20)
     logging.info("sending data to: " + out_dir)
@@ -117,9 +127,9 @@ if __name__ == '__main__':
     occupations_by_sector = occupations_by_sector(config, occupation_section)
     occupations = all_occupations(occupations_by_sector)
 
-    occupations_ids, occupations_counts, occupations_desc = get_user_ids_from_input(in_dir, occupations, args)
+    occupations_ids, occupations_counts, occupations_desc, occupations_json = get_user_ids_from_input(in_dir, occupations, args)
 
     logging.info('-' * 20)
     logging.info("writing " + str(len(occupations_ids)) + " ids")
 
-    write_user_ids_to_out(out_dir, occupations_ids, occupations_counts, occupations_desc, args)
+    write_user_ids_to_out(out_dir, occupations_ids, occupations_counts, occupations_desc, occupations_json, args)
