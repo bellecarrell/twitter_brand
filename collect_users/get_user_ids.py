@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 import gzip
-import io
 import logging
 import sys
+
 sys.path.append('/home/hltcoe/acarrell/PycharmProjects/twitter_brand/')
 import ijson
 import re
 from configs.config import *
+import time
 
 logging.basicConfig(level=logging.INFO)
 
@@ -25,9 +26,10 @@ def get_user_ids_from_input(in_dir, occupations, args):
     occupations_desc = defaultdict(set)
     occupations_json = defaultdict(set)
 
-    user_p = re.compile(r'("user":.*?\{.+?\})',re.S)
+    user_p = re.compile(r'"user":.*?(\{.+?\})', re.S)
     desc_p = re.compile(r'"description":.*?"(.+?)"', re.S)
     id_p = re.compile(r'"id_str":.*?"(.+?)"', re.S)
+    createdat_p = re.compile(r'"created_at":.*?"(.+?)"', re.S)
 
     for dirpath, _, filenames in os.walk(in_dir):
         for filename in filenames:
@@ -38,27 +40,26 @@ def get_user_ids_from_input(in_dir, occupations, args):
                         # Use a new parser for each line
                         if line:
                             try:
-                                #users = ijson.items(line_as_file, 'user')
                                 users = user_p.findall(line)
                                 for user in users:
 
                                     desc = re.findall(desc_p, user)
                                     user_id = re.findall(id_p, user)
+                                    created_at = re.findall(createdat_p, user)
+                                    date2017 = time.strptime('2017-01-01', '%Y-%m-%d') < time.strptime(created_at,
+                                                                                                       '%a %b %d %H:%M:%S +0000 %Y')
 
-                                    #if user['description']:
-                                    if len(desc) > 0 and len(user_id) > 0:
-                                        #user_description_lower = user['description'].lower()
+                                    if len(desc) > 0 and len(
+                                            user_id) > 0:
                                         user_description_lower = desc[0].lower()
                                         user_id = user_id[0]
                                         for occupation in occupations:
-                                            if occupation in user_description_lower:
-                                                #user_id = str(user['id'])
-                                                count +=1
+                                            if occupation in user_description_lower and date2017:
+                                                count += 1
                                                 occupations_ids[occupation].add(user_id)
                                                 if args.stats:
-                                                    if count % 5 == 0:
-                                                        occupations_desc[occupation].add(user_description_lower)
-                                                        occupations_json[occupation].add(user)
+                                                    occupations_desc[occupation].add(user_description_lower)
+                                                    occupations_json[occupation].add(user)
                             except ijson.common.IncompleteJSONError as e:
                                 pass
                 except (IOError, EOFError, Exception) as e:
@@ -103,7 +104,7 @@ def write_user_ids_to_out(out_dir, occupations_ids, occupations_counts, occupati
 
 if __name__ == '__main__':
     """
-    Gets IDs of users who self-describe as any of
+    Gets IDs, descriptions, and JSON of users who self-describe as any of
     the occupations listed in the config file.
     """
 
@@ -113,7 +114,6 @@ if __name__ == '__main__':
     parser = add_occupation_mode(parser)
 
     args = parser.parse_args()
-
 
     config = configparser_for_file('collect_users.ini')
 
@@ -127,7 +127,8 @@ if __name__ == '__main__':
     occupations_by_sector = occupations_by_sector(config, occupation_section)
     occupations = all_occupations(occupations_by_sector)
 
-    occupations_ids, occupations_counts, occupations_desc, occupations_json = get_user_ids_from_input(in_dir, occupations, args)
+    occupations_ids, occupations_counts, occupations_desc, occupations_json = get_user_ids_from_input(in_dir,
+                                                                                                      occupations, args)
 
     logging.info('-' * 20)
     logging.info("writing " + str(len(occupations_ids)) + " ids")

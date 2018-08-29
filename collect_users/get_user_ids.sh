@@ -14,4 +14,4 @@ source activate /home/hltcoe/acarrell/.conda/envs/py3
 TWITTER_PATH=$one
 OUT_DIR=$two
 
-python get_user_ids.py ${TWITTER_PATH} ${OUT_DIR} --stats
+python get_user_ids.py ${TWITTER_PATH} ${OUT_DIR} --stats --om BLOGGER_ONLY
