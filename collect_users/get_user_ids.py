@@ -46,6 +46,7 @@ def get_user_ids_from_input(in_dir, occupations, args):
                                     desc = re.findall(desc_p, user)
                                     user_id = re.findall(id_p, user)
                                     created_at = re.findall(createdat_p, user)
+                                    created_at = created_at[0]
                                     date2017 = time.strptime('2017-01-01', '%Y-%m-%d') < time.strptime(created_at,
                                                                                                        '%a %b %d %H:%M:%S +0000 %Y')
 
@@ -53,6 +54,7 @@ def get_user_ids_from_input(in_dir, occupations, args):
                                             user_id) > 0:
                                         user_description_lower = desc[0].lower()
                                         user_id = user_id[0]
+
                                         for occupation in occupations:
                                             if occupation in user_description_lower and date2017:
                                                 count += 1
