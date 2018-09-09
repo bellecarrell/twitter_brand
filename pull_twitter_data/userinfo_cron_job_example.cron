@@ -1,0 +1,3 @@
+MAILTO="belle.carrell@gmail.com"
+0 0-23/6 * * * sh /home/hltcoe/acarrell/PycharmProjects/twitter_brand/pull_twitter_data/pull_brand_data.sh userinfo >/dev/null 2>&1
+0 0 0 * * sh /home/hltcoe/acarrell/PycharmProjects/twitter_brand/pull_twitter_data/pull_brand_data.sh pasttweets >/dev/null 2>&1
