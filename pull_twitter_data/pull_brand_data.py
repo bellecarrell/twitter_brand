@@ -99,6 +99,9 @@ def pull_data(kw_path, job_dir, method):
     raise Exception('Do not recognize method "{}"'.format(method))
 
 for p in os.listdir(BRAND_USER_DIR):
+  if not p.endswith('.txt'):
+    continue
+  
   m = brand_user_re.match(p)
   if m:
     job = m.group('job')
