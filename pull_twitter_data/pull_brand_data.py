@@ -11,8 +11,8 @@ import argparse
 import os, random, re, time
 from multiprocessing import Process
 
-#TOP_DIR = '/exp/abenton/twitter_brand_data/'
-TOP_DIR = '/exp/acarrell/twitter_brand/user_infos/'
+TOP_DIR = '/exp/abenton/twitter_brand_data/'
+#TOP_DIR = '/exp/acarrell/twitter_brand/user_infos/'
 #if not os.path.exists(TOP_DIR): os.mkdir(TOP_DIR)
 
 KEY = 'dl1'
