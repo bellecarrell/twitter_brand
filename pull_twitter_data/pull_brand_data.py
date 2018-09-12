@@ -119,13 +119,4 @@ for p in os.listdir(BRAND_USER_DIR):
   job_dir = make_dirs(job)
   pull_data(os.path.join(BRAND_USER_DIR, p), job_dir, args.method)
   print('Finished pulling data for "{}" users'.format(job))
-
-for i, p in enumerate(ps):
-  print(i)
-  f = gzip.open(p, 'rt')
-  for ln in f:
-    t = json.loads(ln)
-    uset.add(t['user']['id'])
-  f.close()
-  print(len(uset))
   
