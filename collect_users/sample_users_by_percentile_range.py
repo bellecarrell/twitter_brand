@@ -10,8 +10,10 @@ import math
 import matplotlib as plt
 import random
 from utils.file_io import *
+import requests
 
 follower_count_p = re.compile(r'"followers_count":.*?(\d+)', re.S)
+id_p = re.compile(r'"id_str":.*?"(.+?)"', re.S)
 
 def read_user_json_file(in_dir):
     for dirpath, _, filenames in os.walk(in_dir):
@@ -53,16 +55,45 @@ def get_sample_users_by_percentile(user_json, percentiles, percentile_max, num_u
 
     for user in user_json:
         follower_count = follower_count_p.findall(user)
-        if follower_count:
+        id = id_p.findall(user)
+        active_user = False
+
+        if id:
+            id = id[0]
+            response = requests.get('https://twitter.com/intent/user?user_id=' + id)
+            if response.status_code == 200:
+                active_user = True
+
+        if follower_count and active_user:
             log_follower_count = math.log(int(follower_count[0]), 10) if int(follower_count[0]) > 0 else 0
             for i, percentile in enumerate(percentile_max):
                 if i > 0:
                     if percentiles[i-1] <= log_follower_count <= percentiles[i] and len(sample_users_by_percentile[percentile]) < num_users_per_interval:
-                        sample_users_by_percentile[percentile].add(user)
+                        id = id_p.findall(user)
+                        active_user = False
+
+                        if id:
+                            id = id[0]
+                            response = requests.get('https://twitter.com/intent/user?user_id=' + id)
+                            if response.status_code == 200:
+                                active_user = True
+
+                        if active_user:
+                            sample_users_by_percentile[percentile].add(user)
                         break
                 elif i == 0:
                     if log_follower_count <= percentiles[i] and len(sample_users_by_percentile[percentile]) < num_users_per_interval:
-                        sample_users_by_percentile[percentile].add(user)
+                        id = id_p.findall(user)
+                        active_user = False
+
+                        if id:
+                            id = id[0]
+                            response = requests.get('https://twitter.com/intent/user?user_id=' + id)
+                            if response.status_code == 200:
+                                active_user = True
+
+                        if active_user:
+                            sample_users_by_percentile[percentile].add(user)
                         break
 
     return sample_users_by_percentile
