@@ -19,8 +19,8 @@ KEY = 'dl1'
 KEY_PATH = '/exp/abenton/twitter_collection/keys/{}_keys.txt'.format(KEY)
 ACCESS_TOKEN_PATH = '/exp/abenton/twitter_collection/access_tokens/access_token_{}.txt'.format(KEY)
 
-BRAND_USER_DIR = '/exp/acarrell/twitter_brand/blogger_2018/agg_17/first_400_sample/ids/'
-#BRAND_USER_DIR = '/exp/acarrell/twitter_brand/blogger_2018/17_allids/'
+SAMPLE_USER_DIR = '/exp/acarrell/twitter_brand/blogger_2018/agg_17/first_400_sample/ids/'
+ALL_USER_DIR = '/exp/acarrell/twitter_brand/blogger_2018/17_allids/'
 
 brand_user_re = re.compile('(?P<job>\w+)\.users\.txt')
 
@@ -118,6 +118,9 @@ for p in os.listdir(BRAND_USER_DIR):
   args = parser.parse_args()
   
   job_dir = make_dirs(job)
-  pull_data(os.path.join(BRAND_USER_DIR, p), job_dir, args.method)
+  if args.method == 'userinfo':
+    pull_data(os.path.join(ALL_USER_DIR, p), job_dir, args.method)
+  elif args.method == 'pasttweets':
+    pull_data(os.path.join(SAMPLE_USER_DIR, p), job_dir, args.method)
   print('Finished pulling data for "{}" users'.format(job))
   
