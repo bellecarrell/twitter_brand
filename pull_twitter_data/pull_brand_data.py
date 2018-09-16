@@ -99,6 +99,19 @@ def pull_data(kw_path, job_dir, method):
   else:
     raise Exception('Do not recognize method "{}"'.format(method))
 
+parser = argparse.ArgumentParser(
+  description='Pull brand data, either user information or past tweets')
+parser.add_argument('method', metavar='METHOD', choices=['userinfo',
+                                                         'pasttweets'],
+                    help='type of data to collect, "pasttweets" should ' +
+                         'run much less frequently than user info')
+args = parser.parse_args()
+
+if args.method == 'userinfo':
+  BRAND_USER_DIR = ALL_USER_DIR
+elif args.method == 'pasttweets':
+  BRAND_USER_DIR = SAMPLE_USER_DIR
+
 for p in os.listdir(BRAND_USER_DIR):
   if not p.endswith('.txt'):
     continue
@@ -108,19 +121,7 @@ for p in os.listdir(BRAND_USER_DIR):
     job = m.group('job')
   else:
     continue
-  
-  parser = argparse.ArgumentParser(
-    description='Pull brand data, either user information or past tweets')
-  parser.add_argument('method', metavar='METHOD', choices=['userinfo',
-                                                           'pasttweets'],
-                      help='type of data to collect, "pasttweets" should ' +
-                           'run much less frequently than user info')
-  args = parser.parse_args()
-  
   job_dir = make_dirs(job)
-  if args.method == 'userinfo':
-    pull_data(os.path.join(ALL_USER_DIR, p), job_dir, args.method)
-  elif args.method == 'pasttweets':
-    pull_data(os.path.join(SAMPLE_USER_DIR, p), job_dir, args.method)
+  pull_data(os.path.join(BRAND_USER_DIR, p), job_dir, args.method)
   print('Finished pulling data for "{}" users'.format(job))
   
