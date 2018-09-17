@@ -1,0 +1,159 @@
+<script language="Javascript">
+
+<!--
+function enable(id) {
+  var elts = document.getElementById(id).getElementsByTagName("*");
+  for (var i=0; i < elts.length; i++) {
+    elts[i].disabled=false;
+  }
+  document.getElementById(id).style.opacity="1.0";
+  document.getElementById(id).style.filter="alpha(opacity=100)";
+}
+
+function disable(id) {
+  var elts = document.getElementById(id).getElementsByTagName("*");
+  for (var i=0; i < elts.length; i++) {
+    elts[i].disabled=true;
+  }
+  document.getElementById(id).style.opacity="0.3";
+  document.getElementById(id).style.filter="alpha(opacity=30)";
+}
+
+function expand(id) {
+  var elt = document.getElementById(id);
+  if (elt) elt.style.display = "inline";
+}
+
+function collapse(id) {
+  var elt = document.getElementById(id);
+  if (elt) elt.style.display = "none";
+}
+
+function link_clicked(id) {
+   var elt = document.getElementById(id);
+   elt.checked = true;
+}
+
+window.onload = function() {
+  document.getElementById('submitButton').setAttribute('onclick',
+    'return validateForm()');
+}
+
+function validateForm() {
+  var elt1 = document.getElementById('intruder1');
+  var elt2 = document.getElementById('intruder2');
+  var elt3 = document.getElementById('intruder3');
+  var elt4 = document.getElementById('intruder4');
+  var elt5 = document.getElementById('intruder5');
+  
+  if (elt1.checked || elt2.checked ||
+      elt3.checked || elt4.checked || elt5.checked) {
+    if (document.getElementById("cluster_label").value == '') {
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+  else {
+    return false;
+  }
+}
+// -->
+
+</script>
+<h1>Find the Twitter user that does not belong</h1>
+
+<p><a href="#" id="instructions-link" onclick="expand('instructions'); collapse('instructions-link'); return(false);">View Instructions</a></p>
+
+<div id="instructions" style="display: none">
+<!-- div id="instructions" -->
+<table cellpadding="10%">
+	<tbody>
+		<tr>
+			<td>
+			<h3>Find the Twitter User that does not belong and label what the others have in common&nbsp;&nbsp;</h3>
+			<br />
+      We are interested in understanding how Twitter users can be grouped together. What makes a sensible group, and how should we describe it? You will be shown links to summaries of five different Twitter user accounts. We want to find the user that is most <i>different</i> from the other four: who doesn't belong. Click on each link, get a sense of the user by looking at their profile and tweets.  Then answer two questions:</span>
+
+			<ul>
+				<li><span style="font-size:12.0pt;line-height:115%"><b>(1) Which user is the most different from the other four? </b> </span></li>
+				<li><span style="font-size:12.0pt;line-height:115%">and <b>(2) Describe in your own words, and as specifically as possible, what the other four users have in common. </b> </span></li>
+			</ul>
+			<span style="font-size:12.0pt;line-height:115%"> Below is an example: </span>
+
+			<ul>
+				<li><span style="font-size:12.0pt;line-height:115%"><a target="_blank" href="https://twitter.com/intent/user?user_id=342723392">User 1</a> </span></li>
+				<li><span style="font-size:12.0pt;line-height:115%"><a target="_blank" href="https://twitter.com/intent/user?user_id=719733944">User 2</a> </span></li>
+				<li><span style="font-size:12.0pt;line-height:115%"><a target="_blank" href="https://twitter.com/intent/user?user_id=510125138">User 3</a> </span></li>
+				<li><span style="font-size:12.0pt;line-height:115%"><a target="_blank" href="https://twitter.com/intent/user?user_id=139614245">User 4</a> </span></li>
+				<li><span style="font-size:12.0pt;line-height:115%"><a target="_blank" href="https://twitter.com/intent/user?user_id=371247165">User 5</a> </span></li>
+			</ul>
+			<span style="font-size:12.0pt;line-height:115%"> In this case, User 3 does not belong -- a Spanish tweeting Justin Bieber fan in a group of Indonesian users. A good label for this cluster would be: <i>Indonesian speakers, many who have following/unfollowing apps.</i> </span></td>
+
+      <span style="font-size:12.0pt;line-height:115%">
+      If a user's account is protected or has been removed, please try to do
+      your best in spite of this, and click the checkbox next to their link to
+      note that you can't view their account.
+      </span>
+      </td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<hr />
+
+<h2><b>(1) Select which Twitter user is the most different from the other four. </b></h2>
+
+<p>
+<table style="width:100%,text-align:center", border="1">
+  <tr>
+    <th> <b>Select which user does not belong</b> </th>
+    <th> <b>Link to Twitter profile</b> </th>
+    <th> <b>Mark if account is protected or removed</b> </th>
+  </tr>
+  <tr>
+    <td style="text-align:center"> <input id="intruder1" name="intruder_index" type="radio" value="0" style="transform:scale(1.5)" /> </td>
+    <td style="text-align:center"> <a target="_blank" href="https://twitter.com/intent/user?user_id=${user_id_1}"> User 1 ( ID: ${user_id_1} )</a> </td>
+    <td style="text-align:center"> <input id="deleted1" name="deleted1" type="checkbox" value="deleted" style="transform:scale(1.5)"/> </td>
+  </tr>
+  <tr>
+    <td style="text-align:center"> <input id="intruder2" name="intruder_index" type="radio" value="1" style="transform:scale(1.5)"/> </td>
+    <td style="text-align:center"> <a target="_blank" href="https://twitter.com/intent/user?user_id=${user_id_2}"> User 2 ( ID: ${user_id_2} )</a> </td>
+    <td style="text-align:center"> <input id="deleted2" name="deleted2" type="checkbox" value="deleted" style="transform:scale(1.5)"/> </td>
+  </tr>
+  <tr>
+    <td style="text-align:center"> <input id="intruder3" name="intruder_index" type="radio" value="2" style="transform:scale(1.5)"/> </td>
+    <td style="text-align:center"> <a target="_blank" href="https://twitter.com/intent/user?user_id=${user_id_3}"> User 3 ( ID: ${user_id_3} )</a> </td>
+    <td style="text-align:center"> <input id="deleted3" name="deleted3" type="checkbox" value="deleted" style="transform:scale(1.5)"/> </td>
+  </tr>
+  <tr>
+    <td style="text-align:center"> <input id="intruder4" name="intruder_index" type="radio" value="3" style="transform:scale(1.5)"/> </td>
+    <td style="text-align:center"> <a target="_blank" href="https://twitter.com/intent/user?user_id=${user_id_4}"> User 4 ( ID: ${user_id_4} )</a> </td>
+    <td style="text-align:center"> <input id="deleted4" name="deleted4" type="checkbox" value="deleted" style="transform:scale(1.5)"/> </td>
+  </tr>
+  <tr>
+    <td style="text-align:center"> <input id="intruder5" name="intruder_index" type="radio" value="4" style="transform:scale(1.5)"/> </td>
+    <td style="text-align:center"> <a target="_blank" href="https://twitter.com/intent/user?user_id=${user_id_5}"> User 5 ( ID: ${user_id_5} )</a> </td>
+    <td style="text-align:center"> <input id="deleted5" name="deleted5" type="checkbox" value="deleted" style="transform:scale(1.5)"/> </td>
+  </tr>
+</table>
+</p>
+
+<!--
+<p><br />
+<input id="intruder1" name="intruder_index" type="radio" value="1" /> <a _target="blank" href="https://twitter.com/intent/user?user_id=${user_id_1}"> User 1 (ID: ${user_id_1})</a> <input id="deleted1" name="deleted1" type="checkbox" value="deleted" /> <br />
+<input id="intruder2" name="intruder_index" type="radio" value="2" /> <a _target="blank" href="https://twitter.com/intent/user?user_id=${user_id_2}"> User 2 (ID: ${user_id_2})</a> <input id="deleted2" name="deleted2" type="checkbox" value="deleted" /><br />
+<input id="intruder3" name="intruder_index" type="radio" value="3" /> <a _target="blank" href="https://twitter.com/intent/user?user_id=${user_id_3}"> User 3 (ID: ${user_id_3})</a> <input id="deleted3" name="deleted3" type="checkbox" value="deleted" /><br />
+<input id="intruder4" name="intruder_index" type="radio" value="4" /> <a _target="blank" href="https://twitter.com/intent/user?user_id=${user_id_4}"> User 4 (ID: ${user_id_4})</a> <input id="deleted4" name="deleted4" type="checkbox" value="deleted" /><br />
+<input id="intruder5" name="intruder_index" type="radio" value="5" /> <a _target="blank" href="https://twitter.com/intent/user?user_id=${user_id_5}"> User 5 (ID: ${user_id_5})</a> <input id="deleted5" name="deleted5" type="checkbox" value="deleted" /></p>
+-->
+
+<br />
+<h2><b>(2) Describe as specifically as possible what the other four users have in common. <i>Give the best label for what these four users have in common, not just that they are different than the one that does not belong.</i></b></h2>
+
+<p><br />
+<textarea cols="80" id="cluster_label" name="cluster_label" rows="4"></textarea><input id="intruder_link_clicked1" name="intruder_link_clicked1" style="opacity:0; position:absolute; left:9999px; display:none; visibility:hidden;" type="checkbox" value="link_clicked" /> <input id="intruder_link_clicked2" name="intruder_link_clicked2" style="opacity:0; position:absolute; left:9999px; display:none; visibility:hidden;" type="checkbox" value="link_clicked" /> <input id="intruder_link_clicked3" name="intruder_link_clicked3" style="opacity:0; position:absolute; left:9999px; display:none; visibility:hidden;" type="checkbox" value="link_clicked" /> <input id="intruder_link_clicked4" name="intruder_link_clicked4" style="opacity:0; position:absolute; left:9999px; display:none; visibility:hidden;" type="checkbox" value="link_clicked" /> <input id="intruder_link_clicked5" name="intruder_link_clicked5" style="opacity:0; position:absolute; left:9999px; display:none; visibility:hidden;" type="checkbox" value="link_clicked" /></p>
+
+<p>&nbsp;</p>
