@@ -1,0 +1,789 @@
+<script language="Javascript">
+
+<!--
+function expand(id) {
+  var elt = document.getElementById(id);
+  if (elt) elt.style.display = "inline";
+  var elt = document.getElementById(id+"-link");
+  if (elt) elt.style.display = "none";
+}
+
+function toggleSection(button, section) {
+var element = document.getElementById(section);
+if (document.getElementById(button).checked == true) {
+  element.style.display = "inline";
+} else {
+  element.style.display = "none";
+}
+}
+
+function fadeSection(button, section, fieldset) {
+var element = document.getElementById(section);
+var fieldSetElt = document.getElementById(fieldset);
+if (document.getElementById(button).checked == true) {
+  //element.style.display = "";
+  fieldSetElt.disabled = false;
+  fieldSetElt.className = "activeClass";
+} else {
+  //element.style.display = "none";
+  fieldSetElt.disabled = true;
+  fieldSetElt.className = "fadedClass";
+}
+}
+
+//function fadeSection(button, section) {
+//var element = document.getElementById(section);
+//if (document.getElementById(button).checked == true) {
+//  element.style.display = "";
+//} else {
+//  element.style.display = "none";
+//}
+//}
+// -->
+</script>
+<p>
+<style type="text/css">.faded {
+    font-weight: normal;
+    color: #D3D3D3; }
+
+.fadedClass
+{
+    background-color: white;
+    filter:alpha(opacity=50); /* IE */
+    opacity: 0.5; /* Safari, Opera */
+    -moz-opacity:0.50; /* FireFox */
+    z-index: 20;
+}
+
+.activeClass
+{
+    background-color: white;
+    filter:alpha(opacity=100); /* IE */
+    opacity: 1.0; /* Safari, Opera */
+    -moz-opacity:1.00; /* FireFox */
+    z-index: 20;
+}
+</style>
+</p>
+
+<h1>Identifying Flu Vaccine Perceptions</h1>
+
+<h3>Label each tweet below with the author&#39;s perception of medical flu vaccines.</h3>
+
+<p><a href="#" id="instructions-link" onclick="expand('instructions'); return(false);">View Instructions</a></p>
+
+<div id="instructions" style="display: none">
+<div id="instructions" style.visibility="hidden" visibility="hidden">
+<h3>Instructions</h3>
+
+<table cellpadding="10%">
+	<tbody>
+		<tr>
+			<td>
+			<div id="instructions2">
+			<div id="instructions2">
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%">You will be asked a series of questions regarding each tweet. Some answers will result in follow up questions, which will be enabled based on your provided answers. Under each answer below, we provide several examples.</span></p>
+
+			<h4>Does this message talk about the influenza (flu)?</h4>
+			<i>Yes &mdash; this message talks about the virus influenza (flu). Messages should talk about the flu, and not just the flu shot. Answer the following questions.<br />
+			No &mdash; skip ahead to flu shot questions</i>
+
+			<h4>Does it talk about how severe the flu may be?</h4>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">Yes, this message says the flu is <u>mild</u>.</b></span><br />
+			&nbsp;</p>
+
+			<ul style="margin-top:0in" type="disc">
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">The flu is not that bad</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I wonder if this is this years flu but it&#39;s not that bad because I got the flu shot</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Each day is spent hoping I get the flu bad enough to stay home from work but not bad enough to where I can&#39;t enjoy video games</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">This year&#39;s flu isn&#39;t a bad flu and the symptoms are relatively mild. Stil, get a shot.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Not sure if I have the Flu if I do it&#39;s mild but still crappy...feeling blah.</span></li>
+			</ul>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">Yes, this message says the flu is <u>severe</u>.</b></span><br />
+			&nbsp;</p>
+
+			<ul style="margin-top:0in" type="disc">
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">The flu is not benign. I see severe cases every year. The vaccine is far safer than the disease.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I caved and got a flu shot after a coworker started talking about people dying from the flu.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">This flu makes me think maybe death is not that bad.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">For the majority of people who catch it flu is unpleasant, but for some it can lead to chest infections, severe complications &amp; death.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Contrary to CDC claims, rather than making flu symptoms less severe when vaccination causes flu, shot may well make them more severe/lethal.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Flu vaccine is the best protection against an unpredictable virus which causes severe illness and even deaths each year.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Yes, get the flu shot everyone. My ER doctor sister says this year&#39;s flu is particularly severe &amp; to be avoided</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Strongly dislike it when people say they have the flu when they absolutely do not and have a mild cold. People legit die from the flu. Stop.</span></li>
+			</ul>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">No, this message does not talk about flu severity.</b></span><br />
+			&nbsp;</p>
+
+			<h4>Does it talk about the likelihood of catching the flu?</h4>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">Yes, this message says it is <u>unlikely</u> to catch the flu.</b></span><br />
+			&nbsp;</p>
+
+			<ul style="margin-top:0in" type="disc">
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I haven&#39;t had a flu shot in 5 years... guess how long it&#39;s been since I got the flu.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I have been flu-shot. Bring on your germy selves.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Yep. I never get a flu shot and very rarely am I sick. Can&#39;t remember last time I had the flu. I take vitamin D3.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I must be a rare breed that doesn&#39;t get the flu. So many tweets about people getting sick and I can&#39;t relate, which is fine. </span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Haven&#39;t had the full blown flu in about ten years. When you work on taking care of yourself daily, then getting sick is rare.</span></li>
+			</ul>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">Yes, this message says it is <u>likely</u> to catch the flu.</b></span><br />
+			&nbsp;</p>
+
+			<ul style="margin-top:0in" type="disc">
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Every year I decide to go get a flu shot and end up getting sick before I can even get the shot.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">everyone on this plane is coughing. When they don&#39;t cover their mouths can you kick them off? I haven&#39;t taken a flu shot!</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I need to get a flu shot before I get the flu!</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">The ONE year I don&#39;t get my flu shot, I get the flu</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I think I&#39;m getting sick Fml sneezing and sore throat I should have gotten the flu shot !!</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">if u dont get ur flu shot, please dont come near me (-:</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I always lag on getting my flu shot &amp; I always end up getting sick af, why am I like this</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Pretty sure this fever / joint pain / fatigue / sore throats combo means they predicted the flu shot strains wrong again</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Nothing like getting your flu shot just to get the flu a week later</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">What was the point of going through the pain of getting a flu shot when I ended up with the flu 2 weeks later anyways</span></li>
+			</ul>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">No, this message does not talk about the likelihood of catching the flu.</b></span><br />
+			&nbsp;</p>
+
+			<h4>Does this message talk about the flu shot?</h4>
+			<i>Yes, the message discusses the flu shot/influenza vaccine. Answer the following questions.<br />
+			No, then done.</i>
+
+			<h4>Does this message talk about how severe the side effects may be?</h4>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">Yes, this message talks about <u>mild</u> side effects from the flu vaccine.</b></span><br />
+			&nbsp;</p>
+
+			<ul style="margin-top:0in" type="disc">
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I hate how after a flu shot it feels like you got punched in the arm by some jerk.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I got my flu shot today and that&#39;s prolz why I feel kinda pooped and outta sorts.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">My arm has been sore for the past two days, thanks flu shot</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">My arm is literally dead after this flu shot</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Guess it&#39;s this flu shot that&#39;s got me feeling like it&#39;s allergy season again and also stupidly hungry.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Got the flu shot yesterday. Now body won&#39;t stop with muscle spasms and twitches. Sooooooo annoying and kinda painful. </span></li>
+			</ul>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">Yes, this message talks about <u>severe</u> side effects from the flu vaccine.</b></span><br />
+			&nbsp;</p>
+
+			<ul style="margin-top:0in" type="disc">
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">A healthy, 9-year old Florida girl was paralyzed by the flu shot</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Miscarriage after flu vax. Why is a neurotoxin that crosses placenta still in flu shot? Did pharma greed cause my loss? Plausible.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I was very pro vaccine until my son had a febrile seizure after having flu vaccine last week! But now not so much!</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">For those who see the ambulance post I had a severe allergic reaction to a flu shot where my throat was closing so I had to go to the Er.</span></li>
+			</ul>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">Yes, this message talks about getting the &quot;flu/sick&quot; as a side effect of the flu vaccine.</b></span><br />
+			&nbsp;</p>
+
+			<ul style="margin-top:0in" type="disc">
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Got the flu shot couple days ago and now I&#39;m sick.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">99.99% sure that the flu shot gave me the flu.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Such a coincidence i feel like i&#39;m getting sick right after i get my required flu shot :^)</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Just a warning to anyone getting the flu shot: they say it won&rsquo;t make you sick, but I&rsquo;m having a very different experience here.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">As I lay in my bed, for the 3rd day in a row sick, I think to myself, damn you flu shot.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">You know your immune system has crapped out when the flu shot gives you a 100 degree fever Shout out to my white blood cells for sucking!</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I&#39;m that girl that gets sick the day after getting the flu shot</span></li>
+			</ul>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">No, this message does not talk about the severity of side effects related to flu vaccine.</b></span><br />
+			&nbsp;</p>
+
+			<ul style="margin-top:0in" type="disc">
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">oh great. i&#39;m having a reaction to my flu shot. [does not describe what the reactions could be, and does not describe severity].</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I had my autism shot today...I mean flu shot. Just kidding-I believe in science. [Obvious joke about vaccine side effects]</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Giving up and going back to bed. I fucking hate the flu shot. [unclear what is happening]</span></li>
+			</ul>
+
+			<h4>Does this message talk about the likelihood of having side effects from a flu vaccine?</h4>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">Yes, this message says it is <u>unlikely</u> to get side effects (or get the flu) from the flu vaccine.</b></span><br />
+			&nbsp;</p>
+
+			<ul style="margin-top:0in" type="disc">
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">You cannot get sick from a flu shot You cannot get sick from a flu shot YOU CANNOT GET SICK FROM A FLU SHOT.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">No voice, sore throat, slight fever, chills, body aches. Apparently I get the rare reaction to the flu shot? Yay.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I had my flu shot a week ago, as I do every year. I&#39;m not dead.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">The flu shot won&#39;t give you the flu. Lies.</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Other than a sore arm from flu shot and nasal congestion from nasal spray, side effects are rare. U can&#39;t catch flu from vaccine #fluchat</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">I&#39;m super nervous about becoming that rare percent of the population that gets bad side effects of the flu</span></li>
+			</ul>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">Yes, this message says it is <u>likely</u> to get side effects (or the flu) from the flu vaccine.</b></span><br />
+			&nbsp;</p>
+
+			<ul style="margin-top:0in" type="disc">
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Guillain Barr&eacute; Syndrome is #1 Side Effect of #Vaccine Injury Compensations due to #Flu Shots #GBS #LearnTheRisk</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">Just got a flu shot, so I can expect to have the flu within the next couple days. Aka they never work. I hate shots&hellip;</span></li>
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">You gotta be a dumbass to get a flu shot annually. Your chances of being fucked up by side effects from the vaccine than an actual flu.</span></li>
+			</ul>
+
+			<p class="MsoNormal"><span style="font-size:12.0pt;line-height:115%"><b style="mso-bidi-font-weight:normal">No, this message does not talk about the likelihood of side effects from the flu vaccine.</b></span><br />
+			&nbsp;</p>
+
+			<ul style="margin-top:0in" type="disc">
+				<li class="MsoNormal" style="margin-bottom:0in;margin-bottom:.0001pt;mso-list:
+                l0 level1 lfo1"><span style="font-size:12.0pt;line-
+                height:115%">It&#39;s that time of year again when I say &quot;get your flu shot&quot; and you say &quot;last time I got one, I got hit by lightning and a train, so nope.&quot;</span></li>
+			</ul>
+			</div>
+			</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+</div>
+</div>
+
+<p>&nbsp;&nbsp;</p>
+
+<p><b>${tweet1}</b></p>
+
+<p>Does this message talk about the <b>influenza (flu)</b>?</p>
+
+<p><input id="YesAboutFlu1" name="about_flu1" onclick="fadeSection('YesAboutFlu1', 'FluQuestions1', 'isAbout_flu1');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFlu1" name="about_flu1" onclick="fadeSection('YesAboutFlu1', 'FluQuestions1', 'isAbout_flu1');" type="radio" value="no" />no<br />
+<input id="UnkAboutFlu1" name="about_flu1" onclick="fadeSection('YesAboutFlu1', 'FluQuestions1', 'isAbout_flu1');" type="radio" value="unknown" />unknown or unclear<br />
+<!--div id="FluQuestions1" style="display: none"--></p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_flu1"><!--div id="FluQuestions1" class="darkClass" style="display:none"-->
+<p>Does it talk about how <b>severe</b> the flu may be?</p>
+<input id="MildFluSeverity1" name="about_flu_severity1" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluSeverity1" name="about_flu_severity1" type="radio" value="severe" />yes, severe<br />
+<input id="NoFluSeverity1" name="about_flu_severity1" type="radio" value="no" />no
+<p>Does it talk about the <b>likelihood</b> of catching the flu?</p>
+<input id="UnlikelyFluLikelihood1" name="about_flu_likelihood1" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluLikelihood1" name="about_flu_likelihood1" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluLikelihood1" name="about_flu_likelihood1" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>Does this message talk about the <b>flu shot</b>?</p>
+
+<p><input id="YesAboutFluShot1" name="about_fluShot1" onclick="fadeSection('YesAboutFluShot1', 'FluShotQuestions1', 'isAbout_fluShot1');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFluShot1" name="about_fluShot1" onclick="fadeSection('YesAboutFluShot1', 'FluShotQuestions1', 'isAbout_fluShot1');" type="radio" value="no" />no<br />
+<input id="UnkAboutFluShot1" name="about_fluShot1" onclick="fadeSection('YesAboutFluShot1', 'FluShotQuestions1', 'isAbout_fluShot1');" type="radio" value="unknown" />unknown or unclear</p>
+
+<p>&nbsp;</p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_fluShot1"><!--div id="FluShotQuestions1" class="darkClass" style="display:none"-->
+<p>Does this message talk about how <b>severe</b> side effects may be?</p>
+<input id="MildFluShotSeverity1" name="about_fluShot_severity1" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluShotSeverity1" name="about_fluShot_severity1" type="radio" value="severe" />yes, severe<br />
+<input id="GetFluFluShotSeverity1" name="about_fluShot_severity1" type="radio" value="get_flu" />yes, getting the flu or sick<br />
+<input id="NoFluShotSeverity1" name="about_fluShot_severity1" type="radio" value="no" />no
+<p>Does this message talk about the <b>likelihood</b> of having side effects from a flu vaccine?</p>
+<input id="UnlikelyFluShotLikelihood1" name="about_fluShot_likelihood1" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluShotLikelihood1" name="about_fluShot_likelihood1" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluShotLikelihood1" name="about_fluShot_likelihood1" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>&nbsp;</p>
+
+<hr />
+<p><b>${tweet2}</b></p>
+
+<p>Does this message talk about the <b>influenza (flu)</b>?</p>
+
+<p><input id="YesAboutFlu2" name="about_flu2" onclick="fadeSection('YesAboutFlu2', 'FluQuestions2', 'isAbout_flu2');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFlu2" name="about_flu2" onclick="fadeSection('YesAboutFlu2', 'FluQuestions2', 'isAbout_flu2');" type="radio" value="no" />no<br />
+<input id="UnkAboutFlu2" name="about_flu2" onclick="fadeSection('YesAboutFlu2', 'FluQuestions2', 'isAbout_flu2');" type="radio" value="unknown" />unknown or unclear<br />
+<!--div id="FluQuestions2" style="display: none"--></p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_flu2"><!--div id="FluQuestions2" class="darkClass" style="display:none"-->
+<p>Does it talk about how <b>severe</b> the flu may be?</p>
+<input id="MildFluSeverity2" name="about_flu_severity2" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluSeverity2" name="about_flu_severity2" type="radio" value="severe" />yes, severe<br />
+<input id="NoFluSeverity2" name="about_flu_severity2" type="radio" value="no" />no
+<p>Does it talk about the <b>likelihood</b> of catching the flu?</p>
+<input id="UnlikelyFluLikelihood2" name="about_flu_likelihood2" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluLikelihood2" name="about_flu_likelihood2" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluLikelihood2" name="about_flu_likelihood2" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>Does this message talk about the <b>flu shot</b>?</p>
+
+<p><input id="YesAboutFluShot2" name="about_fluShot2" onclick="fadeSection('YesAboutFluShot2', 'FluShotQuestions2', 'isAbout_fluShot2');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFluShot2" name="about_fluShot2" onclick="fadeSection('YesAboutFluShot2', 'FluShotQuestions2', 'isAbout_fluShot2');" type="radio" value="no" />no<br />
+<input id="UnkAboutFluShot2" name="about_fluShot2" onclick="fadeSection('YesAboutFluShot2', 'FluShotQuestions2', 'isAbout_fluShot2');" type="radio" value="unknown" />unknown or unclear</p>
+
+<p>&nbsp;</p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_fluShot2"><!--div id="FluShotQuestions2" class="darkClass" style="display:none"-->
+<p>Does this message talk about how <b>severe</b> side effects may be?</p>
+<input id="MildFluShotSeverity2" name="about_fluShot_severity2" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluShotSeverity2" name="about_fluShot_severity2" type="radio" value="severe" />yes, severe<br />
+<input id="GetFluFluShotSeverity2" name="about_fluShot_severity2" type="radio" value="get_flu" />yes, getting the flu or sick<br />
+<input id="NoFluShotSeverity2" name="about_fluShot_severity2" type="radio" value="no" />no
+<p>Does this message talk about the <b>likelihood</b> of having side effects from a flu vaccine?</p>
+<input id="UnlikelyFluShotLikelihood2" name="about_fluShot_likelihood2" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluShotLikelihood2" name="about_fluShot_likelihood2" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluShotLikelihood2" name="about_fluShot_likelihood2" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>&nbsp;</p>
+
+<hr />
+<p><b>${tweet3}</b></p>
+
+<p>Does this message talk about the <b>influenza (flu)</b>?</p>
+
+<p><input id="YesAboutFlu3" name="about_flu3" onclick="fadeSection('YesAboutFlu3', 'FluQuestions3', 'isAbout_flu3');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFlu3" name="about_flu3" onclick="fadeSection('YesAboutFlu3', 'FluQuestions3', 'isAbout_flu3');" type="radio" value="no" />no<br />
+<input id="UnkAboutFlu3" name="about_flu3" onclick="fadeSection('YesAboutFlu3', 'FluQuestions3', 'isAbout_flu3');" type="radio" value="unknown" />unknown or unclear<br />
+<!--div id="FluQuestions3" style="display: none"--></p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_flu3"><!--div id="FluQuestions3" class="darkClass" style="display:none"-->
+<p>Does it talk about how <b>severe</b> the flu may be?</p>
+<input id="MildFluSeverity3" name="about_flu_severity3" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluSeverity3" name="about_flu_severity3" type="radio" value="severe" />yes, severe<br />
+<input id="NoFluSeverity3" name="about_flu_severity3" type="radio" value="no" />no
+<p>Does it talk about the <b>likelihood</b> of catching the flu?</p>
+<input id="UnlikelyFluLikelihood3" name="about_flu_likelihood3" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluLikelihood3" name="about_flu_likelihood3" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluLikelihood3" name="about_flu_likelihood3" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>Does this message talk about the <b>flu shot</b>?</p>
+
+<p><input id="YesAboutFluShot3" name="about_fluShot3" onclick="fadeSection('YesAboutFluShot3', 'FluShotQuestions3', 'isAbout_fluShot3');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFluShot3" name="about_fluShot3" onclick="fadeSection('YesAboutFluShot3', 'FluShotQuestions3', 'isAbout_fluShot3');" type="radio" value="no" />no<br />
+<input id="UnkAboutFluShot3" name="about_fluShot3" onclick="fadeSection('YesAboutFluShot3', 'FluShotQuestions3', 'isAbout_fluShot3');" type="radio" value="unknown" />unknown or unclear</p>
+
+<p>&nbsp;</p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_fluShot3"><!--div id="FluShotQuestions3" class="darkClass" style="display:none"-->
+<p>Does this message talk about how <b>severe</b> side effects may be?</p>
+<input id="MildFluShotSeverity3" name="about_fluShot_severity3" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluShotSeverity3" name="about_fluShot_severity3" type="radio" value="severe" />yes, severe<br />
+<input id="GetFluFluShotSeverity3" name="about_fluShot_severity3" type="radio" value="get_flu" />yes, getting the flu or sick<br />
+<input id="NoFluShotSeverity3" name="about_fluShot_severity3" type="radio" value="no" />no
+<p>Does this message talk about the <b>likelihood</b> of having side effects from a flu vaccine?</p>
+<input id="UnlikelyFluShotLikelihood3" name="about_fluShot_likelihood3" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluShotLikelihood3" name="about_fluShot_likelihood3" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluShotLikelihood3" name="about_fluShot_likelihood3" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>&nbsp;</p>
+
+<hr />
+<p><b>${tweet4}</b></p>
+
+<p>Does this message talk about the <b>influenza (flu)</b>?</p>
+
+<p><input id="YesAboutFlu4" name="about_flu4" onclick="fadeSection('YesAboutFlu4', 'FluQuestions4', 'isAbout_flu4');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFlu4" name="about_flu4" onclick="fadeSection('YesAboutFlu4', 'FluQuestions4', 'isAbout_flu4');" type="radio" value="no" />no<br />
+<input id="UnkAboutFlu4" name="about_flu4" onclick="fadeSection('YesAboutFlu4', 'FluQuestions4', 'isAbout_flu4');" type="radio" value="unknown" />unknown or unclear<br />
+<!--div id="FluQuestions4" style="display: none"--></p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_flu4"><!--div id="FluQuestions4" class="darkClass" style="display:none"-->
+<p>Does it talk about how <b>severe</b> the flu may be?</p>
+<input id="MildFluSeverity4" name="about_flu_severity4" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluSeverity4" name="about_flu_severity4" type="radio" value="severe" />yes, severe<br />
+<input id="NoFluSeverity4" name="about_flu_severity4" type="radio" value="no" />no
+<p>Does it talk about the <b>likelihood</b> of catching the flu?</p>
+<input id="UnlikelyFluLikelihood4" name="about_flu_likelihood4" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluLikelihood4" name="about_flu_likelihood4" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluLikelihood4" name="about_flu_likelihood4" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>Does this message talk about the <b>flu shot</b>?</p>
+
+<p><input id="YesAboutFluShot4" name="about_fluShot4" onclick="fadeSection('YesAboutFluShot4', 'FluShotQuestions4', 'isAbout_fluShot4');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFluShot4" name="about_fluShot4" onclick="fadeSection('YesAboutFluShot4', 'FluShotQuestions4', 'isAbout_fluShot4');" type="radio" value="no" />no<br />
+<input id="UnkAboutFluShot4" name="about_fluShot4" onclick="fadeSection('YesAboutFluShot4', 'FluShotQuestions4', 'isAbout_fluShot4');" type="radio" value="unknown" />unknown or unclear</p>
+
+<p>&nbsp;</p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_fluShot4"><!--div id="FluShotQuestions4" class="darkClass" style="display:none"-->
+<p>Does this message talk about how <b>severe</b> side effects may be?</p>
+<input id="MildFluShotSeverity4" name="about_fluShot_severity4" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluShotSeverity4" name="about_fluShot_severity4" type="radio" value="severe" />yes, severe<br />
+<input id="GetFluFluShotSeverity4" name="about_fluShot_severity4" type="radio" value="get_flu" />yes, getting the flu or sick<br />
+<input id="NoFluShotSeverity4" name="about_fluShot_severity4" type="radio" value="no" />no
+<p>Does this message talk about the <b>likelihood</b> of having side effects from a flu vaccine?</p>
+<input id="UnlikelyFluShotLikelihood4" name="about_fluShot_likelihood4" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluShotLikelihood4" name="about_fluShot_likelihood4" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluShotLikelihood4" name="about_fluShot_likelihood4" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>&nbsp;</p>
+
+<hr />
+<p><b>${tweet5}</b></p>
+
+<p>Does this message talk about the <b>influenza (flu)</b>?</p>
+
+<p><input id="YesAboutFlu5" name="about_flu5" onclick="fadeSection('YesAboutFlu5', 'FluQuestions5', 'isAbout_flu5');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFlu5" name="about_flu5" onclick="fadeSection('YesAboutFlu5', 'FluQuestions5', 'isAbout_flu5');" type="radio" value="no" />no<br />
+<input id="UnkAboutFlu5" name="about_flu5" onclick="fadeSection('YesAboutFlu5', 'FluQuestions5', 'isAbout_flu5');" type="radio" value="unknown" />unknown or unclear<br />
+<!--div id="FluQuestions5" style="display: none"--></p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_flu5"><!--div id="FluQuestions5" class="darkClass" style="display:none"-->
+<p>Does it talk about how <b>severe</b> the flu may be?</p>
+<input id="MildFluSeverity5" name="about_flu_severity5" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluSeverity5" name="about_flu_severity5" type="radio" value="severe" />yes, severe<br />
+<input id="NoFluSeverity5" name="about_flu_severity5" type="radio" value="no" />no
+<p>Does it talk about the <b>likelihood</b> of catching the flu?</p>
+<input id="UnlikelyFluLikelihood5" name="about_flu_likelihood5" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluLikelihood5" name="about_flu_likelihood5" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluLikelihood5" name="about_flu_likelihood5" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>Does this message talk about the <b>flu shot</b>?</p>
+
+<p><input id="YesAboutFluShot5" name="about_fluShot5" onclick="fadeSection('YesAboutFluShot5', 'FluShotQuestions5', 'isAbout_fluShot5');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFluShot5" name="about_fluShot5" onclick="fadeSection('YesAboutFluShot5', 'FluShotQuestions5', 'isAbout_fluShot5');" type="radio" value="no" />no<br />
+<input id="UnkAboutFluShot5" name="about_fluShot5" onclick="fadeSection('YesAboutFluShot5', 'FluShotQuestions5', 'isAbout_fluShot5');" type="radio" value="unknown" />unknown or unclear</p>
+
+<p>&nbsp;</p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_fluShot5"><!--div id="FluShotQuestions5" class="darkClass" style="display:none"-->
+<p>Does this message talk about how <b>severe</b> side effects may be?</p>
+<input id="MildFluShotSeverity5" name="about_fluShot_severity5" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluShotSeverity5" name="about_fluShot_severity5" type="radio" value="severe" />yes, severe<br />
+<input id="GetFluFluShotSeverity5" name="about_fluShot_severity5" type="radio" value="get_flu" />yes, getting the flu or sick<br />
+<input id="NoFluShotSeverity5" name="about_fluShot_severity5" type="radio" value="no" />no
+<p>Does this message talk about the <b>likelihood</b> of having side effects from a flu vaccine?</p>
+<input id="UnlikelyFluShotLikelihood5" name="about_fluShot_likelihood5" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluShotLikelihood5" name="about_fluShot_likelihood5" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluShotLikelihood5" name="about_fluShot_likelihood5" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>&nbsp;</p>
+
+<hr />
+<p><b>${tweet6}</b></p>
+
+<p>Does this message talk about the <b>influenza (flu)</b>?</p>
+
+<p><input id="YesAboutFlu6" name="about_flu6" onclick="fadeSection('YesAboutFlu6', 'FluQuestions6', 'isAbout_flu6');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFlu6" name="about_flu6" onclick="fadeSection('YesAboutFlu6', 'FluQuestions6', 'isAbout_flu6');" type="radio" value="no" />no<br />
+<input id="UnkAboutFlu6" name="about_flu6" onclick="fadeSection('YesAboutFlu6', 'FluQuestions6', 'isAbout_flu6');" type="radio" value="unknown" />unknown or unclear<br />
+<!--div id="FluQuestions6" style="display: none"--></p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_flu6"><!--div id="FluQuestions6" class="darkClass" style="display:none"-->
+<p>Does it talk about how <b>severe</b> the flu may be?</p>
+<input id="MildFluSeverity6" name="about_flu_severity6" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluSeverity6" name="about_flu_severity6" type="radio" value="severe" />yes, severe<br />
+<input id="NoFluSeverity6" name="about_flu_severity6" type="radio" value="no" />no
+<p>Does it talk about the <b>likelihood</b> of catching the flu?</p>
+<input id="UnlikelyFluLikelihood6" name="about_flu_likelihood6" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluLikelihood6" name="about_flu_likelihood6" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluLikelihood6" name="about_flu_likelihood6" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>Does this message talk about the <b>flu shot</b>?</p>
+
+<p><input id="YesAboutFluShot6" name="about_fluShot6" onclick="fadeSection('YesAboutFluShot6', 'FluShotQuestions6', 'isAbout_fluShot6');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFluShot6" name="about_fluShot6" onclick="fadeSection('YesAboutFluShot6', 'FluShotQuestions6', 'isAbout_fluShot6');" type="radio" value="no" />no<br />
+<input id="UnkAboutFluShot6" name="about_fluShot6" onclick="fadeSection('YesAboutFluShot6', 'FluShotQuestions6', 'isAbout_fluShot6');" type="radio" value="unknown" />unknown or unclear</p>
+
+<p>&nbsp;</p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_fluShot6"><!--div id="FluShotQuestions6" class="darkClass" style="display:none"-->
+<p>Does this message talk about how <b>severe</b> side effects may be?</p>
+<input id="MildFluShotSeverity6" name="about_fluShot_severity6" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluShotSeverity6" name="about_fluShot_severity6" type="radio" value="severe" />yes, severe<br />
+<input id="GetFluFluShotSeverity6" name="about_fluShot_severity6" type="radio" value="get_flu" />yes, getting the flu or sick<br />
+<input id="NoFluShotSeverity6" name="about_fluShot_severity6" type="radio" value="no" />no
+<p>Does this message talk about the <b>likelihood</b> of having side effects from a flu vaccine?</p>
+<input id="UnlikelyFluShotLikelihood6" name="about_fluShot_likelihood6" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluShotLikelihood6" name="about_fluShot_likelihood6" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluShotLikelihood6" name="about_fluShot_likelihood6" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>&nbsp;</p>
+
+<hr />
+<p><b>${tweet7}</b></p>
+
+<p>Does this message talk about the <b>influenza (flu)</b>?</p>
+
+<p><input id="YesAboutFlu7" name="about_flu7" onclick="fadeSection('YesAboutFlu7', 'FluQuestions7', 'isAbout_flu7');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFlu7" name="about_flu7" onclick="fadeSection('YesAboutFlu7', 'FluQuestions7', 'isAbout_flu7');" type="radio" value="no" />no<br />
+<input id="UnkAboutFlu7" name="about_flu7" onclick="fadeSection('YesAboutFlu7', 'FluQuestions7', 'isAbout_flu7');" type="radio" value="unknown" />unknown or unclear<br />
+<!--div id="FluQuestions7" style="display: none"--></p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_flu7"><!--div id="FluQuestions7" class="darkClass" style="display:none"-->
+<p>Does it talk about how <b>severe</b> the flu may be?</p>
+<input id="MildFluSeverity7" name="about_flu_severity7" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluSeverity7" name="about_flu_severity7" type="radio" value="severe" />yes, severe<br />
+<input id="NoFluSeverity7" name="about_flu_severity7" type="radio" value="no" />no
+<p>Does it talk about the <b>likelihood</b> of catching the flu?</p>
+<input id="UnlikelyFluLikelihood7" name="about_flu_likelihood7" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluLikelihood7" name="about_flu_likelihood7" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluLikelihood7" name="about_flu_likelihood7" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>Does this message talk about the <b>flu shot</b>?</p>
+
+<p><input id="YesAboutFluShot7" name="about_fluShot7" onclick="fadeSection('YesAboutFluShot7', 'FluShotQuestions7', 'isAbout_fluShot7');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFluShot7" name="about_fluShot7" onclick="fadeSection('YesAboutFluShot7', 'FluShotQuestions7', 'isAbout_fluShot7');" type="radio" value="no" />no<br />
+<input id="UnkAboutFluShot7" name="about_fluShot7" onclick="fadeSection('YesAboutFluShot7', 'FluShotQuestions7', 'isAbout_fluShot7');" type="radio" value="unknown" />unknown or unclear</p>
+
+<p>&nbsp;</p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_fluShot7"><!--div id="FluShotQuestions7" class="darkClass" style="display:none"-->
+<p>Does this message talk about how <b>severe</b> side effects may be?</p>
+<input id="MildFluShotSeverity7" name="about_fluShot_severity7" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluShotSeverity7" name="about_fluShot_severity7" type="radio" value="severe" />yes, severe<br />
+<input id="GetFluFluShotSeverity7" name="about_fluShot_severity7" type="radio" value="get_flu" />yes, getting the flu or sick<br />
+<input id="NoFluShotSeverity7" name="about_fluShot_severity7" type="radio" value="no" />no
+<p>Does this message talk about the <b>likelihood</b> of having side effects from a flu vaccine?</p>
+<input id="UnlikelyFluShotLikelihood7" name="about_fluShot_likelihood7" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluShotLikelihood7" name="about_fluShot_likelihood7" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluShotLikelihood7" name="about_fluShot_likelihood7" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>&nbsp;</p>
+
+<hr />
+<p><b>${tweet8}</b></p>
+
+<p>Does this message talk about the <b>influenza (flu)</b>?</p>
+
+<p><input id="YesAboutFlu8" name="about_flu8" onclick="fadeSection('YesAboutFlu8', 'FluQuestions8', 'isAbout_flu8');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFlu8" name="about_flu8" onclick="fadeSection('YesAboutFlu8', 'FluQuestions8', 'isAbout_flu8');" type="radio" value="no" />no<br />
+<input id="UnkAboutFlu8" name="about_flu8" onclick="fadeSection('YesAboutFlu8', 'FluQuestions8', 'isAbout_flu8');" type="radio" value="unknown" />unknown or unclear<br />
+<!--div id="FluQuestions8" style="display: none"--></p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_flu8"><!--div id="FluQuestions8" class="darkClass" style="display:none"-->
+<p>Does it talk about how <b>severe</b> the flu may be?</p>
+<input id="MildFluSeverity8" name="about_flu_severity8" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluSeverity8" name="about_flu_severity8" type="radio" value="severe" />yes, severe<br />
+<input id="NoFluSeverity8" name="about_flu_severity8" type="radio" value="no" />no
+<p>Does it talk about the <b>likelihood</b> of catching the flu?</p>
+<input id="UnlikelyFluLikelihood8" name="about_flu_likelihood8" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluLikelihood8" name="about_flu_likelihood8" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluLikelihood8" name="about_flu_likelihood8" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>Does this message talk about the <b>flu shot</b>?</p>
+
+<p><input id="YesAboutFluShot8" name="about_fluShot8" onclick="fadeSection('YesAboutFluShot8', 'FluShotQuestions8', 'isAbout_fluShot8');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFluShot8" name="about_fluShot8" onclick="fadeSection('YesAboutFluShot8', 'FluShotQuestions8', 'isAbout_fluShot8');" type="radio" value="no" />no<br />
+<input id="UnkAboutFluShot8" name="about_fluShot8" onclick="fadeSection('YesAboutFluShot8', 'FluShotQuestions8', 'isAbout_fluShot8');" type="radio" value="unknown" />unknown or unclear</p>
+
+<p>&nbsp;</p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_fluShot8"><!--div id="FluShotQuestions8" class="darkClass" style="display:none"-->
+<p>Does this message talk about how <b>severe</b> side effects may be?</p>
+<input id="MildFluShotSeverity8" name="about_fluShot_severity8" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluShotSeverity8" name="about_fluShot_severity8" type="radio" value="severe" />yes, severe<br />
+<input id="GetFluFluShotSeverity8" name="about_fluShot_severity8" type="radio" value="get_flu" />yes, getting the flu or sick<br />
+<input id="NoFluShotSeverity8" name="about_fluShot_severity8" type="radio" value="no" />no
+<p>Does this message talk about the <b>likelihood</b> of having side effects from a flu vaccine?</p>
+<input id="UnlikelyFluShotLikelihood8" name="about_fluShot_likelihood8" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluShotLikelihood8" name="about_fluShot_likelihood8" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluShotLikelihood8" name="about_fluShot_likelihood8" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>&nbsp;</p>
+
+<hr />
+<p><b>${tweet9}</b></p>
+
+<p>Does this message talk about the <b>influenza (flu)</b>?</p>
+
+<p><input id="YesAboutFlu9" name="about_flu9" onclick="fadeSection('YesAboutFlu9', 'FluQuestions9', 'isAbout_flu9');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFlu9" name="about_flu9" onclick="fadeSection('YesAboutFlu9', 'FluQuestions9', 'isAbout_flu9');" type="radio" value="no" />no<br />
+<input id="UnkAboutFlu9" name="about_flu9" onclick="fadeSection('YesAboutFlu9', 'FluQuestions9', 'isAbout_flu9');" type="radio" value="unknown" />unknown or unclear<br />
+<!--div id="FluQuestions9" style="display: none"--></p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_flu9"><!--div id="FluQuestions9" class="darkClass" style="display:none"-->
+<p>Does it talk about how <b>severe</b> the flu may be?</p>
+<input id="MildFluSeverity9" name="about_flu_severity9" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluSeverity9" name="about_flu_severity9" type="radio" value="severe" />yes, severe<br />
+<input id="NoFluSeverity9" name="about_flu_severity9" type="radio" value="no" />no
+<p>Does it talk about the <b>likelihood</b> of catching the flu?</p>
+<input id="UnlikelyFluLikelihood9" name="about_flu_likelihood9" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluLikelihood9" name="about_flu_likelihood9" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluLikelihood9" name="about_flu_likelihood9" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>Does this message talk about the <b>flu shot</b>?</p>
+
+<p><input id="YesAboutFluShot9" name="about_fluShot9" onclick="fadeSection('YesAboutFluShot9', 'FluShotQuestions9', 'isAbout_fluShot9');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFluShot9" name="about_fluShot9" onclick="fadeSection('YesAboutFluShot9', 'FluShotQuestions9', 'isAbout_fluShot9');" type="radio" value="no" />no<br />
+<input id="UnkAboutFluShot9" name="about_fluShot9" onclick="fadeSection('YesAboutFluShot9', 'FluShotQuestions9', 'isAbout_fluShot9');" type="radio" value="unknown" />unknown or unclear</p>
+
+<p>&nbsp;</p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_fluShot9"><!--div id="FluShotQuestions9" class="darkClass" style="display:none"-->
+<p>Does this message talk about how <b>severe</b> side effects may be?</p>
+<input id="MildFluShotSeverity9" name="about_fluShot_severity9" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluShotSeverity9" name="about_fluShot_severity9" type="radio" value="severe" />yes, severe<br />
+<input id="GetFluFluShotSeverity9" name="about_fluShot_severity9" type="radio" value="get_flu" />yes, getting the flu or sick<br />
+<input id="NoFluShotSeverity9" name="about_fluShot_severity9" type="radio" value="no" />no
+<p>Does this message talk about the <b>likelihood</b> of having side effects from a flu vaccine?</p>
+<input id="UnlikelyFluShotLikelihood9" name="about_fluShot_likelihood9" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluShotLikelihood9" name="about_fluShot_likelihood9" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluShotLikelihood9" name="about_fluShot_likelihood9" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>&nbsp;</p>
+
+<hr />
+<p><b>${tweet10}</b></p>
+
+<p>Does this message talk about the <b>influenza (flu)</b>?</p>
+
+<p><input id="YesAboutFlu10" name="about_flu10" onclick="fadeSection('YesAboutFlu10', 'FluQuestions10', 'isAbout_flu10');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFlu10" name="about_flu10" onclick="fadeSection('YesAboutFlu10', 'FluQuestions10', 'isAbout_flu10');" type="radio" value="no" />no<br />
+<input id="UnkAboutFlu10" name="about_flu10" onclick="fadeSection('YesAboutFlu10', 'FluQuestions10', 'isAbout_flu10');" type="radio" value="unknown" />unknown or unclear<br />
+<!--div id="FluQuestions10" style="display: none"--></p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_flu10"><!--div id="FluQuestions10" class="darkClass" style="display:none"-->
+<p>Does it talk about how <b>severe</b> the flu may be?</p>
+<input id="MildFluSeverity10" name="about_flu_severity10" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluSeverity10" name="about_flu_severity10" type="radio" value="severe" />yes, severe<br />
+<input id="NoFluSeverity10" name="about_flu_severity10" type="radio" value="no" />no
+<p>Does it talk about the <b>likelihood</b> of catching the flu?</p>
+<input id="UnlikelyFluLikelihood10" name="about_flu_likelihood10" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluLikelihood10" name="about_flu_likelihood10" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluLikelihood10" name="about_flu_likelihood10" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>Does this message talk about the <b>flu shot</b>?</p>
+
+<p><input id="YesAboutFluShot10" name="about_fluShot10" onclick="fadeSection('YesAboutFluShot10', 'FluShotQuestions10', 'isAbout_fluShot10');" type="radio" value="yes" />yes<br />
+<input id="NoAboutFluShot10" name="about_fluShot10" onclick="fadeSection('YesAboutFluShot10', 'FluShotQuestions10', 'isAbout_fluShot10');" type="radio" value="no" />no<br />
+<input id="UnkAboutFluShot10" name="about_fluShot10" onclick="fadeSection('YesAboutFluShot10', 'FluShotQuestions10', 'isAbout_fluShot10');" type="radio" value="unknown" />unknown or unclear</p>
+
+<p>&nbsp;</p>
+
+<fieldset class="fadedClass" disabled="disabled" id="isAbout_fluShot10"><!--div id="FluShotQuestions10" class="darkClass" style="display:none"-->
+<p>Does this message talk about how <b>severe</b> side effects may be?</p>
+<input id="MildFluShotSeverity10" name="about_fluShot_severity10" type="radio" value="mild" />yes, mild<br />
+<input id="SevereFluShotSeverity10" name="about_fluShot_severity10" type="radio" value="severe" />yes, severe<br />
+<input id="GetFluFluShotSeverity10" name="about_fluShot_severity10" type="radio" value="get_flu" />yes, getting the flu or sick<br />
+<input id="NoFluShotSeverity10" name="about_fluShot_severity10" type="radio" value="no" />no
+<p>Does this message talk about the <b>likelihood</b> of having side effects from a flu vaccine?</p>
+<input id="UnlikelyFluShotLikelihood10" name="about_fluShot_likelihood10" type="radio" value="unlikely" />yes, unlikely<br />
+<input id="LikelyFluShotLikelihood10" name="about_fluShot_likelihood10" type="radio" value="likely" />yes, likely<br />
+<input id="NoFluShotLikelihood10" name="about_fluShot_likelihood10" type="radio" value="no" />no<br />
+<!--/div--></fieldset>
+
+<p>&nbsp;</p>
+
+<hr />
+<p>&nbsp;</p>

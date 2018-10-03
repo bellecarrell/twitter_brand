@@ -1,0 +1,235 @@
+<script language="Javascript">
+<!--
+function expand(id) {
+  var elt = document.getElementById(id);
+  if (elt) elt.style.display = "inline";
+  var elt = document.getElementById(id+"-link");
+  if (elt) elt.style.display = "none";
+  document.getElementById("instructions_clicked").selectedIndex = 1;
+}
+
+function expandTask() {
+  var taskElt = document.getElementById("task");
+  taskElt.style.display = "inline";
+}
+
+function collapseTask() {
+  var taskElt = document.getElementById("task");
+  taskElt.style.display = "none";
+}
+// -->
+</script>
+<p>
+<style type="text/css">.faded {
+    font-weight: normal;
+    color: #D3D3D3; }
+</style>
+</p>
+
+<h1>Tobacco News Articles</h1>
+
+<p><a href="#" id="instructions-link" onclick="expand('instructions'); return(false);">View Instructions</a></p>
+
+<div display="none" id="instructions" style="display: none">
+<table cellpadding="10%">
+	<tbody>
+		<tr>
+			<td style="font-size:14.0pt;line-height:115%" width="600px">
+			<h2>Description</h2>
+			We are studying how tobacco is covered in the news media. Our study requires that we identify and categorize tobacco related news articles according to two orthogonal aspects of tobacco discussed in the article. (1) The tobacco product primarily being discussed in the article, such as cigarettes. (2) The thematic content of the story, such as raising tobacco taxes. &nbsp;
+
+			<h2>Your Task</h2>
+			You will be given a single news article. If it is not focused on tobacco, please select so, and you will not be prompted with the following questions. You should read the entire article as needed to answer two questions. <i>(1)</i> Select which of the following tobacco products are the <b>primary</b> subject of the article.
+
+			<ul>
+				<li><b>Smokeless tobacco</b> includes three common types: chewing tobacco, dissolvable tobacco, and dipping tobacco. These types are marketed under several product names, such as chew, chaw, dip, iqmik, gutka, naswar, paan, snuff, snus, shammah or toombak.</li>
+				<br />
+				<li><b>Cigarettes</b> are small cylinders of finely cut tobacco leaves rolled in thin paper for smoking. These products are typically associated with brands, such as basic, Dunhill, Doral, Kool, Marlboro, Newport, Prince, Winston, etc. This does not include &quot;cloved cigarettes.&quot;</li>
+				<br />
+				<li><b>Cigars, Cigarillos, or Little Cigars</b>. Regular cigars are larger than cigarettes and do not have a filter. Cigarillos or little cigars are similar in size and shape of cigarettes but like cigars are wrapped in a tobacco leaf.</li>
+				<br />
+				<li><b>Kreteks or Cloved Cigarettes</b> are cigarettes made with a blend of tobacco, clove and other flavors. These will sometimes be called &quot;flavored cigarettes&quot; (not to be confused with &quot;flavoured cigars&quot;) or &quot;clove cigarettes&quot; in the United States but Kreteks in Asia. Popular brands include Apache, Djarum, or Dji Sam Soe 234.</li>
+				<br />
+				<li><b>Bidis, Beedies, or Bidias</b> are like cigarillos (thin brown products wrapped in leaf) but are wrapped in Tendu or Temburni leafs instead of tobacco leafs. Popular brands are Black Swan, Enigma, Jash, Sutra, and Sumo.</li>
+				<br />
+				<li><b>Electronic Cigarettes or Cigars</b> are battery-powered devices that contains a cartridge filled with nicotine, flavor and other chemicals that can be smoked (or vaped). Brands are numerous but usually involve terms consistent with &quot;vaping&quot; or &quot;vaper.&quot;</li>
+				<br />
+				<li><b>Waterpipe tobacco or Hookah</b> is a pipe used to smoke Shisha, a combination of tobacco and fruit that is heated and the smoke is filtrated through water.</li>
+				<br />
+				<li><b>Other</b></li>
+				<br />
+				<li><b>No product is the focus</b></li>
+			</ul>
+			&nbsp;
+
+			<h3>Example Sentences</h3>
+			&quot;The Tobacco Products Scientific Advisory Committee was asked by the FDA to weigh the scientific evidence submitted by Swedish Match, maker of snus. Snus is a powdered form of tobacco that comes in a pouch that the user places between the cheek and gum.&quot; <b>(Smokeless Tobacco)</b><br />
+			<br />
+			&quot; In Surrey, firefighters believe cigarette butts are responsible for a marked increase in the volume of grass fires they&rsquo;ve battled in the past few days. &quot; <b> (Cigarettes) </b><br />
+			<br />
+			&quot; The premium cigar tax in Louisiana will remain the same after lawmakers there last week rejected an amendment on an existing cigarette tax bill that sought to also raise the tax on premium cigars. &quot; <b> (Cigars, Cigarillos, or Little Cigars) </b><br />
+			<br />
+			&quot; Think clove cigarettes are so six years ago? A new study from the Keck School of Medicine of USC researchers finds that despite a federal Food and Drug Administration ban in 2009, flavored cigarettes are still available for purchase over the Internet and are popular search targets. &quot; <b> (Kreteks or Cloved Cigarettes) </b><br />
+			<br />
+			&quot; The bidi industry is largely unregulated. About 90 per cent of all bidi makers are not registered with the government, stated a report by the All India Bidi Industry Federation, which was submitted to the World Health Organization&rsquo;s tobacco-free initiative. &quot; <b> (Bidis, Beedies, or Bidias) </b><br />
+			<br />
+			&quot; Citing the growing popularity of e-cigarettes, the Food and Drug Administration is considering adding warning labels on liquid nicotine used in so-called electronic &quot;vaping&quot; devices and is also mulling a requirement for the liquid to be sold in child-resistant packaging. &quot; <b> (Electronic Cigarettes or Cigars) </b><br />
+			<br />
+			&quot; The use of hookahs &ndash; pipes that bubble tobacco smoke through water before you puff &ndash; doubled among middle- and high-schoolers in just one year. &quot; <b> (Waterpipe Tobacco or Hookah) </b><br />
+			<br />
+			&nbsp;
+			<hr /> <i>(2)</i> Select which of the following thematic aspects are mentioned in the article:
+
+			<ul>
+				<li><b>Tobacco product use prevalence</b>, statistics and trends</li>
+				<br />
+				<li><b>Smoking bans</b> to reduce air pollution, secondhand tobacco smoke, environmental smoke, or passive smoking.</li>
+				<br />
+				<li><b>Tobacco product cessation</b> (e.g. how to quit using a tobacco product or cessation products like nicotine replacement therapies)</li>
+				<br />
+				<li><b>Tobacco warning or harms</b> (e.g. general warnings about tobacco, warning labels on tobacco packages or discussion of specific diseases or health risks associated with smoking (cancer, heart, lung disease)</li>
+				<br />
+				<li><b>Tobacco advertising and marketing or counter marketing</b>, including promotions and sponsorship of sporting and cultural events, concerts, etc. Also includes anti-smoking campaigns.</li>
+				<br />
+				<li><b>Tobacco prices</b> (e.g. taxes on tobacco products or minimum price regulations)</li>
+				<br />
+				<li><b>Age laws</b> (e.g., restricting minimum age of purchase)</li>
+				<br />
+				<li><b>Flavour Restrictions</b> (e.g., banning flavours in tobacco products)</li>
+				<br />
+				<li><b>Tobacco industry</b> (e.g., descriptions of industry activities, including financial earning reports, mergers and acquisitions). Also industrial coverage of tobacco resellers who are not owned by tobacco companies, like CVS.</li>
+				<br />
+				<li><b>None of the above</b></li>
+			</ul>
+			&nbsp; Identify only which aspect was the focus of the article (the primary aspect), if any. For example, for an article titled &quot;United Kingdom should raise tobacco taxes&quot; you would select &quot;Tobacco prices.&quot;<br />
+			&nbsp;
+			<h3>Example Sentences</h3>
+			&quot;Smoking rates among young adults rose from 12.3 percent in 2010 to 14.6 percent in 2011, a new state study reveals&quot; <b>(Tobacco use prevalence, statistics and trends)</b><br />
+			<br />
+			&quot;Russia took a step towards clamping down on the tobacco industry on December 14 as a bill to ban smoking in public spaces sailed through its first reading in parliament.&quot; <b>(Smoking bans to reduce air pollution)</b><br />
+			<br />
+			&quot;If you quit smoking 20 cigarettes a day at an early age and then invested the &pound;7.60 a day saved in a tax-efficient pension with employer contributions on top, the potential pension pot could be enormous.&quot; <b>(Tobacco Cessation)</b><br />
+			<br />
+			&quot;The reinstatement is being sought to aid in the FDA&#39;s efforts to implement the mandatory graphic warnings required by the Tobacco Control&quot; <b>(Tobacco Warning/Harms)</b><br />
+			<br />
+			&quot;Another recommendation would raise the state&#39;s cigarette tax to $1 a pack from the current 60 cents&quot; or &quot;There are 25 other states, including Minnesota, that regulate minimum cigarette prices, but they do not prohibit the use of promotional coupon...&quot; <b>(Tobacco Prices)</b><br />
+			<br />
+			&quot;Marketers of e-cigarettes are introducing campaigns that echo the traditional appeals for tobacco cigarettes in both content and media placements.&quot; or &quot;The Centers for Disease Control - which is set to launch another round of its &quot;Tips from Former Smokers&quot; ad campaign.&quot; <b>(Tobacco Advertising/Marketing)</b><br />
+			<br />
+			&quot;The legal age to purchase tobacco products and electronic cigarettes on Guam could increase from 18 to 21 if new legislation from Vice Speaker Benjamin Cruz, D-Piti, is approved&quot; or &quot;the Senate unanimously voted Wednesday to ban the use and sale of e-cigarettes to anyone under the age of 18.&quot; <b>(Age Laws)</b><br />
+			<br />
+			&quot;Cities and states around the country are considering banning the sale of flavored e-cigarettes&quot; <b>(Flavour restrictions)</b><br />
+			<br />
+			&quot;Tobacco companies have introduced almost no new cigarettes or smokeless tobacco products in the U.S. in more than 18 months, an Associated Press review has found&quot; or &quot;The CVS Health Corporation said Tuesday that it was resigning from the United States Chamber of Commerce after revelations that the chamber and its foreign affiliates were undertaking a global lobbying campaign against antismoking laws.&quot; <b>(Tobacco Industry)</b><br />
+			&nbsp;
+		</tr>
+	</tbody>
+</table>
+</div>
+<script type='text/javascript'>
+function toggleOtherProduct() {
+
+}
+/*
+  if (document.getElementById("primary_product").selectedIndex == 8) {
+    // document.getElementById("primary_product_freetext").disabled = false;
+    var prodDiv = document.getElementById("primary_product_freetext_div");
+    prodDiv.style.display = "inline";
+    // prodDiv.style.visibility  = "visible";
+  }
+  else {
+    // document.getElementById("primary_product_freetext").disabled = true;
+    var prodDiv = document.getElementById("primary_product_freetext_div");
+    prodDiv.style.display = "none";
+    // prodDiv.style.visibility = "hidden";
+    document.getElementById("primary_product_freetext").value = "";
+  }
+}*/
+
+function disableAllChildren(div, disable) {
+	var children = div.children;
+	
+	for(var i = 0; i < children.length; i++) {
+		children[i].disabled = disable;
+		
+		disableAllChildren(children[i], disable);
+	}
+	
+}
+
+function isRelevant(bool_value) {
+  var question_div = document.getElementById("hit_remainder_div");
+  if (bool_value == true) {
+    question_div.className = "";
+
+	disableAllChildren(question_div, false);
+
+  }
+  else {
+    question_div.className = "faded";
+
+	disableAllChildren(question_div, true);
+
+    
+  }
+}
+
+
+
+
+function recordLinkClicked() {
+  document.getElementById("link_clicked").selectedIndex = 1;
+}
+
+</script>
+
+<p>&nbsp;&nbsp;</p>
+
+<p><a href="${url1}" onclick="recordLinkClicked();" target="_blank">Click to open the article: ${url1}</a></p>
+
+<div id="task" style="display: inline">
+<p><b>Is this article <i>primarily</i> about tobacco use, tobacco effects, tobacco products (including products other than cigarettes, such as snus or hookah), tobacco policy, or the tobacco industry? </b><br />
+&nbsp;&nbsp;&nbsp;&nbsp;<input id="about_tobacco_yes" name="about_tobacco" onclick="isRelevant(true);" type="radio" value="yes" /> Yes<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<input id="about_tobacco_no" name="about_tobacco" onclick="isRelevant(false);" type="radio" value="no" /> No<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<input id="about_tobacco_not_english" name="about_tobacco" onclick="isRelevant(false);" type="radio" value="not_english" /> Article is not in English<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<input id="about_tobacco_broken" name="about_tobacco" onclick="isRelevant(false);" type="radio" value="broken" /> Link is broken</p>
+
+<div class="faded" id="hit_remainder_div" style="display: inline">
+<p><b>Select which of the following tobacco products are the primary subject of the article: </b><br />
+<select id="primary_product" name="product" onchange="toggleOtherProduct();"><option value="default">--- Select Primary Product ---</option><option value="smokeless_tobacco_primary">Smokeless tobacco</option><option value="cigarettes_primary">Cigarettes</option><option value="cigars_primary">Cigars, Cigarillos, or Little Cigars</option><option value="kreteks_primary">Kreteks or Cloved Cigarettes</option><option value="bidis_primary">Bidis, Beedies, or Bidias</option><option value="ecigs_primary">Electronic Cigarettes or Cigars</option><option value="hookahs_primary">Waterpipe Tobacco or Hookah</option><option value="other_primary">Other</option><option value="none_primary">No product is the focus</option> </select><br />
+&nbsp;</p>
+
+<!-- <div id="primary_product_freetext_div">What is the primary tobacco product? <input id="primary_product_freetext" /></div>-->
+
+<!--
+<p><b>Check all of the tobacco products that were mentioned in the article: </b><br />
+<input id="smokeless_tobacco_mention" name="smokeless_tobacco" type="checkbox" /> Smokeless tobacco<br />
+<input id="cigarettes_mention" name="cigarettes" type="checkbox" /> Cigarettes<br />
+<input id="cigars_mention" name="cigars" type="checkbox" /> Cigars, Cigarillos, or Little Cigars<br />
+<input id="kreteks_mention" name="kreteks" type="checkbox" /> Kreteks or Cloved Cigarettes<br />
+<input id="bidis_mention" name="bidis" type="checkbox" /> Bidis, Beedies, or Bidias<br />
+<input id="ecigs_mention" name="ecigs" type="checkbox" /> Electronic Cigarettes or Cigars<br />
+<input id="hookahs_mention" name="hookahs" type="checkbox" /> Waterpipe Tobacco or Hookah<br />
+&nbsp;</p>
+-->
+
+<p><b>Select the primary theme of the article<br />
+<b><select id="primary_theme" name="aspect"><option value="default">--- Select Primary Theme ---</option><option value="prevalence">Tobacco Product Prevalence/Statistics</option><option value="smoking_bans">Smoking Bans</option><option value="cessation">Tobacco Product Cessation</option><option value="warnings_harms">Tobacco Warnings or Harms</option><option value="advertising_marketing">Tobacco Advertising/Counter Marketing</option><option value="prices">Tobacco Prices</option><option value="age_laws">Age Laws</option><option value="flavor_restrictions">Flavour Restrictions</option><option value="tobacco_industry">Tobacco Industry</option><option value="none_of_the_above">None of the above</option> </select></b></b><br />
+&nbsp;</p>
+
+<!--
+<p><b><b><input id="is_editorial" name="is_editorial" type="checkbox" /><b>Is this article an editorial? (check if yes)</b></b></b></p>
+</div>
+-->
+
+<p><br />
+<b><b><!-- To keep track of whether or not they clicked on the link.
+     May not want to use this. --> <select id="link_clicked" name="link_clicked" style="display: none"><option value="no">no</option><option value="yes">yes</option> </select> <select id="instructions_clicked" name="instructions_clicked" style="display: none"><option value="no">no</option><option value="yes">yes</option> </select> </b></b></p>
+
+<p><b><b>&nbsp;</b></b></p>
+</div>
+
+<p>&nbsp;</p>
+<script>
+isRelevant(false);
+</script>
