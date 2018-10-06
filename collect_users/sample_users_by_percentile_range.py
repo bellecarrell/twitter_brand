@@ -49,15 +49,19 @@ def save_percentiles(out_dir, percentiles):
         for val in percentiles:
             f.write("log_follower: {} follower: {}\n".format(val, 10**val))
 
+def is_active_id(id):
+    response = requests.get('https://twitter.com/intent/user?user_id=' + id)
+    if response.status_code == 200:
+        return True
+    return False
+
 def is_active(user):
     id = id_p.findall(user)
     active_user = False
 
     if id:
         id = id[0]
-        response = requests.get('https://twitter.com/intent/user?user_id=' + id)
-        if response.status_code == 200:
-            active_user = True
+        active_user = is_active_id(id)
 
     return active_user
 
@@ -114,6 +118,10 @@ if __name__ == '__main__':
     num_users_per_interval = 400
 
     user_json = read_user_json_file(in_dir)
+    for user in user_json:
+        if is_active(user) is False:
+            pass
+
     follower_counts = collect_follower_counts(user_json)
     log_follower_percentiles = calculate_log_follower_percentiles(follower_counts, percentile_max)
     save_percentiles(out_dir, log_follower_percentiles)
