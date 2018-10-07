@@ -144,8 +144,7 @@
 
 <h1>Identifying Self-Promoting Twitter Accounts</h1>
 
-<p><a href="#" id="instructions-link" onclick="expand('instructions'); collapse('instructions-link'); return(false);">View
-    Instructions</a></p>
+<p><a href="#" id="instructions-link" onclick="expand('instructions'); collapse('instructions-link'); return(false);">View Detailed Instructions and Examples</a></p>
 
 <div id="instructions" style="display: none">
     <!-- div id="instructions" -->
@@ -159,7 +158,7 @@
                 their expertise or careers online.  For each HIT, follow the link to a Twitter user's profile
                 summary, and perform two tasks. (1) Classify this account as either belonging to a
                 "self-promoting" user: someone who uses Twitter primarily to promote their expertise, online
-                presence, or career, or one of the three other accounts:
+                presence, or career, or one of the three other account types:
                 inactive account, a non-English speaker, or personal account (account is used to talk about
                 personal life, more than promoting their career). </span>
                 <span style="font-size:12.0pt;line-height:115%"> Below are examples of each account type: </span>
@@ -230,14 +229,14 @@
 <h2> Visit <a target="_blank" href="https://twitter.com/intent/user?user_id=${user_id}"> User Profile [ID = ${user_id}]</a> </h2>
 <br />
 
-<h3><b>(1) Classify Twitter account.</b></h3>
+<h3><b>(1) Classify this Twitter account:</b></h3>
 
 <input id="classify_account1" name="classify_account" type="radio" value="0"
        onclick="fadeSection('classify_account4', 'if_active')"
        style="transform:scale(1.5)"/> Account is missing, private, or banned <br>
 <input id="classify_account2" name="classify_account" type="radio" value="0"
        onclick="fadeSection('classify_account4', 'if_active')"
-       style="transform:scale(1.5)"/> Primary language is <b>not</b> English <br>
+       style="transform:scale(1.5)"/> User's primary language is <b>not</b> English <br>
 <input id="classify_account3" name="classify_account" type="radio" value="0"
        onclick="fadeSection('classify_account4', 'if_active')"
        style="transform:scale(1.5)"/> Account is primarily for personal use <br>
@@ -249,12 +248,15 @@
 
 <fieldset id="if_active" class="fadedClass" disabled="disabled">
 
-  <h3><b>(2) Using <i>all</i> parts of the user summary page (profile image, name,
-         description, tweets), mark every relevant category
-         using the checkboxes on the right. Also, select the <i>most</i> relevant
-         category by using the radio buttons on the left. If you are unsure what
-         the primary focus is, try your best to fit them into one of the predefined
-         categories.  If selecting "Other", describe using the text field.</b></h3>
+  <h3><b>(2) If this user is promoting their online presence or career, mark
+         <i>all</i> relevant categories
+         using the checkboxes on the right and select the <i>most</i> relevant
+         category by using the radio buttons on the left. If you are not sure what
+         this user's primary focus is, do your best to fit them into one of
+         the predefined categories.  If selecting "Other", describe the category
+         in the text field.  You
+         can use <i>all</i> parts of the user summary page (profile image, name,
+         description, tweets) to tag categories.</b></h3>
   <p>
 
     <font size="4.0" >
