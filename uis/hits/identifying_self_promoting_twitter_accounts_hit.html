@@ -60,23 +60,23 @@
         var self_promoting = document.getElementById('self_promoting_true');
         var nof_self_promoting = document.getElementById('self_promoting_false');
 
-        var cat_most1 = document.getElementById('category_most1');
-        var cat_most2 = document.getElementById('category_most2');
-        var cat_most3 = document.getElementById('category_most3');
-        var cat_most4 = document.getElementById('category_most4');
-        var cat_most5 = document.getElementById('category_most5');
-        var cat_most6 = document.getElementById('category_most6');
-        var cat_most7 = document.getElementById('category_most7');
-        var other_most = document.getElementById('category_most8');
+        var cat_most1 = document.getElementById('category_most_travel');
+        var cat_most2 = document.getElementById('category_most_beauty');
+        var cat_most3 = document.getElementById('category_most_gastronomy');
+        var cat_most4 = document.getElementById('category_most_politics');
+        var cat_most5 = document.getElementById('category_most_style');
+        var cat_most6 = document.getElementById('category_most_family');
+        var cat_most7 = document.getElementById('category_most_sports');
+        var other_most = document.getElementById('category_most_other');
 
-        var cat_all1 = document.getElementById('category_all1');
-        var cat_all2 = document.getElementById('category_all2');
-        var cat_all3 = document.getElementById('category_all3');
-        var cat_all4 = document.getElementById('category_all4');
-        var cat_all5 = document.getElementById('category_all5');
-        var cat_all6 = document.getElementById('category_all6');
-        var cat_all7 = document.getElementById('category_all7');
-        var other_all = document.getElementById('category_all8');
+        var cat_all1 = document.getElementById('category_all_travel');
+        var cat_all2 = document.getElementById('category_all_beauty');
+        var cat_all3 = document.getElementById('category_all_gastronomoy');
+        var cat_all4 = document.getElementById('category_all_politics');
+        var cat_all5 = document.getElementById('category_all_style');
+        var cat_all6 = document.getElementById('category_all_family');
+        var cat_all7 = document.getElementById('category_all_sports');
+        var other_all = document.getElementById('category_all_other');
 
         if (active.checked) {
 
@@ -231,16 +231,16 @@
 
 <h3><b>(1) Classify this Twitter account:</b></h3>
 
-<input id="classify_account1" name="classify_account" type="radio" value="0"
+<input id="classify_account1" name="classify_account" type="radio" value="missing"
        onclick="fadeSection('classify_account4', 'if_active')"
        style="transform:scale(1.5)"/> Account is missing, private, or banned <br>
-<input id="classify_account2" name="classify_account" type="radio" value="0"
+<input id="classify_account2" name="classify_account" type="radio" value="non_english"
        onclick="fadeSection('classify_account4', 'if_active')"
        style="transform:scale(1.5)"/> User's primary language is <b>not</b> English <br>
-<input id="classify_account3" name="classify_account" type="radio" value="0"
+<input id="classify_account3" name="classify_account" type="radio" value="personal"
        onclick="fadeSection('classify_account4', 'if_active')"
        style="transform:scale(1.5)"/> Account is primarily for personal use <br>
-<input id="classify_account4" name="classify_account" type="radio" value="1"
+<input id="classify_account4" name="classify_account" type="radio" value="promoting"
        onclick="fadeSection('classify_account4', 'if_active')"
        style="transform:scale(1.5)"/> Account is used for promoting online presence or career
 
@@ -275,7 +275,7 @@
         </tr>
 
         <tr>
-            <td style="text-align:center"><input id="category_most_travel" name="category_most_index" type="radio" value="0"
+            <td style="text-align:center"><input id="category_most_travel" name="category_most_index" type="radio" value="travel"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Travel</td>
 
@@ -284,7 +284,7 @@
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most_beauty" name="category_most_index" type="radio" value="1"
+            <td style="text-align:center"><input id="category_most_beauty" name="category_most_index" type="radio" value="beauty"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Beauty</td>
             <td style="text-align:center"><input id="category_all_beauty" name="category_all_beauty" type="checkbox"
@@ -292,7 +292,7 @@
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most_gastronomy" name="category_most_index" type="radio" value="2"
+            <td style="text-align:center"><input id="category_most_gastronomy" name="category_most_index" type="radio" value="gastronomy"
                                                  style="transform:scale(1.5)"/></td>
 
             <td style="text-align:center"> Gastronomy (Food/Drink)</td>
@@ -301,7 +301,7 @@
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most_politics" name="category_most_index" type="radio" value="3"
+            <td style="text-align:center"><input id="category_most_politics" name="category_most_index" type="radio" value="politics"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Politics</td>
             <td style="text-align:center"><input id="category_all_politics" name="category_all_politics" type="checkbox"
@@ -309,7 +309,7 @@
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most_style" name="category_most_index" type="radio" value="4"
+            <td style="text-align:center"><input id="category_most_style" name="category_most_index" type="radio" value="style"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Style</td>
             <td style="text-align:center"><input id="category_all_style" name="category_all_style" type="checkbox"
@@ -317,7 +317,7 @@
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most_family" name="category_most_index" type="radio" value="5"
+            <td style="text-align:center"><input id="category_most_family" name="category_most_index" type="radio" value="family"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Family</td>
             <td style="text-align:center"><input id="category_all_family" name="category_all_family" type="checkbox"
@@ -325,7 +325,7 @@
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most_sports" name="category_most_index" type="radio" value="6"
+            <td style="text-align:center"><input id="category_most_sports" name="category_most_index" type="radio" value="sports"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Sports</td>
             <td style="text-align:center"><input id="category_all_sports" name="category_all_sports" type="checkbox"
@@ -333,7 +333,7 @@
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most_other" name="category_most_index" type="radio" value="7"
+            <td style="text-align:center"><input id="category_most_other" name="category_most_index" type="radio" value="other"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Other: <textarea cols="20" id="other_text" name="other_text"
                                                             rows="1"></textarea></td>
