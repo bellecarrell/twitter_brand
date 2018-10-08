@@ -1,6 +1,5 @@
-import argparse
 from configs.config import *
-from collect_users.sample_util import *
+from utils.sample_util import *
 from utils.file_io import *
 
 inactive_id = '1YjSjnArcKlmtIyNbVUimjRhnXeGwXHpL'

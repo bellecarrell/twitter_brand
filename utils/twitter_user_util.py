@@ -1,7 +1,36 @@
 import re
+import requests
 
 #user json fields, by type
 ints = ['followers_count']
+
+def has_linked_page(user):
+    url_re = re.compile('.*http.|.*www.')
+    description = field_from_json('description', user)
+    url = field_from_json('url', user)
+
+    if url:
+        full_url = url_re.findall(url)
+        if full_url:
+            return True
+    if description:
+        url_in_description = url_re.findall(description)
+        if url_in_description:
+            return True
+    return False
+
+def is_active_id(id):
+    response = requests.get('https://twitter.com/intent/user?user_id=' + id)
+    if response.status_code == 200:
+        return True
+    return False
+
+
+def is_active(user):
+    id = field_from_json('id_str', user)
+    active_user = is_active_id(id)
+
+    return active_user
 
 def re_for_json_field(field):
     if field in ints:
