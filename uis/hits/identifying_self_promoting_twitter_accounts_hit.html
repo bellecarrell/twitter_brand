@@ -35,8 +35,8 @@
     }
 
     window.onload = function () {
-        document.getElementById('submitButton').setAttribute('onclick',
-            'return validateForm()');
+        //document.getElementById('submitButton').setAttribute('onclick',
+        //    'return validateForm()');
     }
 
     function fadeSection(button, fieldset) {
@@ -60,23 +60,23 @@
         var self_promoting = document.getElementById('self_promoting_true');
         var nof_self_promoting = document.getElementById('self_promoting_false');
 
-        var cat_most1 = document.getElementById('category_most1');
-        var cat_most2 = document.getElementById('category_most2');
-        var cat_most3 = document.getElementById('category_most3');
-        var cat_most4 = document.getElementById('category_most4');
-        var cat_most5 = document.getElementById('category_most5');
-        var cat_most6 = document.getElementById('category_most6');
-        var cat_most7 = document.getElementById('category_most7');
-        var other_most = document.getElementById('category_most8');
+        var cat_most1 = document.getElementById('category_most_travel');
+        var cat_most2 = document.getElementById('category_most_beauty');
+        var cat_most3 = document.getElementById('category_most_gastronomy');
+        var cat_most4 = document.getElementById('category_most_politics');
+        var cat_most5 = document.getElementById('category_most_style');
+        var cat_most6 = document.getElementById('category_most_family');
+        var cat_most7 = document.getElementById('category_most_sports');
+        var other_most = document.getElementById('category_most_other');
 
-        var cat_all1 = document.getElementById('category_all1');
-        var cat_all2 = document.getElementById('category_all2');
-        var cat_all3 = document.getElementById('category_all3');
-        var cat_all4 = document.getElementById('category_all4');
-        var cat_all5 = document.getElementById('category_all5');
-        var cat_all6 = document.getElementById('category_all6');
-        var cat_all7 = document.getElementById('category_all7');
-        var other_all = document.getElementById('category_all8');
+        var cat_all1 = document.getElementById('category_all_travel');
+        var cat_all2 = document.getElementById('category_all_beauty');
+        var cat_all3 = document.getElementById('category_all_gastronomoy');
+        var cat_all4 = document.getElementById('category_all_politics');
+        var cat_all5 = document.getElementById('category_all_style');
+        var cat_all6 = document.getElementById('category_all_family');
+        var cat_all7 = document.getElementById('category_all_sports');
+        var other_all = document.getElementById('category_all_other');
 
         if (active.checked) {
 
@@ -144,8 +144,7 @@
 
 <h1>Identifying Self-Promoting Twitter Accounts</h1>
 
-<p><a href="#" id="instructions-link" onclick="expand('instructions'); collapse('instructions-link'); return(false);">View
-    Instructions</a></p>
+<p><a href="#" id="instructions-link" onclick="expand('instructions'); collapse('instructions-link'); return(false);">View Detailed Instructions and Examples</a></p>
 
 <div id="instructions" style="display: none">
     <!-- div id="instructions" -->
@@ -159,7 +158,7 @@
                 their expertise or careers online.  For each HIT, follow the link to a Twitter user's profile
                 summary, and perform two tasks. (1) Classify this account as either belonging to a
                 "self-promoting" user: someone who uses Twitter primarily to promote their expertise, online
-                presence, or career, or one of the three other accounts:
+                presence, or career, or one of the three other account types:
                 inactive account, a non-English speaker, or personal account (account is used to talk about
                 personal life, more than promoting their career). </span>
                 <span style="font-size:12.0pt;line-height:115%"> Below are examples of each account type: </span>
@@ -230,18 +229,18 @@
 <h2> Visit <a target="_blank" href="https://twitter.com/intent/user?user_id=${user_id}"> User Profile [ID = ${user_id}]</a> </h2>
 <br />
 
-<h3><b>(1) Classify Twitter account.</b></h3>
+<h3><b>(1) Classify this Twitter account:</b></h3>
 
-<input id="classify_account1" name="classify_account" type="radio" value="0"
+<input id="classify_account1" name="classify_account" type="radio" value="missing"
        onclick="fadeSection('classify_account4', 'if_active')"
        style="transform:scale(1.5)"/> Account is missing, private, or banned <br>
-<input id="classify_account2" name="classify_account" type="radio" value="0"
+<input id="classify_account2" name="classify_account" type="radio" value="non_english"
        onclick="fadeSection('classify_account4', 'if_active')"
-       style="transform:scale(1.5)"/> Primary language is <b>not</b> English <br>
-<input id="classify_account3" name="classify_account" type="radio" value="0"
+       style="transform:scale(1.5)"/> User's primary language is <b>not</b> English <br>
+<input id="classify_account3" name="classify_account" type="radio" value="personal"
        onclick="fadeSection('classify_account4', 'if_active')"
        style="transform:scale(1.5)"/> Account is primarily for personal use <br>
-<input id="classify_account4" name="classify_account" type="radio" value="1"
+<input id="classify_account4" name="classify_account" type="radio" value="promoting"
        onclick="fadeSection('classify_account4', 'if_active')"
        style="transform:scale(1.5)"/> Account is used for promoting online presence or career
 
@@ -249,12 +248,15 @@
 
 <fieldset id="if_active" class="fadedClass" disabled="disabled">
 
-  <h3><b>(2) Using <i>all</i> parts of the user summary page (profile image, name,
-         description, tweets), mark every relevant category
-         using the checkboxes on the right. Also, select the <i>most</i> relevant
-         category by using the radio buttons on the left. If you are unsure what
-         the primary focus is, try your best to fit them into one of the predefined
-         categories.  If selecting "Other", describe using the text field.</b></h3>
+  <h3><b>(2) If this user is promoting their online presence or career, mark
+         <i>all</i> relevant categories
+         using the checkboxes on the right and select the <i>most</i> relevant
+         category by using the radio buttons on the left. If you are not sure what
+         this user's primary focus is, do your best to fit them into one of
+         the predefined categories.  If selecting "Other", describe the category
+         in the text field.  You
+         can use <i>all</i> parts of the user summary page (profile image, name,
+         description, tweets) to tag categories.</b></h3>
   <p>
 
     <font size="4.0" >
@@ -273,70 +275,70 @@
         </tr>
 
         <tr>
-            <td style="text-align:center"><input id="category_most1" name="category_most_index" type="radio" value="0"
+            <td style="text-align:center"><input id="category_most_travel" name="category_most_index" type="radio" value="travel"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Travel</td>
 
-            <td style="text-align:center"><input id="category_all1" name="category_all1" type="checkbox"
-                                                 value="category_all"
+            <td style="text-align:center"><input id="category_all_travel" name="category_all_travel" type="checkbox"
+                                                 value="category_travel"
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most2" name="category_most_index" type="radio" value="1"
+            <td style="text-align:center"><input id="category_most_beauty" name="category_most_index" type="radio" value="beauty"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Beauty</td>
-            <td style="text-align:center"><input id="category_all2" name="category_all2" type="checkbox"
-                                                 value="category_all"
+            <td style="text-align:center"><input id="category_all_beauty" name="category_all_beauty" type="checkbox"
+                                                 value="category_beauty"
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most3" name="category_most_index" type="radio" value="2"
+            <td style="text-align:center"><input id="category_most_gastronomy" name="category_most_index" type="radio" value="gastronomy"
                                                  style="transform:scale(1.5)"/></td>
 
-            <td style="text-align:center"> Gastronomy</td>
-            <td style="text-align:center"><input id="category_all3" name="category_all3" type="checkbox"
-                                                 value="category_all"
+            <td style="text-align:center"> Gastronomy (Food/Drink)</td>
+            <td style="text-align:center"><input id="category_all_gastronomy" name="category_all_gastronomy" type="checkbox"
+                                                 value="category_gastronomy"
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most4" name="category_most_index" type="radio" value="3"
+            <td style="text-align:center"><input id="category_most_politics" name="category_most_index" type="radio" value="politics"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Politics</td>
-            <td style="text-align:center"><input id="category_all4" name="category_all4" type="checkbox"
-                                                 value="category_all"
+            <td style="text-align:center"><input id="category_all_politics" name="category_all_politics" type="checkbox"
+                                                 value="category_politics"
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most5" name="category_most_index" type="radio" value="4"
+            <td style="text-align:center"><input id="category_most_style" name="category_most_index" type="radio" value="style"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Style</td>
-            <td style="text-align:center"><input id="category_all5" name="category_all5" type="checkbox"
-                                                 value="category_all"
+            <td style="text-align:center"><input id="category_all_style" name="category_all_style" type="checkbox"
+                                                 value="category_style"
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most6" name="category_most_index" type="radio" value="4"
+            <td style="text-align:center"><input id="category_most_family" name="category_most_index" type="radio" value="family"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Family</td>
-            <td style="text-align:center"><input id="category_all6" name="category_all5" type="checkbox"
-                                                 value="category_all"
+            <td style="text-align:center"><input id="category_all_family" name="category_all_family" type="checkbox"
+                                                 value="category_family"
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most7" name="category_most_index" type="radio" value="4"
+            <td style="text-align:center"><input id="category_most_sports" name="category_most_index" type="radio" value="sports"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Sports</td>
-            <td style="text-align:center"><input id="category_all7" name="category_all5" type="checkbox"
-                                                 value="category_all"
+            <td style="text-align:center"><input id="category_all_sports" name="category_all_sports" type="checkbox"
+                                                 value="category_sports"
                                                  style="transform:scale(1.5)"/></td>
         </tr>
         <tr>
-            <td style="text-align:center"><input id="category_most8" name="category_most_index" type="radio" value="4"
+            <td style="text-align:center"><input id="category_most_other" name="category_most_index" type="radio" value="other"
                                                  style="transform:scale(1.5)"/></td>
             <td style="text-align:center"> Other: <textarea cols="20" id="other_text" name="other_text"
                                                             rows="1"></textarea></td>
-            <td style="text-align:center"><input id="category_all8" name="category_all5" type="checkbox"
-                                                 value="category_all"
+            <td style="text-align:center"><input id="category_all_other" name="category_all_other" type="checkbox"
+                                                 value="category_other"
                                                  style="transform:scale(1.5)"/></td>
         </tr>
     </table>
