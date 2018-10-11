@@ -2,6 +2,7 @@ import argparse
 from configs.config import *
 import pandas as pd
 
+
 def mean_median(df, col, where_col, where_val):
     if where_col:
         df = df.loc[df[where_col] == where_val]
@@ -10,8 +11,8 @@ def mean_median(df, col, where_col, where_val):
 
     return vals.mean(), vals.median()
 
-def add_per(df_with_count, total=None):
 
+def add_per(df_with_count, total=None):
     if total:
         per = 100 * (df_with_count['count'] / total)
     else:
@@ -19,6 +20,28 @@ def add_per(df_with_count, total=None):
 
     df_with_count['percentage'] = per
     return df_with_count
+
+
+def inter_annotator(df, worker, workers):
+    worker_hits = df.loc[df['WorkerId'] == worker]['HITId']
+    totals = [0 for worker in workers]
+    agrees = [0 for worker in workers]
+    answers = [row for row in df.columns.values if 'Answer' in row]
+
+    for hit in worker_hits:
+        hit_rows = df.loc[df['HITId'] == hit]
+        hit_workers = hit_rows.WorkerId.unique()
+
+        for answer in answers:
+            worker_response = hit_rows.loc[df['WorkerId'] == worker][answer].iloc[0]
+
+            for other_worker in hit_workers:
+                totals[workers.index(other_worker)] += 1
+                other_response = hit_rows.loc[df['WorkerId'] == other_worker][answer].iloc[0]
+                if worker_response == other_response:
+                    agrees[workers.index(other_worker)] += 1
+
+    return [worker] + [100 * (agree / total) if total != 0 else 'N/A' for agree, total in zip(agrees, totals) ]
 
 if __name__ == '__main__':
     """
@@ -36,8 +59,12 @@ if __name__ == '__main__':
     df = pd.read_csv(in_file)
     output_dfs = []
 
-    answer_cols_to_statify = ['classify_account', 'category_most_index', 'category_all_style', 'category_all_travel', 'category_all_beauty', 'category_all_gastronomy', 'category_all_politics', 'category_all_family', 'category_all_sports', 'category_all_other']
-    all_df = pd.DataFrame(columns=['category', 'count', 'percentage'])
+    answer_cols_to_statify = ['classify_account', 'category_most_index', 'category_all_style', 'category_all_travel',
+                              'category_all_beauty', 'category_all_gastronomy', 'category_all_politics',
+                              'category_all_family', 'category_all_sports', 'category_all_other']
+    separate_all_df = pd.DataFrame(columns=['category', 'count', 'percentage'])
+    mj_all_df = pd.DataFrame(columns=['category', 'count', 'percentage'])
+    un_all_df = pd.DataFrame(columns=['category', 'count', 'percentage'])
 
     for col in answer_cols_to_statify:
         all = False
@@ -52,49 +79,71 @@ if __name__ == '__main__':
             separate = add_per(separate)
             separate_fname = 'separate_' + col
             output_dfs.append((separate_fname, separate))
-        #else:
-        #    separate = add_per(separate, total_promoting_hits)
-        #    separate_fname = 'separate_' + col
-        #    output_dfs.append((separate_fname, separate))
+        else:
+            separate = add_per(separate, total_promoting_hits)
+            separate_all_df.loc[0] = [col, separate['count'].iloc[0], separate['percentage'].iloc[0]]
+            separate_all_df.index = separate_all_df.index + 1
 
         ac_gp = df.groupby(['HITId', full_col_name]).size()
+        mj = ac_gp.loc[ac_gp.values >= 2].groupby(full_col_name).size().to_frame(name='count').reset_index()
         # majority vote
         if not all:
-            mj = ac_gp.loc[ac_gp.values >= 2].groupby(full_col_name).size().to_frame(name='count').reset_index()
             mj = add_per(mj)
             mj_fname = 'majority_' + col
             output_dfs.append((mj_fname, mj))
+        else:
+            mj = add_per(mj, total_promoting_hits)
+            mj_all_df.loc[0] = [col, mj['count'].iloc[0], mj['percentage'].iloc[0]]
+            mj_all_df.index = mj_all_df.index + 1
 
         # unanimous
+        un = ac_gp.loc[ac_gp.values >= 3].groupby(full_col_name).size().to_frame(name='count').reset_index()
         if not all:
-            un = ac_gp.loc[ac_gp.values >=3].groupby(full_col_name).size().to_frame(name='count').reset_index()
             un = add_per(un)
-
             un_fname = 'unanimous_' + col
             output_dfs.append((un_fname, un))
+        else:
+            un = add_per(un, total_promoting_hits)
+            if not un.empty:
+                un_all_df.loc[0] = [col, un['count'].iloc[0], un['percentage'].iloc[0]]
+            else:
+                un_all_df.loc[0] = [col, '0', '0']
+
+            un_all_df.index = un_all_df.index + 1
+
+    output_dfs.append(('separate_all', separate_all_df))
+    output_dfs.append(('mj_all', mj_all_df))
+    output_dfs.append(('un_all', un_all_df))
 
     workers = df.WorkerId.unique()
     worker_hit_counts = df.groupby('WorkerId').count().HITId
     worker_df = pd.DataFrame(columns=['WorkerId', 'mean', 'median', 'non_promoting'])
-    i = -1
+    # inter-annotator
+    ia_cols = ['selected_worker'] + list(workers)
+    ia_df = pd.DataFrame(columns=ia_cols)
 
     for worker in workers:
         mean, median = mean_median(df, 'WorkTimeInSeconds', 'WorkerId', worker)
         number_assignments = worker_hit_counts.get(worker)
 
-        classifications = df.loc[df['WorkerId'] == worker].groupby('Answer.classify_account').size().to_frame(name='count').reset_index()
+        classifications = df.loc[df['WorkerId'] == worker].groupby('Answer.classify_account').size().to_frame(
+            name='count').reset_index()
         classifications = add_per(classifications)
-        p = classifications.loc[df['Answer.classify_account'] == 'promoting']['percentage']
-        non_promoting = 100 - classifications.loc[df['Answer.classify_account'] == 'promoting']['percentage']
+        # hack -- actual indexing isn't working for some reason?
+        non_promoting = 100 - classifications.tail(1)['percentage'].iloc[0]
 
-        worker_df.loc[0] = [worker, mean, median, 'tbd']
+        worker_df.loc[0] = [worker, mean, median, non_promoting]
         worker_df.index = worker_df.index + 1
 
+        inter_annotator_agreement = inter_annotator(df, worker, list(workers))
+        ia_df.loc[0] = inter_annotator_agreement
+        ia_df.index = ia_df.index + 1
+
     output_dfs.append(('worker_stats', worker_df))
+    output_dfs.append(('inter-annotator', ia_df))
 
     for name_df in output_dfs:
         name = name_df[0]
         df = name_df[1]
         fname = out_dir + name + '.csv'
         df.to_csv(fname)
-
