@@ -1,7 +1,7 @@
 import argparse
 from configs.config import *
 import pandas as pd
-
+import math
 
 def mean_median(df, col, where_col, where_val):
     if where_col:
@@ -22,24 +22,29 @@ def add_per(df_with_count, total=None):
     return df_with_count
 
 
-def inter_annotator(df, worker, workers):
+def inter_annotator(df, worker, workers, answers):
     worker_hits = df.loc[df['WorkerId'] == worker]['HITId']
-    totals = [0 for worker in workers]
-    agrees = [0 for worker in workers]
-    answers = [row for row in df.columns.values if 'Answer' in row]
+    totals = [0 for answer in answers]
+    agrees = [0 for answer in answers]
 
     for hit in worker_hits:
         hit_rows = df.loc[df['HITId'] == hit]
         hit_workers = hit_rows.WorkerId.unique()
 
         for answer in answers:
-            worker_response = hit_rows.loc[df['WorkerId'] == worker][answer].iloc[0]
+            worker_response = str(hit_rows.loc[df['WorkerId'] == worker][answer].iloc[0])
 
             for other_worker in hit_workers:
-                totals[workers.index(other_worker)] += 1
-                other_response = hit_rows.loc[df['WorkerId'] == other_worker][answer].iloc[0]
-                if worker_response == other_response:
-                    agrees[workers.index(other_worker)] += 1
+                if worker != other_worker:
+                    other_response = str(hit_rows.loc[df['WorkerId'] == other_worker][answer].iloc[0])
+                    if worker_response is not 'nan':
+                        totals[answers.index(answer)] += 1
+                        if worker_response == other_response:
+                            agrees[answers.index(answer)] += 1
+                    else:
+                        if other_response is 'nan':
+                            totals[answers.index(answer)] += 1
+                            agrees[answer.index(answer)] += 1
 
     return [worker] + [100 * (agree / total) if total != 0 else 'N/A' for agree, total in zip(agrees, totals) ]
 
@@ -117,9 +122,10 @@ if __name__ == '__main__':
 
     workers = df.WorkerId.unique()
     worker_hit_counts = df.groupby('WorkerId').count().HITId
-    worker_df = pd.DataFrame(columns=['WorkerId', 'mean', 'median', 'non_promoting'])
+    worker_df = pd.DataFrame(columns=['WorkerId', 'mean', 'median', 'num_assignments', 'non_promoting'])
     # inter-annotator
-    ia_cols = ['selected_worker'] + list(workers)
+    answers = [row for row in df.columns.values if 'Answer' in row]
+    ia_cols = ['selected_worker'] + answers
     ia_df = pd.DataFrame(columns=ia_cols)
 
     for worker in workers:
@@ -132,10 +138,10 @@ if __name__ == '__main__':
         # hack -- actual indexing isn't working for some reason?
         non_promoting = 100 - classifications.tail(1)['percentage'].iloc[0]
 
-        worker_df.loc[0] = [worker, mean, median, non_promoting]
+        worker_df.loc[0] = [worker, mean, median, number_assignments, non_promoting]
         worker_df.index = worker_df.index + 1
 
-        inter_annotator_agreement = inter_annotator(df, worker, list(workers))
+        inter_annotator_agreement = inter_annotator(df, worker, list(workers), answers)
         ia_df.loc[0] = inter_annotator_agreement
         ia_df.index = ia_df.index + 1
 
