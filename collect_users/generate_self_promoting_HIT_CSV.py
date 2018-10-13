@@ -14,6 +14,8 @@ style_id = '13lIg99ukplqrelqPpYNnqvtLj38ymZgp'
 family_id = '1fKsoDk_FvW0kAoExhq_d7FelMt7xGXvU'
 sports_id = '1Ea005AV1cIe8fceJEyTCcYxNar59TUuJ'
 other_id = '1gS6sArS_N21Cv52gwCdutF8dIq0Ky0gy'
+health_id = '1wzkO_7V9ZEGkPeumcZtbwE0zbtFp03cg'
+arts_id = '1t5g7ATcuKVXgXwztO0df_ELwrilNNGi-'
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -28,11 +30,11 @@ if __name__ == '__main__':
     user_ids_shuffled = users_from_sample(in_dir, sample_size)
 
     csv_rows = []
-    column_headers = ['inactive_id', 'not_english_id', 'personal_id', 'brand_id', 'travel_id', 'beauty_id', 'gastro_id', 'politics_id', 'style_id', 'family_id', 'sports_id', 'other_id', 'user_id']
+    column_headers = ['inactive_id', 'not_english_id', 'personal_id', 'brand_id', 'travel_id', 'beauty_id', 'gastro_id', 'politics_id', 'style_id', 'family_id', 'sports_id', 'health_id', 'arts_id', 'other_id', 'user_id']
     csv_rows.append(column_headers)
 
     for id in user_ids_shuffled:
-        row = [inactive_id, not_english_id, personal_id, brand_id, travel_id, beauty_id, gastro_id, politics_id, style_id, family_id, sports_id, other_id, str(id)]
+        row = [inactive_id, not_english_id, personal_id, brand_id, travel_id, beauty_id, gastro_id, politics_id, style_id, family_id, sports_id, health_id, arts_id, other_id, str(id)]
         csv_rows.append(row)
 
     csv_fname = out_dir + str(sample_size) + '_size_HIT_self_promoting.csv'
