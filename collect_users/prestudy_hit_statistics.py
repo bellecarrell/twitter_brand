@@ -54,6 +54,12 @@ def other_no_text(df, worker):
     total_other_no_text = len(df.loc[(worker_hits['Answer.other_text'] == '{}') & (df['Answer.category_most_index'] == 'other')].index)
     return 100 * total_other_no_text / total_worker_hits
 
+def did_not_complete(df, worker):
+    worker_hits = df.loc[df['WorkerId'] == worker]
+    total_worker_hits = len(worker_hits.index)
+    did_not_complete = len(df.loc[(worker_hits['Answer.classify_account'] == 'promoting') & (df['Answer.category_most_index'].isnull()==True) & (df['Answer.category_all_arts'].isnull()==True) & (df['Answer.category_all_beauty'].isnull()==True) & (df['Answer.category_all_family'].isnull()==True)& (df['Answer.category_all_gastronomy'].isnull()==True)& (df['Answer.category_all_health'].isnull()==True) & (df['Answer.category_all_other'].isnull()==True) & (df['Answer.category_all_politics'].isnull()==True) & (df['Answer.category_all_sports'].isnull()==True) & (df['Answer.category_all_style'].isnull()==True) &(df['Answer.category_all_travel'].isnull()==True)].index)
+    return 100 * did_not_complete / total_worker_hits
+
 if __name__ == '__main__':
     """
     Calculates relevant statistics for HIT results from the pre-study. 
@@ -143,7 +149,7 @@ if __name__ == '__main__':
 
     workers = df.WorkerId.unique()
     worker_hit_counts = df.groupby('WorkerId').count().HITId
-    worker_df = pd.DataFrame(columns=['WorkerId', 'mean', 'median', 'num_assignments', 'non_promoting', 'other_no_text'])
+    worker_df = pd.DataFrame(columns=['WorkerId', 'mean', 'median', 'num_assignments', 'non_promoting', 'other_no_text', 'did_not_complete'])
     # inter-annotator
     answers = [row for row in df.columns.values if 'Answer' in row]
     ia_cols = ['selected_worker'] + answers
@@ -161,7 +167,9 @@ if __name__ == '__main__':
 
         other_no_txt = other_no_text(df, worker)
 
-        worker_df.loc[0] = [worker, mean, median, number_assignments, non_promoting, other_no_txt]
+        not_complete = did_not_complete(df, worker)
+
+        worker_df.loc[0] = [worker, mean, median, number_assignments, non_promoting, other_no_txt, not_complete]
         worker_df.index = worker_df.index + 1
 
         inter_annotator_agreement = inter_annotator(df, worker, list(workers), answers)
