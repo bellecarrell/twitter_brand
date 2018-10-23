@@ -16,6 +16,7 @@ TOP_DIR = '/exp/abenton/twitter_brand_data/'
 #if not os.path.exists(TOP_DIR): os.mkdir(TOP_DIR)
 
 KEY = 'dl1'
+
 KEY_PATH = '/exp/abenton/twitter_collection/keys/{}_keys.txt'.format(KEY)
 ACCESS_TOKEN_PATH = '/exp/abenton/twitter_collection/access_tokens/access_token_{}.txt'.format(KEY)
 
