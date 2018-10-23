@@ -1,4 +1,4 @@
 MAILTO="adrian.benton@gmail.com"
 PATH=/usr/bin:/bin:/usr/local/bin:/opt/anaconda2/bin
-*/20 * * * *  /exp/abenton/twitter_brand/pull_twitter_data/pull_brand_data_userinfo.sh
-0 0 1 * * /exp/abenton/twitter_brand/pull_twitter_data/pull_brand_data_pasttweets.sh
+* */12 * * *  /exp/abenton/twitter_brand/pull_twitter_data/pull_brand_data_userinfo.sh
+1 1 1 * * /exp/abenton/twitter_brand/pull_twitter_data/pull_brand_data_pasttweets.sh
