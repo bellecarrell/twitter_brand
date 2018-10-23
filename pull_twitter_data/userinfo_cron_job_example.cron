@@ -1,3 +1,4 @@
-MAILTO="belle.carrell@gmail.com"
-0 */6 * * * sh /home/hltcoe/acarrell/PycharmProjects/twitter_brand/pull_twitter_data/pull_brand_data.sh userinfo >/dev/null 2>&1
-0 0 1 * * sh /home/hltcoe/acarrell/PycharmProjects/twitter_brand/pull_twitter_data/pull_brand_data.sh pasttweets >/dev/null 2>&1
+MAILTO="adrian.benton@gmail.com"
+PATH=/usr/bin:/bin:/usr/local/bin:/opt/anaconda2/bin
+*/20 * * * *  /exp/abenton/twitter_brand/pull_twitter_data/pull_brand_data_userinfo.sh
+0 0 1 * * /exp/abenton/twitter_brand/pull_twitter_data/pull_brand_data_pasttweets.sh
