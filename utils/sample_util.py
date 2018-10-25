@@ -12,8 +12,8 @@ def users_from_sample(in_dir, sample_size):
 
     used_fname = in_dir + 'used_ids.txt'
     used_ids = []
-    with open(used_fname, 'a+') as f:
-        used_ids = f.readlines()
+    with open(used_fname, 'r+') as f:
+        used_ids = [int(line) for line in f.readlines()]
 
     for dirpath, _, filenames in os.walk(in_dir):
         for filename in filenames:
@@ -23,7 +23,7 @@ def users_from_sample(in_dir, sample_size):
                     if line != '\n':
                         id = field_from_json('id_str', line)
                         if curr_f_users < users_per_interval:
-                            if str(id) not in used_ids and is_active_id(str(id)) and has_linked_page(line):
+                            if int(id) not in used_ids and is_active_id(str(id)) and has_linked_page(line):
                                 sample_subset.append(id)
                                 curr_f_users += 1
                                 add_to_used(in_dir, id)
