@@ -3,7 +3,7 @@ import os
 import numpy.random
 import requests
 from utils.twitter_user_util import *
-
+import requests
 
 def users_from_sample(in_dir, sample_size):
     # hardcoded. todo: count files ending in users.txt?
@@ -22,11 +22,21 @@ def users_from_sample(in_dir, sample_size):
                 for line in f:
                     if line != '\n':
                         id = field_from_json('id_str', line)
-                        if curr_f_users < users_per_interval:
-                            if int(id) not in used_ids and is_active_id(str(id)) and has_linked_page(line):
-                                sample_subset.append(id)
-                                curr_f_users += 1
-                                add_to_used(in_dir, id)
+                        if id:
+                            if curr_f_users < users_per_interval:
+                                try:
+                                    if int(id) not in used_ids and is_active_id(str(id)) and has_linked_page(line):
+                                        sample_subset.append(int(id))
+                                        curr_f_users += 1
+                                        add_to_used(in_dir, id)
+                                except requests.exceptions.ConnectionError:
+                                    pass
+
+    all_ids = list(set(used_ids)) + sample_subset
+    all_ids_set = set(all_ids)
+
+    # ensuring sample has no overlap with used ids
+    assert(len(all_ids) == len(all_ids_set))
 
     numpy.random.shuffle(sample_subset)
     return sample_subset
