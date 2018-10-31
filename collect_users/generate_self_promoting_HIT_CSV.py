@@ -2,6 +2,8 @@ from configs.config import *
 from utils.sample_util import *
 from utils.file_io import *
 
+import os
+
 inactive_id = '1YjSjnArcKlmtIyNbVUimjRhnXeGwXHpL'
 not_english_id = '1qgZvxRAbVk0iBCJBB73I4CrwxbKbA_zd'
 personal_id = '1iH5Tv1OmovyhiwuvRWiOVioIWlGBhQlS'
@@ -37,5 +39,5 @@ if __name__ == '__main__':
         row = [inactive_id, not_english_id, personal_id, brand_id, travel_id, beauty_id, gastro_id, politics_id, style_id, family_id, sports_id, health_id, arts_id, other_id, str(id)]
         csv_rows.append(row)
 
-    csv_fname = out_dir + str(sample_size) + '_size_HIT_self_promoting.csv'
+    csv_fname = os.path.join(out_dir, str(sample_size) + '_size_HIT_self_promoting.csv')
     write_rows_to_csv(csv_fname, csv_rows)
