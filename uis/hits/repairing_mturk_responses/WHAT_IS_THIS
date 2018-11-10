@@ -1,0 +1,6 @@
+Fixing simple issues with the MTurk responses: 
+1) Rebinning other into one of the other categories if appropriate (e.g. social activism -> politics)
+2) Creating new categories if enough write-ins reached (e.g. music, technology)
+3) Select the checkbox if _no_ checkbox selected, but the radio button (main specialization) was selected
+
+Except for step 3, these steps are done by hand.  Afterwards, this file is run through MACE, and a single label is assigned to each user for each column, discrepancies between annotators is resolved.
