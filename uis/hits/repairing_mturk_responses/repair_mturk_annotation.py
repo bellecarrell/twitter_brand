@@ -65,8 +65,8 @@ def main(args):
     REBINNED = 'rebinned_category_most_index'
     ORIG_MAIN = 'Answer.category_most_index'
     
-    df = pd.read_table(args.inpath, sep=',')
-    
+    df = pd.read_table(args.inpath, dtype=object, sep=',')
+
     def _row_to_rebinned_category(row):
         most_cat = row[ORIG_MAIN]
         
@@ -135,6 +135,8 @@ def main(args):
     
     df[ORIG_MAIN] = df[REBINNED]
     del df[REBINNED]
+
+    import pdb; pdb.set_trace()
     
     df.to_csv(args.outpath, sep=',', index=False, header=True)
 
