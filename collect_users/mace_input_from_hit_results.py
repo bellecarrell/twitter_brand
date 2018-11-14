@@ -6,10 +6,11 @@ from utils.file_io import *
 
 def labels_to_mace_fmt(in_file_path, out_dir, mode):
     df = pd.read_csv(in_file_path, dtype=object)
-
-    user_ids = df['Input.user_id'].unique().tolist()
-    workers = df.WorkerId.unique().tolist()
     
+    user_ids = df['Input.user_id'].unique().tolist()
+    user_ids = [uid for uid in user_ids if uid and (not pd.isna(uid))]
+    workers = df.WorkerId.unique().tolist()
+
     cols_to_get = []
     
     if mode == "classify":
