@@ -1,10 +1,12 @@
 import gzip
+import sys
+sys.path.append('/home/hltcoe/acarrell/PycharmProjects/twitter_brand/')
+
 import logging
 from configs.config import *
 from utils.file_io import *
 from utils.twitter_user_util import *
 import re
-import sys
 import ijson
 import io
 import json
