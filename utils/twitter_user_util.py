@@ -2,7 +2,8 @@ import re
 import requests
 
 #user json fields, by type
-ints = ['followers_count']
+ints = ['followers_count', 'friends_count', 'listed_count', 'retweet_count', 'favorite_count']
+objs = ['user','status']
 
 def has_linked_page(user):
     url_re = re.compile('.*http.|.*www.')
@@ -35,6 +36,10 @@ def is_active(user):
 def re_for_json_field(field):
     if field in ints:
         return re.compile(r'"{}":.*?(\d+)'.format(field), re.S)
+    elif field == 'user':
+        return re.compile(r'"user":.*?(\{.+?\})', re.S)
+    elif field == 'status':
+        return re.compile(r'"status":.*?(\{.+?\})', re.S)
     else:
         return re.compile(r'"{}":.*?"(.+?)"'.format(field), re.S)
 
