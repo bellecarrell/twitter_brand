@@ -145,7 +145,7 @@ def main(input_dir, gold_path, output_prefix):
             desc_stat_file.write(
                 '# Agree: {}/{} ({:.2f}%)\n'.format(num_agree,
                                                     denom,
-                                                    num_agree / float(denom))
+                                                    100 * num_agree / float(denom))
             )
     
     desc_stat_file.close()
