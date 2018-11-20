@@ -2,7 +2,7 @@ import re
 import requests
 
 #user json fields, by type
-ints = ['followers_count', 'friends_count', 'listed_count', 'retweet_count', 'favorite_count']
+ints = ['followers_count', 'friends_count', 'listed_count', 'retweet_count', 'favorite_count', 'statuses_count']
 objs = ['user','status']
 
 def has_linked_page(user):
