@@ -8,6 +8,7 @@ import re
 import json
 import os
 import multiprocessing as mp
+import numpy as np
 import datetime
 import time
 import random
@@ -112,7 +113,8 @@ def dump_tweets(in_paths, out_dir, num_procs):
                             tweet_idxes.add(id)
                         
                         created_at = int(datetime.datetime.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y').timestamp())
-                        r = [tweet['id_str'], created_at, tweet['text'], tweet['user']['id_str']]
+                        r = [tweet['id_str'], created_at, tweet['text'].replace('\r', ' ').replace('\t', ' ').replace('\n', ' '),
+                             tweet['user']['id_str']]
                         
                         rows.append(r)
                         nrows += 1
@@ -142,11 +144,24 @@ def dump_tweets(in_paths, out_dir, num_procs):
     else:
         _write_tweets(path_subsets[0], out_paths[0], 0)
     
-    subset_dfs = [pd.read_table(p, sep='\t', error_bad_lines=False) for p in out_paths]
+    df = pd.read_table('user_tweets.noduplicates.tsv.gz', compression='gzip', encoding='utf8', low_memory=False)
+    subset_dfs = [pd.read_table(p, sep='\t', encoding='utf8', low_memory=False, dtype={'tweet_id': str,
+                                                                                       'created_at': str,
+                                                                                       'text': str,
+                                                                                       'user_id': str}, error_bad_lines=False)
+                  for p in out_paths]
     print('read partial tweet paths')
     joined_df = pd.concat(subset_dfs)
     
     joined_df_dedup = joined_df.drop_duplicates(subset='tweet_id', keep='first')
+    
+    # remove lines that were misread
+    good_ln_mask = [type(tid)==str and type(cat)==str and type(uid)==str and
+                    re.match('\d+', tid) is not None and
+                    re.match('\d+', cat) is not None and
+                    re.match('\d+', uid) is not None
+                    for tid, cat, uid in zip(df_nodup['tweet_id'], df_nodup['created_at'], df_nodup['user_id'])]
+    joined_df_dedup = joined_df_dedup[good_ln_mask]
     joined_df_dedup.to_csv(os.path.join(out_dir, 'user_tweets.noduplicates.tsv.gz'), sep='\t',
                            encoding='utf8', header=True, index=False, compression='gzip')
     print('wrote joined tweet table (deduplicated)')
