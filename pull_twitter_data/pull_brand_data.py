@@ -20,8 +20,10 @@ KEY = 'dl1'
 KEY_PATH = '/exp/abenton/twitter_collection/keys/{}_keys.txt'.format(KEY)
 ACCESS_TOKEN_PATH = '/exp/abenton/twitter_collection/access_tokens/access_token_{}.txt'.format(KEY)
 
-SAMPLE_USER_DIR = '/exp/acarrell/twitter_brand/blogger_2018/agg_17/first_400_sample/ids/'
-ALL_USER_DIR = '/exp/acarrell/twitter_brand/blogger_2018/17_allids/'
+SAMPLE_USER_DIR = '/exp/abenton/twitter_brand/blogger_2018/agg_17/first_400_sample/ids/'
+ALL_USER_DIR = '/exp/abenton/twitter_brand/blogger_2018/17_allids/'
+#SAMPLE_USER_DIR = '/exp/acarrell/twitter_brand/blogger_2018/agg_17/first_400_sample/ids/'
+#ALL_USER_DIR = '/exp/acarrell/twitter_brand/blogger_2018/17_allids/'
 
 brand_user_re = re.compile('(?P<job>\w+)\.users\.txt')
 
