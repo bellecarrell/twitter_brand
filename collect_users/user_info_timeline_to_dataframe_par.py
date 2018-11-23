@@ -142,7 +142,7 @@ def dump_tweets(in_paths, out_dir, num_procs):
     else:
         _write_tweets(path_subsets[0], out_paths[0], 0)
     
-    subset_dfs = [pd.read_table(p, sep='\t') for p in out_paths]
+    subset_dfs = [pd.read_table(p, sep='\t', error_bad_lines=False) for p in out_paths]
     print('read partial tweet paths')
     joined_df = pd.concat(subset_dfs)
     
