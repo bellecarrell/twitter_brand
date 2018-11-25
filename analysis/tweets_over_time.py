@@ -20,11 +20,10 @@ def main(tweet_path, user_label_path):
     main_spec_df = prom_user_df[['user_id', 'classify_account-mace_label']]
     
     filt_tweet_df = tweet_df[tweet_df['user_id'].isin(promoting_users)]
-    filt_tweet_df = filt_tweet_df.join(main_spec_df, on='user_id',
-                                       how='left', lsuffix='', rsuffix='_r',
-                                       sort=True)
     
     import pdb; pdb.set_trace()
+    filt_tweet_df = filt_tweet_df.join(main_spec_df, on='user_id',
+                                       how='left', lsuffix='', rsuffix='_r')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
