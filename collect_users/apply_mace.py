@@ -17,7 +17,8 @@ import sklearn.metrics
 from collect_users.krippendorff_alpha import krippendorff_alpha, nominal_metric
 
 # AB: Point to MACE executable script.  This points to it on my local machine.
-MACE = '/home/annabelle/PycharmProjects/MACE/MACE'
+#MACE = '/home/annabelle/PycharmProjects/MACE/MACE'
+MACE = '/Users/abenton10/additional_projects/twitter_brand/MACE/MACE'
 
 MACE_INPUT_PATH_RE = re.compile('mace_input(?P<suffix>_\w+\-Answer\.(?P<label>\w+)\-full_rebinned\.csv)')
 
