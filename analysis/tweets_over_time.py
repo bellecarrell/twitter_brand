@@ -17,10 +17,10 @@ def main(tweet_path, user_label_path):
     prom_user_df = user_df[user_df['classify_account-mace_label']=='promoting']
     promoting_users = set(prom_user_df['user_id'].tolist())
     
-    main_spec_df = prom_user_df[['user_id', 'classify_account-mace_label']]
+    main_spec_df = prom_user_df[['user_id', 'category_most_index-mace_label']]
     u_to_lab = {u: lab for u, lab
-                in zip(main_spec_df['user_id'].tolist(),
-                       main_spec_df['classify_account-mace_label'].tolist())}
+            in zip(main_spec_df['user_id'].tolist(),
+                   main_spec_df['category_most_index-mace_label'].tolist())}
     
     filt_tweet_df = tweet_df[tweet_df['user_id'].isin(promoting_users)]
     filt_tweet_df['main_specialization'] = [u_to_lab[u]
