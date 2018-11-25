@@ -16,14 +16,19 @@ def main(tweet_path, user_label_path):
     
     prom_user_df = user_df[user_df['classify_account-mace_label']=='promoting']
     promoting_users = set(prom_user_df['user_id'].tolist())
-
+    
     main_spec_df = prom_user_df[['user_id', 'classify_account-mace_label']]
+    u_to_lab = {u: lab for u, lab
+                in zip(main_spec_df['user_id'].tolist(),
+                       main_spec_df['classify_account-mace_label'].tolist())}
     
     filt_tweet_df = tweet_df[tweet_df['user_id'].isin(promoting_users)]
+    filt_tweet_df['main_specialization'] = [u_to_lab[u]
+                                            for u
+                                            in filt_tweet_df['user_id']]
     
     import pdb; pdb.set_trace()
-    filt_tweet_df = filt_tweet_df.join(main_spec_df, on='user_id',
-                                       how='left', lsuffix='', rsuffix='_r')
+    
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
