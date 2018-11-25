@@ -13,6 +13,34 @@ import pandas as pd
 
 # These mappings from category to text descriptions were generated manually.
 # They seemed right, and new categories that capture very few users are discarded.  --Adrian
+# Merge business + finance, lifestyle + style, and family + religion
+new_category_mapping = {
+    'style': {'lifestyle', 'lifestyle blogger', 'lifetyle'},
+    'science and technology': {'cyber security', 'technology', 'tech', 'information technology',
+                               'computer', 'computers', 'computer science',
+                               'computer engineering blog', 'technology/developer',
+                               'technology, science', 'technology, internet',
+                               'technology programming', 'technical', 'software engineer',
+                               'web development', 'web developer', 'tech blogging',
+                               'engineering', 'mathematics', 'electronics', 'developing skills',
+                               'it', 'cyber security', 'science'},
+    'business': {'marketing', 'business', 'digital marketing', 'entrepreneur',
+                 'entrepreneurship', 'internet marketing', 'online marketing',
+                 'business,consultant', 'business, social network',
+                 'business, motivational speaker', 'business, blogger',
+                 'finance', 'stock trading', 'stock market', 'cryptocurrency',
+                 'crypto currency' 'taxes', 'finance blogger', 'investments',
+                 'financial/ stock market', 'finance (cryptocurrency)', 'finance (taxes)',
+                 'finance blogger', 'money', 'personal finance', 'making money', 'finances'},
+    'books': {'books', 'book blogger', 'literature', 'books/reading', 'book reviews'},
+    'family': {'religion', 'faith', 'spiritual', 'spirituality', 'religious',
+               'religion, religious books', 'religion (Christianity)'},
+    'games': {'videogames and streaming', 'videogames', 'video_blogger', 'video games',
+              'gambling', 'game', 'gaming', 'affiliate twitch streamer', 'gamer', 'games',
+              'gaming, streaming', 'gambling', 'video games', 'blogger, gamer', 'gaming'},
+}
+
+'''
 new_category_mapping = {
     'lifestyle': {'lifestyle', 'lifestyle blogger', 'lifetyle'},
     'science and technology': {'cyber security', 'technology', 'tech', 'information technology',
@@ -38,6 +66,7 @@ new_category_mapping = {
                 'financial/ stock market', 'finance (cryptocurrency)', 'finance (taxes)',
                 'finance blogger', 'money', 'personal finance', 'making money', 'finances'}
 }
+'''
 
 old_category_mapping = {
     'arts': {"graphic designer, blogger", 'graphic design', 'artist',
@@ -135,8 +164,6 @@ def main(args):
     
     df[ORIG_MAIN] = df[REBINNED]
     del df[REBINNED]
-
-    import pdb; pdb.set_trace()
     
     df.to_csv(args.outpath, sep=',', index=False, header=True)
 
