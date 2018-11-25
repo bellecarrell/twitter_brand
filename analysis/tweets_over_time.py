@@ -71,7 +71,7 @@ def main(tweet_path, user_label_path, out_path):
                            [('UNIQUE_USERS', u_per_mon),
                             ('NUM_TWEETS', t_per_mon)]))
     
-    df.to_csv(out_path, sep='\t', index=False, header=True)
+    df.to_csv(out_path, sep='\t', index=True, header=True)
 
     
 if __name__ == '__main__':
