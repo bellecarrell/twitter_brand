@@ -52,7 +52,7 @@ def main(tweet_path, user_label_path, out_path):
     counts_per_user = {}
     for u in filt_tweet_df['user_id'].unique():
         u_tweet_subset = filt_tweet_df[filt_tweet_df['user_id']==u]
-        counts_per_user[u] = \
+        counts_per_user['USER_{}'.format(u)] = \
             u_tweet_subset.groupby('month')['user_id'].count().reindex(
                 u_per_mon.index, fill_value=0
             )
@@ -61,15 +61,15 @@ def main(tweet_path, user_label_path, out_path):
     counts_per_spec = {}
     for s in filt_tweet_df['main_specialization'].unique():
         s_tweet_subset = filt_tweet_df[filt_tweet_df['main_specialization']==s]
-        counts_per_spec[s] = \
+        counts_per_spec['SPEC_{}'.format(s)] = \
             s_tweet_subset.groupby('month')['user_id'].unique().map(len).reindex(
                 u_per_mon.index, fill_value=0
             )
     
     df = pd.DataFrame(dict(list(counts_per_spec.items()) +
                            list(counts_per_user.items()) +
-                           [('unique_users', u_per_mon),
-                            ('num_tweets', t_per_mon)]))
+                           [('UNIQUE_USERS', u_per_mon),
+                            ('NUM_TWEETS', t_per_mon)]))
     
     df.to_csv(out_path, sep='\t', index=False, header=True)
 
