@@ -12,11 +12,13 @@ import os
 import pandas as pd
 import re
 import sklearn
+import sklearn.metrics
 
 from collect_users.krippendorff_alpha import krippendorff_alpha, nominal_metric
 
 # AB: Point to MACE executable script.  This points to it on my local machine.
 MACE = '/home/annabelle/PycharmProjects/MACE/MACE'
+#MACE = '/Users/abenton10/additional_projects/twitter_brand/MACE/MACE'
 
 MACE_INPUT_PATH_RE = re.compile('mace_input(?P<suffix>_\w+\-Answer\.(?P<label>\w+)\-full_rebinned\.csv)')
 
@@ -124,6 +126,20 @@ def main(input_dir, gold_path, output_prefix):
         if label in {'category_most_index', 'classify_account'}:
             gold_uid_to_label = gold_uid_to_category if label == 'category_most_index' else gold_uid_to_clazz
             
+            gold_labels = [gold_uid_to_label[u].strip().lower()
+                           for u in sorted(list(gold_uid_to_label.keys()))
+                           if gold_uid_to_label[u] is not None and
+                           user_to_labels[u]['{}-mace_label'.format(label)] is not None]
+            mace_labels = [user_to_labels[u]['{}-mace_label'.format(label)].strip().lower()
+                           for u in sorted(list(gold_uid_to_label.keys()))
+                           if gold_uid_to_label[u] is not None and
+                           user_to_labels[u]['{}-mace_label'.format(label)] is not None]
+            
+            label_names = sorted(list(set(gold_labels + mace_labels)))
+            conf_max = sklearn.metrics.confusion_matrix(gold_labels, mace_labels,
+                                                        labels=label_names)
+            conf_max_df = pd.DataFrame(data=conf_max, index=label_names, columns=label_names)
+            
             for u, gold_label in gold_uid_to_label.items():
                 mace_label = user_to_labels[u]['{}-mace_label'.format(label)]
                 
@@ -131,7 +147,7 @@ def main(input_dir, gold_path, output_prefix):
                     num_unsure += 1
                 else:
                     denom += 1
-
+                    
                     if mace_label == gold_label.strip().lower():
                         num_agree += 1
     
@@ -147,6 +163,8 @@ def main(input_dir, gold_path, output_prefix):
                                                     denom,
                                                     100 * num_agree / float(denom))
             )
+            with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+                desc_stat_file.write('Confusion matrix:\n{}\n'.format(conf_max_df))
     
     desc_stat_file.close()
 

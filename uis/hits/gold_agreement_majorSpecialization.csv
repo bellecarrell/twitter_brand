@@ -1,0 +1,15 @@
+﻿,arts,beauty,books,business,family,games,gastronomy,health,other,politics,science and technology,sports,style,travel
+arts,20,0,1,0,0,0,0,1,8,0,0,0,1,0
+beauty,0,0,0,0,0,0,0,0,1,0,0,0,0,0
+books,2,0,7,0,0,0,0,0,1,0,0,0,0,0
+business,0,0,0,10,0,0,0,0,6,0,0,0,0,0
+family,1,0,0,1,9,0,0,0,7,0,0,1,0,0
+games,0,0,0,0,0,5,0,0,1,0,0,0,0,0
+gastronomy,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+health,1,0,0,0,0,0,0,4,3,0,0,0,0,0
+other,11,2,1,3,2,0,2,0,41,1,1,2,1,2
+politics,0,0,0,0,0,0,0,0,4,3,0,0,0,0
+science and technology,0,0,0,4,0,0,0,0,3,0,4,0,0,0
+sports,0,0,0,0,0,0,0,0,0,0,0,2,0,0
+style,0,0,0,0,0,0,0,0,6,0,0,0,11,0
+travel,0,0,0,0,0,0,0,0,0,0,0,0,0,3

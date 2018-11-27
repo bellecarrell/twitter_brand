@@ -14,8 +14,6 @@ def write_rows_to_csv(fname, l):
         writer.writerows(l)
 
 def write_row_to_csv(fname,r,mode='a+'):
-    if fname.endswith('.gz'):
-
     with open(fname,mode) as f:
         writer = csv.writer(f)
         writer.writerow(r)
