@@ -14,7 +14,6 @@ import pandas as pd
 # These mappings from category to text descriptions were generated manually.
 # They seemed right, and new categories that capture very few users are discarded.  --Adrian
 new_category_mapping = {
-    'lifestyle': {'lifestyle', 'lifestyle blogger', 'lifetyle'},
     'science and technology': {'cyber security', 'technology', 'tech', 'information technology',
                                'computer', 'computers', 'computer science',
                                'computer engineering blog', 'technology/developer',
@@ -26,17 +25,14 @@ new_category_mapping = {
     'business': {'marketing', 'business', 'digital marketing', 'entrepreneur',
                  'entrepreneurship', 'internet marketing', 'online marketing',
                  'business,consultant', 'business, social network',
-                 'business, motivational speaker', 'business, blogger'},
-    'books': {'books', 'book blogger', 'literature', 'books/reading', 'book reviews'},
-    'religion': {'religion', 'faith', 'spiritual', 'spirituality', 'religious',
-                 'religion, religious books', 'religion (Christianity)'},
-    'games': {'videogames and streaming', 'videogames', 'video_blogger', 'video games',
-              'gambling', 'game', 'gaming', 'affiliate twitch streamer', 'gamer', 'games',
-              'gaming, streaming', 'gambling', 'video games', 'blogger, gamer', 'gaming'},
-    'finance': {'finance', 'stock trading', 'stock market', 'cryptocurrency',
+                 'business, motivational speaker', 'business, blogger', 'finance', 'stock trading', 'stock market', 'cryptocurrency',
                 'crypto currency' 'taxes', 'finance blogger', 'investments',
                 'financial/ stock market', 'finance (cryptocurrency)', 'finance (taxes)',
-                'finance blogger', 'money', 'personal finance', 'making money', 'finances'}
+                'finance blogger', 'money', 'personal finance', 'making money', 'finances'},
+    'books': {'books', 'book blogger', 'literature', 'books/reading', 'book reviews'},
+    'games': {'videogames and streaming', 'videogames', 'video_blogger', 'video games',
+              'gambling', 'game', 'gaming', 'affiliate twitch streamer', 'gamer', 'games',
+              'gaming, streaming', 'gambling', 'video games', 'blogger, gamer', 'gaming'}
 }
 
 old_category_mapping = {
@@ -45,8 +41,9 @@ old_category_mapping = {
              'blogger, music', 'singing/music', 'poetry', 'poet, writer, blogger',
              'singer', 'poetry, writing', 'song writer', 'photos', 'photogragher',
              'music (rap)'},
-    'style': {'fashion', 'designer', 'blogger, designer', 'blogger, fashion'},
-    'family': {'parenting', 'homeschooling'},
+    'style': {'fashion', 'designer', 'blogger, designer', 'blogger, fashion', 'lifestyle', 'lifestyle blogger', 'lifetyle'},
+    'family': {'parenting', 'homeschooling', 'mom', 'dad', 'mother', 'father', 'religion', 'faith', 'spiritual', 'spirituality', 'religious',
+                 'religion, religious books', 'religion (Christianity)'},
     'health': {'mental health', 'medical', 'mental health and abuse'},
     'gastronomy': {'food', 'cooking'},
     'politics': {'social activism', 'socialist', 'criminal justice', 'activist'},
