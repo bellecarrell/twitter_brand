@@ -153,14 +153,15 @@ class RandomizedRegression:
                 
                 for i in nz_idxes:
                     v = wts[target, i]
-                    
-                    if i not in self.abs_feature_counts[0]:
+
+                    if i not in self.abs_feature_counts[target]:
                         self.abs_feature_counts[target][i] = 0
                         self.pos_feature_counts[target][i] = 0
                         self.neg_feature_counts[target][i] = 0
     
                     if np.abs(v) > self.min_absolute_threshold:
                         self.abs_feature_counts[target][i] += 1
+
                     if v > self.min_absolute_threshold:
                         self.pos_feature_counts[target][i] += 1
                     if v < -self.min_absolute_threshold:
