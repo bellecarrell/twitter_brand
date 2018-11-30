@@ -48,6 +48,8 @@ class RandomizedRegression:
             else:
                 raise Exception('Do not recognize count type: "{}"'.format(salience_type))
 
+            print('{} feature counts'.format(feature_counts))
+            print('{} target key'.format(target_key))
             rev_cnts = [[(v, feature_key[k]) for k, v in feature_counts[i].items()]
                         for i, target in target_key.items()]
             for cnts in rev_cnts:
@@ -74,14 +76,14 @@ class RandomizedRegression:
             
             if VERBOSE:
                 print('Finished {}/{} ({}s)'.format(b, len(l1s), int(time.time() - start)))
-    
+
     def fit_batches(self, Xs, ys, l1_range=[0.0, 1.0]):
         np.random.seed(SEED)
         
         n_batches = len(Xs)
 
         if self.log_l1_range:
-            l1s = np.pow(l1_range[1] - l1_range[0], np.random.random(n_batches)) - 1 + l1_range[0]
+            l1s = np.power(l1_range[1] - l1_range[0], np.random.random(n_batches)) - 1 + l1_range[0]
         else:
             l1s = (l1_range[1] - l1_range[0]) * np.random.random(n_batches) + l1_range[0]
 
@@ -99,9 +101,9 @@ class RandomizedRegression:
             return
         
         model = self._build_model(l1)
-        
+
         model.fit(X, y)
-        
+
         if 'sparse_coef_' in dir(model):
             wts = model.sparse_coef_
         else:
