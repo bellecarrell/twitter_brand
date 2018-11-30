@@ -18,10 +18,13 @@ def clean_dates_tweets(d):
     return dict((int(k),v) for k,v in d.items())
 
 def train_dev_test(users,dev_frac, test_frac):
-    random(SEED)
-    n_users = len(users)
-    random.shuffle(users)
-    dev_u = n_users*dev_frac
-    test_frac = n_users*test_frac
+    """
+    :param users:
+    :param dev_frac:
+    :param test_frac:
+    :return: 3 lists: train, dev, test
+    """
+    train, dev, test = [],[],[]
+    return train, dev, test
 
 
