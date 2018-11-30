@@ -17,12 +17,14 @@ def from_gz(in_dir,fname):
 def clean_dates_tweets(d):
     return dict((int(k),v) for k,v in d.items())
 
-def train_dev_test(users,dev_frac, test_frac):
+def train_dev_test(in_dir, users,dev_frac, test_frac):
     """
+
+    :param in_dir:
     :param users:
     :param dev_frac:
     :param test_frac:
-    :return: 3 lists: train, dev, test
+    :return:
     """
     train, dev, test = [],[],[]
     return train, dev, test
