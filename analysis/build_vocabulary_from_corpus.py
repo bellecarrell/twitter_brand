@@ -11,7 +11,10 @@ import datetime
 import copy
 import pandas as pd
 import json
-
+from twokenize.twokenize import tokenizeRawTweetText
+from nltk.tokenize import word_tokenize
+import nltk
+nltk.download('punkt')
 
 def posted_recently(collection_date,user_date):
     return datetime.datetime.fromtimestamp(collection_date) - datetime.timedelta(days=60) <= datetime.datetime.fromtimestamp(user_date)
@@ -60,10 +63,16 @@ def dated_tweets_by_user(f, users):
 
     return dates_tweets.keys(), dates_tweets
 
-
-
 def all_tweets_by_user(users,dates_tweets):
     return (' '.join([dt[1] for dt in dates_tweets[u]]) for u in users)
+
+def longest_doc(corpus):
+    max = 0
+    for doc in corpus:
+        toks = word_tokenize(doc)
+        if len(toks) > max:
+            max = len(toks)
+    return max
 
 def to_json_file(data,out_dir, fname):
 
@@ -81,6 +90,7 @@ def main(in_dir, out_dir):
         'user_id'].dropna().unique().tolist()
     filtered_users, dates_tweets = dated_tweets_by_user(timeline, users)
     corpus = all_tweets_by_user(filtered_users,dates_tweets)
+
 
     #todo: remove "usher names" and numbers and lemmatize
     sw = set(stopwords.words('english'))
