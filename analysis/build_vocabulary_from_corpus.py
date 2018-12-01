@@ -19,11 +19,21 @@ nltk.download('punkt')
 def posted_recently(collection_date,user_date):
     return datetime.datetime.fromtimestamp(collection_date) - datetime.timedelta(days=60) <= datetime.datetime.fromtimestamp(user_date)
 
+# def filter_inactive_users(users, dates_tweets,most_recent):
+#     print('Filtering users with {} most recent'.format(most_recent))
+#     recent_users_removed = 0
+#     all_users = copy.deepcopy(list(dates_tweets.keys()))
+#     for user in all_users:
+#         u_date = dates[user]
+#         if not posted_recently(most_recent, u_date):
+#             del dates_tweets[user]
+#             del dates[user]
+#             recent_users_removed += 1
+#     print('{} users removed'.format(recent_users_removed))
 
 def dated_tweets_by_user(f, users):
     """
     Get tweets from the timeline compressed file and place in dict sorted by user.
-    Filtered to include only tweets within window
     :param in_dir: top-level directory containing promoting user dfs
     :return: dict of tweets by user ID
     """
@@ -50,18 +60,7 @@ def dated_tweets_by_user(f, users):
         if count % 100000 == 0:
             print('Read {} rows'.format(count))
 
-    print('Filtering users with {} most recent'.format(most_recent))
-    recent_users_removed = 0
-    all_users = copy.deepcopy(list(dates_tweets.keys()))
-    for user in all_users:
-        u_date = dates[user]
-        if not posted_recently(most_recent, u_date):
-            del dates_tweets[user]
-            del dates[user]
-            recent_users_removed += 1
-    print('{} users removed'.format(recent_users_removed))
-
-    return dates_tweets.keys(), dates_tweets
+    return dates_tweets
 
 def all_tweets_by_user(users,dates_tweets):
     return (' '.join([dt[1] for dt in dates_tweets[u]]) for u in users)
@@ -73,6 +72,9 @@ def longest_doc(corpus):
         if len(toks) > max:
             max = len(toks)
     return max
+
+def stringify_dict(d):
+    return dict((str(k),str(v)) for k, v, in d.items())
 
 def to_json_file(data,out_dir, fname):
 
@@ -88,8 +90,8 @@ def main(in_dir, out_dir):
     timeline = gzip.open(os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz'), 'rt')
     users = static_info.loc[static_info['classify_account-mace_label'] == 'promoting'][
         'user_id'].dropna().unique().tolist()
-    filtered_users, dates_tweets = dated_tweets_by_user(timeline, users)
-    corpus = all_tweets_by_user(filtered_users,dates_tweets)
+    dates_tweets = dated_tweets_by_user(timeline, users)
+    corpus = all_tweets_by_user(users,dates_tweets)
 
 
     #todo: remove "usher names" and numbers and lemmatize
@@ -99,14 +101,16 @@ def main(in_dir, out_dir):
     vectorizer = CountVectorizer(tokenizer=twokenize.tokenizeRawTweetText,stop_words=sw,ngram_range=(1,2),min_df=10,max_df=0.8)
     vectorizer.fit(corpus)
 
-    to_json_file(vectorizer.vocabulary_,os.path.join(out_dir),'vocab')
+    vocab = vectorizer.vocabulary_
+    vocab = stringify_dict(vocab)
+
+    to_json_file(vocab,os.path.join(out_dir),'vocab')
     to_json_file(dates_tweets,os.path.join(out_dir),'dates_tweets')
 
 if __name__ == '__main__':
     """
-    Run randomized logistic regression to see features selected for different specializations.
-    May add different class of Ys in the future for user impact (so, change in follower count or
-    a related metric)
+    build a vocabulary from corpus and save to file.
+    documents per user that are promoting in the static_info file.
     """
 
     parser = argparse.ArgumentParser(
