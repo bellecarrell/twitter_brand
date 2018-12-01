@@ -1,6 +1,7 @@
 """
 Utility method for file and data handling for consistency across analysis/ scripts.
 """
+
 import random
 import gzip
 import json
@@ -12,6 +13,7 @@ import math
 import numpy as np
 np.random.seed(SEED)
 
+
 def from_gz(in_dir,fname):
     v_file = gzip.GzipFile(os.path.join(in_dir,'{}.json.gz'.format(fname)),'r')
     v_json = v_file.read()
@@ -19,8 +21,10 @@ def from_gz(in_dir,fname):
     v_json = v_json.decode('utf-8')
     return json.loads(v_json)
 
+
 def clean_dates_tweets(d):
     return dict((int(k),v) for k,v in d.items())
+
 
 def split_list_3_way(l,frac1,frac2):
     def _split_no_q(l,n,frac1,frac2):
@@ -45,6 +49,7 @@ def split_list_3_way(l,frac1,frac2):
             else:
                 l2.append(el)
         return l0,l1,l2
+
 
 def train_dev_test(in_dir, users, dev_frac, test_frac):
     """
