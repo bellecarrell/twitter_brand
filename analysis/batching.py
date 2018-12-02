@@ -48,7 +48,9 @@ def filter_by_tw_and_specialization_precomputed(static_info, feature_df, tw):
                                           not_nan, 'user_id'])
     
     feature_df = feature_df[feature_df['user_id'].isin(promoting_users)]  # restrict to promoting users
-    feature_df = feature_df[feature_df['created_at'].map(lambda x: start <= x <= stop)]  # only keep tweets from preset time range
+    feature_df = feature_df[feature_df['created_at'].map(
+            lambda x: start <= datetime.datetime.utcfromtimestamp(x) <= stop)
+    ]  # only keep tweets from preset time range
     
     return feature_df['user_id'].unique(), feature_df
 
