@@ -41,13 +41,14 @@ def main(in_dir, out_dir, n_batches=100):
         if not os.path.isdir(subdir):
             os.mkdir(subdir)
         
-        for b, (X, user_ids) in enumerate(batch_generator):
+        for b, (X, user_ids, tw) in enumerate(batch_generator):
             rs, cs = X.nonzero()
             np.savez_compressed(os.path.join(subdir, 'batch_{}.npz'.format(b)),
                                 **{'row': rs,
                                    'col': cs,
                                    'value': np.array(X[(rs, cs)])[0],
-                                   'user_id': user_ids})
+                                   'user_id': user_ids,
+                                   'time_window': tw})
             
             print('Wrote batch {} for {}'.format(b, tw_name))
 
