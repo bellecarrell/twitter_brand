@@ -145,11 +145,12 @@ def generate_batches_precomputed_features(static_info, feature_df, rev_vocab_key
                                            random.random()),
                                 window_size) for _ in
                     range(n_batches)]
-
+    
     return (generate_batch_precomputed_features(static_info,
                                                 feature_df,
+                                                tw,
                                                 {v: k for k, v in rev_vocab_key.items()},
-                                                tw, ret_tw) for tw in time_windows)
+                                                ret_tw) for tw in time_windows)
 
 
 def generate_batches(static_info, dates_tweets, vectorizer, n_batches=100, window_size=30, ret_tw=False):
