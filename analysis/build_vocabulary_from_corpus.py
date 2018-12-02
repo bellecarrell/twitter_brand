@@ -116,7 +116,7 @@ def featurize_tweet(t):
     norm_toks = [t for t in norm_toks if t]
     
     feats = {pair for pair in zip(norm_toks, norm_toks[1:])}
-    feats |= {t for t in norm_toks}
+    feats |= {(t,) for t in norm_toks}
     
     return feats
 
@@ -190,6 +190,7 @@ def main(in_dir, out_dir, min_df=5, max_df=0.8):
         static_info['classify_account-mace_label'] == 'promoting'
     ]['user_id'].dropna().unique().tolist()
     
+    print('Featurizing tweets for {}/{} self-promoting users'.format(len(promoting_users), static_info.shape[0]))
     rev_vocab_key, promoting_df = extract_vocab_and_features(promoting_users,
                                                              timeline_path,
                                                              min_df=min_df,
