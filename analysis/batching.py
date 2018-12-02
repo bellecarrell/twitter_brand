@@ -83,6 +83,7 @@ def generate_batch(static_info, dates_tweets, time_window, vectorizer,ret_tw=Fal
     else:
         return X, filtered_users_zero_fv, time_window
 
+
 def generate_batches(static_info, dates_tweets, vectorizer, n_batches=100, window_size=30, ret_tw=False):
     random.seed(SEED)
     end_date = BATCH_END_WINDOW - datetime.timedelta(days=window_size)
