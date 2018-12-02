@@ -85,7 +85,9 @@ def generate_batch(static_info, dates_tweets, time_window, vectorizer,ret_tw=Fal
 
 def generate_batch_precomputed_features(static_info, tweet_feature_df, time_window, vocab_key, ret_tw=False):
     print('generating batch for {} time window'.format(time_window))
-    filtered_users, tweet_feature_df = filter_by_tw_and_specialization(static_info, tweet_feature_df, time_window)
+    filtered_users, tweet_feature_df = filter_by_tw_and_specialization_precomputed(static_info,
+                                                                                   tweet_feature_df,
+                                                                                   time_window)
     
     # join features from several tweets
     def _join_features(feats):
@@ -149,7 +151,7 @@ def generate_batches_precomputed_features(static_info, feature_df, rev_vocab_key
     return (generate_batch_precomputed_features(static_info,
                                                 feature_df,
                                                 tw,
-                                                {v: k for k, v in rev_vocab_key.items()},
+                                                rev_vocab_key,
                                                 ret_tw) for tw in time_windows)
 
 
