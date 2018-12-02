@@ -131,7 +131,7 @@ def extract_vocab_and_features(promoting_users, timeline_path, min_df=5, max_df=
     
     start = time.time()
     
-    for tidx, tweet in only_promoting_df.text:
+    for tidx, tweet in enumerate(only_promoting_df.text):
         features = featurize_tweet(tweet)
         ngramset_per_tweet.append(features)
         
