@@ -122,7 +122,7 @@ def featurize_tweet(t):
 
 
 def extract_vocab_and_features(promoting_users, timeline_path, min_df=5, max_df=0.8):
-    timeline_df = pd.read_table(timeline_path, sep=',', header=True)
+    timeline_df = pd.read_table(timeline_path, sep=',')
     only_promoting_df = timeline_df[timeline_df['user_id'].isin(promoting_users)]
     n = only_promoting_df.shape[0]
     
