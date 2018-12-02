@@ -18,11 +18,11 @@ def main(in_dir, out_dir, n_batches=100):
     if not os.path.isdir(batches_dir):
         os.mkdir(batches_dir)
     
-    for tw_name, wsize, tr in [('one_week', 7, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
-                               ('two_week', 14, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
-                               ('month', 30, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
-                               ('all_data', (BATCH_END_WINDOW - BATCH_START_WINDOW).days,
-                                  (BATCH_START_WINDOW, BATCH_END_WINDOW)),
+    for tw_name, wsize, tr in [#('one_week', 7, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
+                               #('two_week', 14, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
+                               #('month', 30, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
+                               #('all_data', (BATCH_END_WINDOW - BATCH_START_WINDOW).days,
+                               #   (BATCH_START_WINDOW, BATCH_END_WINDOW)),
                                ('one_week_future', 7, (BATCH_END_WINDOW, BATCH_END_FOLLOWER_TS)),
                                ('two_week_future', 14, (BATCH_END_WINDOW, BATCH_END_FOLLOWER_TS)),
                                ('month_future', 30, (BATCH_END_WINDOW, BATCH_END_FOLLOWER_TS)),
@@ -32,7 +32,7 @@ def main(in_dir, out_dir, n_batches=100):
         batch_generator = generate_batches_precomputed_features(static_info,
                                                                 feature_df,
                                                                 rev_vocab_key,
-                                                                n_batches=n_batches,
+                                                                n_batches=20 if tw_name.startswith('all_data') else n_batches,
                                                                 window_size=wsize,
                                                                 ret_tw=True,
                                                                 full_time_range=tr)
