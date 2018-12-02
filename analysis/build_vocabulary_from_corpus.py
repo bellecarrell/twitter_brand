@@ -16,7 +16,7 @@ from nltk.stem.porter import PorterStemmer
 import re
 
 stemmer = PorterStemmer()
-stop = set(stopwords.words('english')) | set(string.punctuation) | ['rt']
+stop = set(stopwords.words('english')) | set(string.punctuation) | {'rt'}
 
 def posted_recently(collection_date,user_date):
     return datetime.datetime.fromtimestamp(collection_date) - datetime.timedelta(days=60) <= datetime.datetime.fromtimestamp(user_date)
