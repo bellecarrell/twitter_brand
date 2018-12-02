@@ -18,15 +18,15 @@ def main(in_dir, out_dir, n_batches=100):
     if not os.path.isdir(batches_dir):
         os.mkdir(batches_dir)
     
-    for tw_name, wsize, tr in [('one_week', 7, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
-                               ('two_week', 14, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
-                               ('month', 30, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
-                               ('all_data', BATCH_END_WINDOW - BATCH_START_WINDOW,
+    for tw_name, wsize, tr in [#('one_week', 7, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
+                               #('two_week', 14, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
+                               #('month', 30, (BATCH_START_WINDOW, BATCH_END_WINDOW)),
+                               ('all_data', (BATCH_END_WINDOW - BATCH_START_WINDOW).days,
                                   (BATCH_START_WINDOW, BATCH_END_WINDOW)),
                                ('one_week_future', 7, (BATCH_END_WINDOW, BATCH_END_FOLLOWER_TS)),
                                ('two_week_future', 14, (BATCH_END_WINDOW, BATCH_END_FOLLOWER_TS)),
                                ('month_future', 30, (BATCH_END_WINDOW, BATCH_END_FOLLOWER_TS)),
-                               ('all_data_future', BATCH_END_FOLLOWER_TS - BATCH_END_WINDOW,
+                               ('all_data_future', (BATCH_END_FOLLOWER_TS - BATCH_END_WINDOW).days,
                                   (BATCH_END_WINDOW, BATCH_END_FOLLOWER_TS)),
                                ]:
         batch_generator = generate_batches_precomputed_features(static_info,
