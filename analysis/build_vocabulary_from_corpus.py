@@ -84,7 +84,7 @@ def stringify_dict(d):
     return dict((str(k),str(v)) for k, v, in d.items())
 
 
-def to_json_file(data,out_dir, fname):
+def to_json_file(data, out_dir, fname):
 
     json_str = json.dumps(data) + "\n"  # 2. string (i.e. JSON)
     json_bytes = json_str.encode('utf-8')  # 3. bytes (i.e. UTF-8)
@@ -172,7 +172,7 @@ def featurize_by_vectorizer():
     sw = set(stopwords.words('english'))
     sw.union({c for c in list(string.punctuation) if c is not "#" and c is not "@"})
     
-    vectorizer = CountVectorizer(tokenizer=twokenize.tokenizeRawTweetText, stop_words=sw, ngram_range=(1, 2),
+    vectorizer = CountVectorizer(tokenizer=tokenize, stop_words=sw, ngram_range=(1, 2),
                                  min_df=10, max_df=0.8)
     vectorizer.fit(corpus)
     
@@ -183,7 +183,7 @@ def featurize_by_vectorizer():
     to_json_file(dates_tweets, os.path.join(out_dir), 'dates_tweets')
 
 
-def main(in_dir, out_dir, min_df=5, max_df=0.8):
+def main(in_dir, out_dir, min_df=20, max_df=0.8):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
     timeline_path = os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz')
     promoting_users = static_info.loc[
@@ -195,6 +195,8 @@ def main(in_dir, out_dir, min_df=5, max_df=0.8):
                                                              timeline_path,
                                                              min_df=min_df,
                                                              max_df=max_df)
+    
+    import pdb; pdb.set_trace()
     
     to_json_file(rev_vocab_key, out_dir, 'vocab')
     promoting_df[['tweet_id',

@@ -84,6 +84,36 @@ def generate_batch(static_info, dates_tweets, time_window, vectorizer,ret_tw=Fal
         return X, filtered_users_zero_fv, time_window
 
 
+def generate_batch_precomputed_features(static_info, dates_tweets, time_window, vectorizer, ret_tw=False):
+    print('generating batch for {} time window'.format(time_window))
+    filtered_users, tweets_by_user = filter_by_tw_and_specialization(static_info, dates_tweets, time_window)
+    
+    # filter out users with zero feature vectors
+    filtered_users_zero_fv = []
+    for i, u in enumerate(filtered_users):
+        u_tweets = [' '.join(tweets_by_user[u])]
+        Xi_unorm = vectorizer.transform(u_tweets).toarray()
+        # todo: relative frequency
+        sum = float(Xi_unorm.sum(axis=1))
+        if sum != 0.0:
+            filtered_users_zero_fv.append(u)
+    
+    X = np.zeros(shape=(len(filtered_users_zero_fv), len(vectorizer.vocabulary.keys())))
+    for i, u in enumerate(filtered_users_zero_fv):
+        u_tweets = [' '.join(tweets_by_user[u])]
+        Xi_unorm = vectorizer.transform(u_tweets).toarray()
+        # todo: relative frequency
+        sum = float(Xi_unorm.sum(axis=1))
+        X[i] = Xi_unorm / sum
+    
+    print('batch generated, {} users'.format(len(filtered_users_zero_fv)))
+    
+    if not ret_tw:
+        return X, filtered_users_zero_fv
+    else:
+        return X, filtered_users_zero_fv, time_window
+
+
 def generate_batches(static_info, dates_tweets, vectorizer, n_batches=100, window_size=30, ret_tw=False):
     random.seed(SEED)
     end_date = BATCH_END_WINDOW - datetime.timedelta(days=window_size)
