@@ -160,7 +160,7 @@ def dump_tweets(in_paths, out_dir, num_procs):
                     re.match('\d+', tid) is not None and
                     re.match('\d+', cat) is not None and
                     re.match('\d+', uid) is not None
-                    for tid, cat, uid in zip(df_nodup['tweet_id'], df_nodup['created_at'], df_nodup['user_id'])]
+                    for tid, cat, uid in zip(joined_df_dedup['tweet_id'], joined_df_dedup['created_at'], joined_df_dedup['user_id'])]
     joined_df_dedup = joined_df_dedup[good_ln_mask]
     joined_df_dedup.to_csv(os.path.join(out_dir, 'user_tweets.noduplicates.tsv.gz'), sep='\t',
                            encoding='utf8', header=True, index=False, compression='gzip')
