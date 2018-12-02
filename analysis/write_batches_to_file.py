@@ -9,7 +9,7 @@ import gzip
 def main(in_dir, out_dir, n_batches=100):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
     
-    rev_vocab_key = from_gz(in_dir, 'vocab')
+    rev_vocab_key = from_gz(os.path.join(in_dir, 'features'), 'vocab')
     feature_df = pd.read_table(os.path.join(in_dir,
                                             'features',
                                             'user_features_per_tweet.noduplicates.tsv.gz'))
@@ -50,6 +50,7 @@ def main(in_dir, out_dir, n_batches=100):
                                    'user_id': user_ids})
             
             print('Wrote batch {} for {}'.format(b, tw_name))
+
 
 def main_unprocessed(in_dir, out_dir):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
