@@ -101,18 +101,17 @@ def generate_batch_precomputed_features(static_info, tweet_feature_df, time_wind
         
         for fs in feats:
             for f in eval(fs):
-                if len(vocab_key[f]) == 1:
+                if len(eval(vocab_key[f])) == 1:
                     if f not in uni_counts:
                         uni_counts[f] = 0
                     uni_counts[f] += 1
                     c1 += 1
-                elif len(vocab_key[f]) == 2:
+                elif len(eval(vocab_key[f])) == 2:
                     if f not in bi_counts:
                         bi_counts[f] = 0
                     bi_counts[f] += 1
                     c2 += 1
                 else:
-                    import pdb; pdb.set_trace()
                     raise Exception('Problem reading feature: {}'.format(f))
         
         feats = dict([(k, v/c1) for k, v in uni_counts.items()] + [(k, v/c2) for k, v in bi_counts.items()])
