@@ -131,8 +131,8 @@ def generate_batch_precomputed_features(static_info, tweet_feature_df, time_wind
     X = scipy.sparse.csr_matrix(([x[2] for x in rcv], ([x[0] for x in rcv], [x[1] for x in rcv])),
                                 shape=(user_feature_df.shape[0], max_col))
     
-    print('batch generated, {} users'.format(len(filtered_users_zero_fv)))
-
+    print('batch generated, {} users'.format(user_feature_df.shape[0]))
+    
     if not ret_tw:
         return X, filtered_users_zero_fv
     else:
