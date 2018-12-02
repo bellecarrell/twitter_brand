@@ -112,6 +112,7 @@ def generate_batch_precomputed_features(static_info, tweet_feature_df, time_wind
                     bi_counts[f] += 1
                     c2 += 1
                 else:
+                    import pdb; pdb.set_trace()
                     raise Exception('Problem reading feature: {}'.format(f))
         
         feats = dict([(k, v/c1) for k, v in uni_counts.items()] + [(k, v/c2) for k, v in bi_counts.items()])
