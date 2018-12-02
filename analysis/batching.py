@@ -43,7 +43,9 @@ def filter_by_tw_and_specialization(static_info, dates_tweets, tw):
 def filter_by_tw_and_specialization_precomputed(static_info, feature_df, tw):
     start, stop = tw
     tweets = defaultdict(list)
-
+    
+    import pdb; pdb.set_trace()
+    
     promoting_users = set(static_info.loc[static_info[static_info['classify_account-mace_label'] == 'promoting'] & \
                                           (~static_info['category_most_index-mace_label'].isna()), 'user_id'])
     
