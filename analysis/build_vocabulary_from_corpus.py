@@ -194,9 +194,9 @@ def main(in_dir, out_dir, min_df=50, max_df=0.8):
                                                              min_df=min_df,
                                                              max_df=max_df)
     
-    import pdb; pdb.set_trace()
-    
     to_json_file({str(k): v for k, v in rev_vocab_key.items()}, out_dir, 'vocab')
+    print('Wrote vocabulary')
+    
     promoting_df[['tweet_id',
                   'created_at',
                   'user_id',
