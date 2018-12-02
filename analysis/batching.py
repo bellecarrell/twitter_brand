@@ -21,6 +21,7 @@ nltk.download('stopwords')
 
 BATCH_START_WINDOW = datetime.datetime(2018, 4, 1)
 BATCH_END_WINDOW = datetime.datetime(2018, 7, 31)
+BATCH_END_FOLLOWER_TS = datetime.datetime(2018, 10, 31)
 SEED = 12345
 VERBOSE = True
 
@@ -136,10 +137,10 @@ def generate_batch_precomputed_features(static_info, tweet_feature_df, time_wind
         return X, filtered_users_zero_fv, time_window
 
 
-def generate_batches_precomputed_features(static_info, feature_df, rev_vocab_key, n_batches=100, window_size=30, ret_tw=False):
+def generate_batches_precomputed_features(static_info, feature_df, rev_vocab_key, n_batches=100, window_size=30, ret_tw=False, full_time_range=(BATCH_START_WINDOW, BATCH_END_WINDOW)):
     random.seed(SEED)
-    end_date = BATCH_END_WINDOW - datetime.timedelta(days=window_size)
-    time_windows = [time_window(randomDate(BATCH_START_WINDOW,
+    end_date = full_time_range[1] - datetime.timedelta(days=window_size)
+    time_windows = [time_window(randomDate(full_time_range[0],
                                            end_date,
                                            random.random()),
                                 window_size) for _ in
