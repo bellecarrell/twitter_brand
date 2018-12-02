@@ -121,7 +121,7 @@ def generate_batch_precomputed_features(static_info, tweet_feature_df, time_wind
     # collect all non-zero indices for each user
     user_feature_df = tweet_feature_df.groupby('user_id')['extracted_features'].agg(_join_features)
     
-    filtered_users_zero_fv = user_feature_df[user_feature_df.map(lambda x: len(x) == 0)].index.tolist()
+    filtered_users_zero_fv = user_feature_df[user_feature_df.map(lambda x: len(x) > 0)].index.tolist()
     user_feature_df = user_feature_df[user_feature_df.map(lambda x: len(x) > 0)]
     
     max_col = len(vocab_key)
