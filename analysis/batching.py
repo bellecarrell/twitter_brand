@@ -153,7 +153,7 @@ def generate_batches_precomputed_features(static_info, feature_df, rev_vocab_key
     return (generate_batch_precomputed_features(static_info,
                                                 feature_df,
                                                 tw,
-                                                rev_vocab_key,
+                                                {v:k for k, v in rev_vocab_key.items()},
                                                 ret_tw) for tw in time_windows)
 
 
