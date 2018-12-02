@@ -42,12 +42,10 @@ def filter_by_tw_and_specialization(static_info, dates_tweets, tw):
 
 def filter_by_tw_and_specialization_precomputed(static_info, feature_df, tw):
     start, stop = tw
-    tweets = defaultdict(list)
     
-    import pdb; pdb.set_trace()
-    
-    promoting_users = set(static_info.loc[static_info[static_info['classify_account-mace_label'] == 'promoting'] & \
-                                          (~static_info['category_most_index-mace_label'].isna()), 'user_id'])
+    not_nan = ~static_info['category_most_index-mace_label'].isna()
+    promoting_users = set(static_info.loc[(static_info['classify_account-mace_label'] == 'promoting') &
+                                          not_nan, 'user_id'])
     
     feature_df = feature_df[feature_df['user_id'].isin(promoting_users)]  # restrict to promoting users
     feature_df = feature_df[feature_df['created_at'].map(lambda x: start <= x <= stop)]  # only keep tweets from preset time range
