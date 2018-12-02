@@ -98,7 +98,7 @@ def generate_batch_precomputed_features(static_info, tweet_feature_df, time_wind
         
         c1 = 0
         c2 = 0
-        for fs in feats:
+        for fs in eval(feats):
             for f in fs:
                 f = eval(f)
                 if len(f) == 1:
