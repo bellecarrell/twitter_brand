@@ -16,7 +16,7 @@ from nltk.stem.porter import PorterStemmer
 import re
 
 stemmer = PorterStemmer()
-stop = set(stopwords.words('english')) | set(string.punctuation)
+stop = set(stopwords.words('english')) | set(string.punctuation) | ['rt']
 
 def posted_recently(collection_date,user_date):
     return datetime.datetime.fromtimestamp(collection_date) - datetime.timedelta(days=60) <= datetime.datetime.fromtimestamp(user_date)
@@ -121,7 +121,7 @@ def featurize_tweet(t):
     return feats
 
 
-def extract_vocab_and_features(promoting_users, timeline_path, min_df=5, max_df=0.8):
+def extract_vocab_and_features(promoting_users, timeline_path, min_df=50, max_df=0.8):
     timeline_df = pd.read_table(timeline_path, sep=',')
     only_promoting_df = timeline_df[timeline_df['user_id'].isin(promoting_users)]
     n = only_promoting_df.shape[0]
@@ -166,14 +166,12 @@ def featurize_by_vectorizer():
     dates_tweets = dated_tweets_by_user(timeline, users)
     corpus = all_tweets_by_user(users, dates_tweets)
     
-    import pdb; pdb.set_trace()
-    
     # todo: remove usernames, normalize numbers, and lemmatize
     sw = set(stopwords.words('english'))
     sw.union({c for c in list(string.punctuation) if c is not "#" and c is not "@"})
     
     vectorizer = CountVectorizer(tokenizer=tokenize, stop_words=sw, ngram_range=(1, 2),
-                                 min_df=10, max_df=0.8)
+                                 min_df=50, max_df=0.8)
     vectorizer.fit(corpus)
     
     vocab = vectorizer.vocabulary_
@@ -183,7 +181,7 @@ def featurize_by_vectorizer():
     to_json_file(dates_tweets, os.path.join(out_dir), 'dates_tweets')
 
 
-def main(in_dir, out_dir, min_df=20, max_df=0.8):
+def main(in_dir, out_dir, min_df=50, max_df=0.8):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
     timeline_path = os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz')
     promoting_users = static_info.loc[
@@ -198,7 +196,7 @@ def main(in_dir, out_dir, min_df=20, max_df=0.8):
     
     import pdb; pdb.set_trace()
     
-    to_json_file(rev_vocab_key, out_dir, 'vocab')
+    to_json_file({str(k): v for k, v in rev_vocab_key.items()}, out_dir, 'vocab')
     promoting_df[['tweet_id',
                   'created_at',
                   'user_id',

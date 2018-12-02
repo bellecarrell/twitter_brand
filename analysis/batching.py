@@ -7,32 +7,16 @@ import argparse
 import sys
 
 sys.path.append('/home/hltcoe/acarrell/PycharmProjects/twitter_brand/')
-from analysis.rlr import RandomizedRegression as RR
-from sklearn.feature_extraction.text import CountVectorizer
-import os
-import pandas as pd
-import gzip
 import logging
-import csv
 from collections import defaultdict
-import datetime
-from twokenize import twokenize
 
 logging.basicConfig(level=logging.INFO)
-import copy
 import time
-import datetime
 import random
 import numpy as np
-import json
-from scipy.sparse import csr_matrix
-import multiprocessing as mp
 import nltk
-from nltk.corpus import stopwords
 from analysis.datetime_util import *
 nltk.download('stopwords')
-import string
-import sklearn.model_selection
 
 BATCH_START_WINDOW = datetime.datetime(2018, 4, 1)
 BATCH_END_WINDOW = datetime.datetime(2018, 7, 31)
