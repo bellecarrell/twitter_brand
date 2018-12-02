@@ -121,15 +121,12 @@ def generate_batch_precomputed_features(static_info, tweet_feature_df, time_wind
     # collect all non-zero indices for each user
     user_feature_df = tweet_feature_df.groupby('user_id')['extracted_features'].agg(_join_features)
     
-    import pdb; pdb.set_trace()
-    filtered_users_zero_fv = user_feature_df[
-        user_feature_df['extracted_features'].map(lambda x: len(x) == 0), 'user_id'
-    ].tolist()
-    user_feature_df = user_feature_df[user_feature_df['extracted_features'].map(lambda x: len(x) > 0)]
+    filtered_users_zero_fv = user_feature_df[user_feature_df.map(lambda x: len(x) == 0)].index.tolist()
+    user_feature_df = user_feature_df[user_feature_df.map(lambda x: len(x) > 0)]
     
     max_col = len(vocab_key)
     
-    rcv = [(r, c, v) for r, feats in enumerate(user_feature_df['extracted_features']) for c, v in feats.items()]
+    rcv = [(r, c, v) for r, feats in enumerate(user_feature_df) for c, v in feats.items()]
     
     X = scipy.sparse.csr_matrix(([x[2] for x in rcv], ([x[0] for x in rcv], [x[1] for x in rcv])),
                                 shape=(user_feature_df.shape[0], max_col))
