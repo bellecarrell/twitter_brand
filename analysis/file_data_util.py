@@ -82,4 +82,54 @@ def train_dev_test(in_dir, users, dev_frac, test_frac):
 
     return train, dev, test
 
+def batch_from_compressed(data,n_features):
+    us = data['user_id']
+    rows = data['row']
+    cols = data['col']
+    values = data['value']
+    tw = data['time_window']
+    X = np.zeros(shape=(len(us),n_features))
 
+    vidx = 0
+    for r,c in zip(rows, cols):
+        X[r][c] = values[vidx]
+        vidx += 1
+
+    return X, us, tw
+
+def load_train(data,vocab,static_info):
+    n_features = len(vocab)
+    X, us, tw = batch_from_compressed(data,n_features)
+
+    us_old = []
+    for i, u in enumerate(us):
+        fold = static_info.loc[static_info['user_id'] == u]['fold'].values[0]
+        if fold == 'train':
+            us_old.append((u,i))
+
+    train_X = np.zeros(shape=(len(us_old),n_features))
+
+    for i, (u,old_i) in enumerate(us_old):
+        train_X[i] = X[old_i]
+
+    train_us = [u[0] for u in us_old]
+    return train_X, train_us, tw
+
+
+def load_test(in_dir,vocab,static_info):
+    n_features = len(vocab)
+    data = np.load(os.path.join(in_dir,'batches/all_data_batches/batch_0.npz'))
+    X, us, tw = batch_from_compressed(data,n_features)
+
+    us_old = []
+    for i, u in enumerate(us):
+        fold = static_info.loc[static_info['user_id'] == u]['fold'].values[0]
+        if fold == 'test':
+            us_old.append((u,i))
+
+    test_X = np.zeros(shape=(len(us_old),n_features))
+
+    for i, (u,old_i) in enumerate(us_old):
+        test_X[i] = X[old_i]
+    test_us = [u[0] for u in us_old]
+    return test_X, test_us

@@ -51,14 +51,15 @@ class RandomizedRegression:
             else:
                 raise Exception('Do not recognize count type: "{}"'.format(salience_type))
 
-            print('{} feature counts'.format(feature_counts))
-            print('{} target key'.format(target_key))
+            print('{} feature counts'.format(feature_counts.keys()))
+            print('{} target key'.format(target_key.keys()))
             rev_cnts = [[(v, feature_key[k]) for k, v in feature_counts[i].items()]
-                        for i, target in target_key.items()]
+                        for i, target in target_key.items() if i in feature_counts.keys()]
             for cnts in rev_cnts:
                 cnts.sort(reverse=True)
             
-            salient_features_per_target = {target: rev_cnts[i][:n] for i, target in target_key.items()}
+            salient_features_per_target = {target: rev_cnts[i][:n] for i, target in target_key.items()
+                                           if i in feature_counts.keys()}
             
             return salient_features_per_target
     

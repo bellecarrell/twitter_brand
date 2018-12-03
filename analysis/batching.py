@@ -17,7 +17,6 @@ import numpy as np
 import nltk
 from analysis.datetime_util import *
 import scipy.sparse
-nltk.download('stopwords')
 
 BATCH_START_WINDOW = datetime.datetime(2018, 4, 1)
 BATCH_END_WINDOW = datetime.datetime(2018, 7, 31)

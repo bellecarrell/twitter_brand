@@ -4,3 +4,4 @@ pull_twitter_data/keys/
 pull_twitter_data/access_tokens/
 test_data/
 analysis/log_reg_models/
+analysis/log_reg_models*
