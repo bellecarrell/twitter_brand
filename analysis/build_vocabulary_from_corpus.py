@@ -97,11 +97,14 @@ def norm_token(t):
     # t = t.lower() ## AB: I assume sentence is already tokenized
     
     if t.startswith('@'):
-        return '<USER>'
+        #return '<USER>'
+        return None
     elif t.startswith('http'):
-        return '<URL>'
-    
-    if t in stop:
+        #return '<URL>'
+        return None
+    elif t in stop:
+        return None
+    elif re.search('[a-z]', t) is None:
         return None
     
     t_repl_digits = re.sub('\d', '0', t)  # normalize digits
@@ -121,7 +124,7 @@ def featurize_tweet(t):
     return feats
 
 
-def extract_vocab_and_features(promoting_users, timeline_path, min_df=50, max_df=0.8):
+def extract_vocab_and_features(promoting_users, timeline_path, min_df=50, max_df=0.5):
     timeline_df = pd.read_table(timeline_path, sep=',')
     only_promoting_df = timeline_df[timeline_df['user_id'].isin(promoting_users)]
     n = only_promoting_df.shape[0]
@@ -181,7 +184,7 @@ def featurize_by_vectorizer():
     to_json_file(dates_tweets, os.path.join(out_dir), 'dates_tweets')
 
 
-def main(in_dir, out_dir, min_df=50, max_df=0.8):
+def main(in_dir, out_dir, min_df=50, max_df=0.5):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
     timeline_path = os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz')
     promoting_users = static_info.loc[
