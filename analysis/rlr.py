@@ -42,6 +42,7 @@ class RandomizedRegression:
             print('Need to fit model first')
             return None
         else:
+            
             if salience_type == 'pos':
                 feature_counts = self.pos_feature_counts
             elif salience_type == 'neg':
