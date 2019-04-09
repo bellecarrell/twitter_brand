@@ -133,3 +133,26 @@ def load_test(in_dir,vocab,static_info):
         test_X[i] = X[old_i]
     test_us = [u[0] for u in us_old]
     return test_X, test_us
+
+def load_fold(in_dir,vocab,static_info,fold_v,future=False):
+    n_features = len(vocab)
+    if future:
+        data = np.load(os.path.join(in_dir,'batches/all_data_future_batches/batch_0.npz'))
+    else:
+        data = np.load(os.path.join(in_dir, 'batches/all_data_batches/batch_0.npz'))
+    X, us, tw = batch_from_compressed(data,n_features)
+
+    us_old = []
+    for i, u in enumerate(us):
+        fold = static_info.loc[static_info['user_id'] == u]['fold'].values[0]
+        if fold == fold_v:
+            us_old.append((u,i))
+
+    fold_X = np.zeros(shape=(len(us_old),n_features))
+
+    for i, (u,old_i) in enumerate(us_old):
+        fold_X[i] = X[old_i]
+    fold_us = [u[0] for u in us_old]
+    return fold_X, fold_us
+
+

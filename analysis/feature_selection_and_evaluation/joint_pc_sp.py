@@ -14,7 +14,7 @@ import numpy as np
 
 from analysis.file_data_util import *
 import argparse
-name = 'joint_fc_sp'
+name = 'joint_pc_sp'
 n_batches = 100
 
 def filter_by_stratification(X,us, static_info,n_features,s_to_y_val):
@@ -35,13 +35,17 @@ def filter_by_stratification(X,us, static_info,n_features,s_to_y_val):
     return filt_X, ys
 
 def _generate_single_y_joint(u, static_info,s_to_y_val):
-    percentile = int(static_info.loc[static_info['user_id'] == u]['percentile'].values[0])
-    s = static_info.loc[static_info['user_id'] == u]['category_most_index-mace_label'].values[0]
+    pc = static_info.loc[static_info['user_id'] == u]['pc_percentile'].values[0]
+    if not math.isinf(pc) and not math.isnan(pc):
+        percentile = int(pc)
+        s = static_info.loc[static_info['user_id'] == u]['category_most_index-mace_label'].values[0]
 
-    if percentile >= 90:
-        return s_to_y_val[(s,1)]
-    if percentile < 70:
-        return s_to_y_val[(s,0)]
+        if percentile >= 90:
+            return s_to_y_val[(s,1)]
+        if percentile < 70:
+            return s_to_y_val[(s,0)]
+        else:
+            return None
     else:
        return None
 
@@ -89,24 +93,27 @@ def main(in_dir,out_dir):
     s_to_y_val = dict((v,k) for k, v in y_to_s_val.items())
     vocab = from_gz(os.path.join(in_dir, 'features'), 'vocab')
 
-    batch_tws = ['all_data', 'month', 'one_week', 'two_week']
+    #batch_tws = ['all_data_future', 'month_future', 'one_week_future', 'two_week_future']
+    batch_tws = ['month_future', 'one_week_future', 'two_week_future']
 
     for tw in batch_tws:
 
         model_dir = './log_reg_models_{}_{}'.format(name,tw)
 
-        rr = fit_batches(in_dir, static_info, model_dir, s_to_y_val, l1_range=[0.0, 10.0])
+        rr = fit_batches(in_dir, static_info, model_dir, s_to_y_val, l1_range=[0.0, 1000.0])
         sf = rr.get_salient_features(dict((v,k) for k,v in vocab.items()), y_to_s_val,n=1300)
 
         with open(os.path.join(out_dir,'rlr_selected_features_{}_{}.txt'.format(name,tw)),'w+') as f:
             for s, feat in sf.items():
                 f.write('Target: {} Salient features: {}\n\n'.format(s, feat))
 
-        ensemble = Ensemble(model_dir)
-        X, us = load_test(in_dir, vocab, static_info)
-        X, y = filter_by_stratification(X, us, static_info, len(vocab), s_to_y_val)
-        ensemble.eval_to_file(X,y, os.path.join(out_dir,'eval_{}_batch_{}'.format(name,tw)))
-
+        try:
+            ensemble = Ensemble(model_dir)
+            X, us = load_test(in_dir, vocab, static_info)
+            X, y = filter_by_stratification(X, us, static_info, len(vocab), s_to_y_val)
+            ensemble.eval_to_file(X,y, os.path.join(out_dir,'eval_{}_batch_{}'.format(name,tw)))
+        except Exception as ex:
+            print(ex)
     
 if __name__ == '__main__':
     """

@@ -174,13 +174,13 @@ if __name__ == '__main__':
     """
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('--in_dir', required=True, help='input directory')
+    #parser.add_argument('--in_dir', required=True, help='input directory')
     parser.add_argument('--out_dir', required=True, help='output directory')
     parser.add_argument('--num_procs', type=int, default=1, help='number of processes to run in parallel')
     parser.add_argument('--max_paths', type=int, default=None, help='for debugging, limit number of input files')
     args = parser.parse_args()
     
-    in_dir = args.in_dir
+    in_dirs = ['/exp/acarrell/twitter_brand_data','/exp/abenton/twitter_brand_data']
     out_dir = args.out_dir
     num_procs = args.num_procs
     
@@ -196,10 +196,18 @@ if __name__ == '__main__':
         os.mkdir(out_timeline_dir)
     
     random.seed(12345)
-    info_paths = [os.path.join(in_dir, dirpath, p) for dirpath, _, filenames in os.walk(in_dir)
+    info_paths = []
+    tweet_paths = []
+
+    for in_dir in in_dirs:
+        ips = [os.path.join(in_dir, dirpath, p) for dirpath, _, filenames in os.walk(in_dir)
                   for p in filenames if p.startswith('userInfo_')]
-    tweet_paths = [os.path.join(in_dir, dirpath, p) for dirpath, _, filenames in os.walk(in_dir)
+        info_paths = info_paths + ips
+        tps = [os.path.join(in_dir, dirpath, p) for dirpath, _, filenames in os.walk(in_dir)
                    for p in filenames if p.endswith('.statuses.json.gz')]
+        tweet_paths = tweet_paths + tps
+
+
     random.shuffle(info_paths)
     random.shuffle(tweet_paths)
     

@@ -14,7 +14,7 @@ import numpy as np
 
 from analysis.file_data_util import *
 import argparse
-name = 'fc_by_sp'
+name = 'pc_by_sp'
 n_batches = 100
 
 def filter_by_stratification(X,us, static_info,n_features,s):
@@ -36,26 +36,32 @@ def filter_by_stratification(X,us, static_info,n_features,s):
     return filt_X, y_l, y_h
 
 def _generate_single_y_low_high(u, static_info,s):
-    percentile = int(static_info.loc[static_info['user_id'] == u]['percentile'].values[0])
-    specialization = static_info.loc[static_info['user_id'] == u]['category_most_index-mace_label'].values[0]
+    pc = static_info.loc[static_info['user_id'] == u]['pc_percentile'].values[0]
+    if not math.isinf(pc) and not math.isnan(pc):
+        percentile = int(pc)
+        specialization = static_info.loc[static_info['user_id'] == u]['category_most_index-mace_label'].values[0]
 
-    if specialization == s:
-        if percentile >= 90:
-            return (0,1)
-        if percentile < 70:
-            return (1,0)
+        if specialization == s:
+            if percentile >= 90:
+                return (0,1)
+            if percentile < 70:
+                return (1,0)
+            else:
+                return None
+        else:
+            return None
     else:
        return None
 
 
-def fit_batches(in_dir, static_info, s, model_dir, batch='month', l1_range=[0.0, 1.0]):
+def fit_batches(in_dir, static_info, s, model_dir, batch='month', l1_range=[0.0, 1.0], model_type='sv,'):
     np.random.seed(SEED)
 
     vocab = from_gz(os.path.join(in_dir,'features'),'vocab')
     low_md = model_dir + '_low'
-    low = RandomizedRegression(is_continuous=False, model_dir=low_md, log_l1_range=True)
+    low = RandomizedRegression(model_type=model_type, model_dir=low_md, log_l1_range=True)
     high_md = model_dir + '_high'
-    high = RandomizedRegression(is_continuous=False, model_dir=high_md, log_l1_range=True)
+    high = RandomizedRegression(model_type=model_type, model_dir=high_md, log_l1_range=True)
 
 
     if low.log_l1_range:
@@ -92,34 +98,23 @@ def main(in_dir,out_dir):
     y_to_s_val = dict((i, s) for i, s in enumerate(specializations))
     vocab = from_gz(os.path.join(in_dir, 'features'), 'vocab')
 
-    batch_tws = ['all_data', 'month', 'one_week', 'two_week']
+    #batch_tws = ['all_data_future', 'month_future', 'one_week_future', 'two_week_future']
+    batch_tws = ['month_future']
 
     for tw in batch_tws:
 
         for s in specializations:
-            model_dir = './log_reg_models_{}_{}_{}'.format(name,s,tw)
+            model_dir = './models/svm_log_reg_models_{}_{}_{}'.format(name,s,tw)
 
-            low, high = fit_batches(in_dir, static_info,s, model_dir, l1_range=[0.0, 10.0])
+            low, high = fit_batches(in_dir, static_info,s, model_dir, l1_range=[0.0, 100.0],model_type='svm')
             low_sf = low.get_salient_features(dict((v,k) for k,v in vocab.items()), {0:'low'},n=100)
             high_sf = high.get_salient_features(dict((v, k) for k, v in vocab.items()), {0: 'high'}, n=100)
             if low_sf and high_sf:
                 salient_features = dict(low_sf, **high_sf)
 
                 with open(os.path.join(out_dir,'rlr_selected_features_{}_{}_{}.txt'.format(name,s,tw)),'w+') as f:
-                    for s, feat in salient_features.items():
-                        f.write('Target: {} Salient features: {}\n\n'.format(s, feat))
-
-                X, us = load_test(in_dir, vocab, static_info)
-                X, y_l, y_h = filter_by_stratification(X, us, static_info, len(vocab), s)
-
-                if X.shape[0] != 0:
-                    low_md = model_dir + '_low'
-                    ensemble = Ensemble(low_md)
-                    ensemble.eval_to_file(X, y_l, os.path.join(out_dir, 'eval_{}_{}_batch_{}'.format(name, s, tw)))
-
-                    high_md = model_dir + '_high'
-                    ensemble = Ensemble(high_md)
-                    ensemble.eval_to_file(X, y_h, os.path.join(out_dir, 'eval_{}_{}_batch_{}'.format(name, s, tw)))
+                    for sf, feat in salient_features.items():
+                        f.write('Target: {} Salient features: {}\n\n'.format(sf, feat))
 
 
 if __name__ == '__main__':

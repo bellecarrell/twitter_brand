@@ -48,14 +48,14 @@ def _generate_single_y_low_high(u, static_info,s):
        return None
 
 
-def fit_batches(in_dir, static_info, s, model_dir, batch='month', l1_range=[0.0, 1.0]):
+def fit_batches(in_dir, static_info, s, model_dir, batch='month', l1_range=[0.0, 1.0], model_type='lr'):
     np.random.seed(SEED)
 
     vocab = from_gz(os.path.join(in_dir,'features'),'vocab')
     low_md = model_dir + '_low'
-    low = RandomizedRegression(is_continuous=False, model_dir=low_md, log_l1_range=True)
+    low = RandomizedRegression(model_type=model_type, model_dir=low_md, log_l1_range=True)
     high_md = model_dir + '_high'
-    high = RandomizedRegression(is_continuous=False, model_dir=high_md, log_l1_range=True)
+    high = RandomizedRegression(model_type=model_type, model_dir=high_md, log_l1_range=True)
 
 
     if low.log_l1_range:
@@ -92,32 +92,34 @@ def main(in_dir,out_dir):
     y_to_s_val = dict((i, s) for i, s in enumerate(specializations))
     vocab = from_gz(os.path.join(in_dir, 'features'), 'vocab')
 
-    batch_tws = ['all_data', 'month', 'one_week', 'two_week']
+    batch_tws = ['month']
 
     for tw in batch_tws:
 
         for s in specializations:
-            model_dir = './log_reg_models_{}_{}_{}'.format(name,s,tw)
+            model_dir = './models/cd svm_log_reg_models_{}_{}_{}'.format(name,s,tw)
 
-            low, high = fit_batches(in_dir, static_info,s, model_dir, l1_range=[0.0, 10.0])
+            low, high = fit_batches(in_dir, static_info,s, model_dir, l1_range=[0.0, 10.0],model_type='svm')
             low_sf = low.get_salient_features(dict((v,k) for k,v in vocab.items()), {0:'low'},n=100)
             high_sf = high.get_salient_features(dict((v, k) for k, v in vocab.items()), {0: 'high'}, n=100)
-            salient_features = dict(low_sf, **high_sf)
+            if low_sf and high_sf:
+                salient_features = dict(low_sf, **high_sf)
 
-            with open(os.path.join(out_dir,'rlr_selected_features_{}_{}_{}.txt'.format(name,s,tw)),'w+') as f:
-                for s, feat in salient_features.items():
-                    f.write('Target: {} Salient features: {}\n\n'.format(s, feat))
+                with open(os.path.join(out_dir,'rlr_selected_features_{}_{}_{}.txt'.format(name,s,tw)),'w+') as f:
+                    for sf, feat in salient_features.items():
+                        f.write('Target: {} Salient features: {}\n\n'.format(sf, feat))
+                #X, us = load_fold(in_dir, vocab, static_info, 'dev')
+                X, us = load_test(in_dir, vocab, static_info)
+                X, y_l, y_h = filter_by_stratification(X, us, static_info, len(vocab), s)
 
-            X, us = load_test(in_dir, vocab, static_info)
-            X, y_l, y_h = filter_by_stratification(X, us, static_info, len(vocab), s)
+                if X.shape[0] != 0:
+                    low_md = model_dir + '_low'
+                    ensemble = Ensemble(low_md)
+                    ensemble.eval_to_file(X, y_l, 1, os.path.join(out_dir, 'low_eval_{}_{}_batch_{}'.format(name, s, tw)), replace=True)
 
-            low_md = model_dir + '_low'
-            ensemble = Ensemble(low_md)
-            ensemble.eval_to_file(X, y_l, os.path.join(out_dir, 'eval_{}_{}_batch_{}'.format(name, s, tw)))
-
-            high_md = model_dir + '_high'
-            ensemble = Ensemble(high_md)
-            ensemble.eval_to_file(X, y_h, os.path.join(out_dir, 'eval_{}_{}_batch_{}'.format(name, s, tw)))
+                    high_md = model_dir + '_high'
+                    ensemble = Ensemble(high_md)
+                    ensemble.eval_to_file(X, y_h, 0, os.path.join(out_dir, 'high_eval_{}_{}_batch_{}'.format(name, s, tw)), replace=True)
 
 
 if __name__ == '__main__':

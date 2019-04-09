@@ -7,7 +7,7 @@ import nltk
 import os
 
 from analysis.batching import *
-
+from analysis.feature_selection_and_evaluation.exp_util import *
 SEED = 12345
 VERBOSE = True
 import numpy as np
@@ -28,30 +28,6 @@ def _generate_y_multi(us, static_info):
     return y
 
 
-def fit_batches(rr, in_dir, static_info, batch_tw='month', l1_range=[0.0, 1.0]):
-    np.random.seed(SEED)
-
-    vocab = from_gz(os.path.join(in_dir,'features'),'vocab')
-
-    if rr.log_l1_range:
-        l1s = np.power(l1_range[1] - l1_range[0], np.random.random(n_batches)) - 1 + l1_range[0]
-    else:
-        l1s = (l1_range[1] - l1_range[0]) * np.random.random(n_batches) + l1_range[0]
-
-    start = time.time()
-
-    # fit each batch
-    for dirpath, _, filenames in os.walk(os.path.join(in_dir,'batches','{}_batches'.format(batch_tw))):
-        filenames = [f for f in filenames if f.startswith('batch')]
-        for b, (filename, l1) in enumerate(zip(filenames,l1s)):
-            data = np.load(os.path.join(dirpath,filename))
-            X, us, tw = load_train(data, vocab,static_info)
-            y = _generate_y_multi(us, static_info)
-
-            print('{} size of y'.format(y.shape))
-            rr.fit_batch(X, y, l1, b)
-            if VERBOSE:
-                print('Finished {}/{} ({}s)'.format(b, len(l1s), int(time.time() - start)))
 
 
 def main(in_dir,out_dir):
@@ -64,23 +40,19 @@ def main(in_dir,out_dir):
     vocab = from_gz(os.path.join(in_dir, 'features'), 'vocab')
 
 
-    batch_tws = ['all_data', 'month', 'one_week', 'two_week']
+    #batch_tws = ['all_data', 'month', 'one_week', 'two_week']
+    batch_tws = ['month']
 
     for tw in batch_tws:
-        model_dir = './log_reg_models_{}_{}'.format(name,tw)
 
-        log_reg = RandomizedRegression(is_continuous=False, model_dir=model_dir, log_l1_range=True)
-        fit_batches(log_reg, in_dir, static_info, batch_tw=tw, l1_range=[0.0, 10.0])
-        salient_features = log_reg.get_salient_features(dict((v,k) for k,v in vocab.items()), y_to_s_val,n=1300)
 
-        with open(os.path.join(out_dir,'rlr_selected_features_{}_{}.txt'.format(name,tw)),'w+') as f:
-            for s, feat in salient_features.items():
-                f.write('Specialization: {} Salient features: {}\n\n'.format(s, feat))
+        model_dir = '/home/hltcoe/acarrell/PycharmProjects/twitter_brand/analysis/models/svm_log_reg_models_{}_{}'.format(name,tw)
 
         ensemble = Ensemble(model_dir)
         X, us = load_test(in_dir, vocab, static_info)
+        # #X, us = load_fold(in_dir, vocab, static_info,'dev')
         y = _generate_y_multi(us, static_info)
-        ensemble.eval_to_file(X,y, os.path.join(out_dir,'eval_{}_batch_{}'.format(name,tw)))
+        ensemble.eval_to_file(X,y, 1, os.path.join(out_dir,'svm_eval_{}_batch_{}'.format(name,tw)))
 
     
 if __name__ == '__main__':

@@ -1,0 +1,60 @@
+========== Stats for "category_all_religion" ==========
+Krippendorff's alpha: 0.27793575161389494
+Label distribution: {'n': 1163, None: 217, 'y': 10} {'n': 0.8366906474820144, None: 0.15611510791366906, 'y': 0.007194244604316547}
+========== Stats for "category_all_health" ==========
+Krippendorff's alpha: 0.47265995453069176
+Label distribution: {'n': 1114, None: 217, 'y': 59} {'n': 0.8014388489208633, None: 0.15611510791366906, 'y': 0.04244604316546763}
+========== Stats for "category_all_family" ==========
+Krippendorff's alpha: 0.3347939549287281
+Label distribution: {'n': 1083, None: 217, 'y': 90} {'n': 0.779136690647482, None: 0.15611510791366906, 'y': 0.06474820143884892}
+========== Stats for "category_all_other" ==========
+Krippendorff's alpha: 0.10721346364923212
+Label distribution: {'n': 826, 'y': 347, None: 217} {'n': 0.5942446043165468, 'y': 0.24964028776978417, None: 0.15611510791366906}
+========== Stats for "category_all_games" ==========
+Krippendorff's alpha: 0.37332106055116543
+Label distribution: {'n': 1165, None: 217, 'y': 8} {'n': 0.8381294964028777, None: 0.15611510791366906, 'y': 0.0057553956834532375}
+========== Stats for "category_all_travel" ==========
+Krippendorff's alpha: 0.4012008569543476
+Label distribution: {'y': 203, 'n': 970, None: 217} {'y': 0.1460431654676259, 'n': 0.697841726618705, None: 0.15611510791366906}
+========== Stats for "category_all_sports" ==========
+Krippendorff's alpha: 0.48753269505240393
+Label distribution: {'n': 1151, None: 217, 'y': 22} {'n': 0.8280575539568346, None: 0.15611510791366906, 'y': 0.015827338129496403}
+========== Stats for "category_all_beauty" ==========
+Krippendorff's alpha: 0.24979245139167083
+Label distribution: {'n': 979, 'y': 194, None: 217} {'n': 0.7043165467625899, 'y': 0.13956834532374102, None: 0.15611510791366906}
+========== Stats for "classify_account" ==========
+Krippendorff's alpha: 0.29841291986413143
+Label distribution: {'promoting': 926, 'missing': 62, 'personal': 234, 'non_english': 168} {'promoting': 0.6661870503597123, 'missing': 0.04460431654676259, 'personal': 0.1683453237410072, 'non_english': 0.12086330935251799}
+========== Gold Agreement for "classify_account" ==========
+# MACE uncertain: 0/201
+# Agree: 175/201 (87.06%)
+========== Stats for "category_all_finance" ==========
+Krippendorff's alpha: 0.4962525644456338
+Label distribution: {'n': 1159, None: 217, 'y': 14} {'n': 0.8338129496402877, None: 0.15611510791366906, 'y': 0.010071942446043165}
+========== Stats for "category_all_business" ==========
+Krippendorff's alpha: 0.34104616216338424
+Label distribution: {'n': 1123, None: 217, 'y': 50} {'n': 0.8079136690647482, None: 0.15611510791366906, 'y': 0.03597122302158273}
+========== Stats for "category_all_books" ==========
+Krippendorff's alpha: 0.26827178126912865
+Label distribution: {'n': 1141, None: 217, 'y': 32} {'n': 0.820863309352518, None: 0.15611510791366906, 'y': 0.02302158273381295}
+========== Stats for "category_all_gastronomy" ==========
+Krippendorff's alpha: 0.5732387529164904
+Label distribution: {'n': 1103, None: 217, 'y': 70} {'n': 0.7935251798561151, None: 0.15611510791366906, 'y': 0.050359712230215826}
+========== Stats for "category_all_arts" ==========
+Krippendorff's alpha: 0.30945099285992894
+Label distribution: {'n': 1027, 'y': 146, None: 217} {'n': 0.7388489208633093, 'y': 0.10503597122302158, None: 0.15611510791366906}
+========== Stats for "category_most_index" ==========
+Krippendorff's alpha: 0.39774156500832103
+Label distribution: {'travel': 148, 'other': 192, 'business': 59, 'style': 158, 'beauty': 95, 'arts': 143, None: 224, 'family': 93, 'politics': 43, 'health': 70, 'gastronomy': 74, 'sports': 28, 'games': 13, 'science and technology': 23, 'books': 27} {'travel': 0.10647482014388489, 'other': 0.1381294964028777, 'business': 0.04244604316546763, 'style': 0.11366906474820145, 'beauty': 0.0683453237410072, 'arts': 0.10287769784172662, None: 0.16115107913669063, 'family': 0.06690647482014389, 'politics': 0.03093525179856115, 'health': 0.050359712230215826, 'gastronomy': 0.053237410071942444, 'sports': 0.02014388489208633, 'games': 0.00935251798561151, 'science and technology': 0.016546762589928057, 'books': 0.019424460431654675}
+========== Gold Agreement for "category_most_index" ==========
+# MACE uncertain: 1/201
+# Agree: 103/200 (51.50%)
+========== Stats for "category_all_politics" ==========
+Krippendorff's alpha: 0.3890852854054897
+Label distribution: {'n': 1133, None: 217, 'y': 40} {'n': 0.8151079136690648, None: 0.15611510791366906, 'y': 0.02877697841726619}
+========== Stats for "category_all_lifestyle" ==========
+Krippendorff's alpha: 0.07997404315843581
+Label distribution: {'n': 1139, None: 217, 'y': 34} {'n': 0.8194244604316546, None: 0.15611510791366906, 'y': 0.02446043165467626}
+========== Stats for "category_all_style" ==========
+Krippendorff's alpha: 0.2927277389969708
+Label distribution: {'n': 988, 'y': 185, None: 217} {'n': 0.7107913669064748, 'y': 0.13309352517985612, None: 0.15611510791366906}
