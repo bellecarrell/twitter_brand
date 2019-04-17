@@ -60,6 +60,8 @@ def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=
         train_idxes = np.random.choice(train_nmf.shape[0], batch_size, replace=False)
         
         reconst_train_max = nmf.inverse_transform(train_nmf[train_idxes])
+        
+        import pdb; pdb.set_trace()
         prop_train_reconst_err = np.linalg.norm(reconst_train_max - train_max[train_idxes]) / \
                                  np.linalg.norm(train_max[train_idxes])
         prop_train_reconst_errs.append(prop_train_reconst_err)
