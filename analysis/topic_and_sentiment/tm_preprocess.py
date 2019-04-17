@@ -52,7 +52,7 @@ def featurize_tweet(t):
 
 
 def extract_vocab_and_features(tweets_merged_with_uinfo_path, out_dir, max_rows=None, min_df=10, max_df=0.5):
-    timeline_df = pd.read_table(tweets_merged_with_uinfo_path, sep=',')
+    timeline_df = pd.read_table(tweets_merged_with_uinfo_path, sep='\t')
     only_promoting_df = timeline_df
     
     if max_rows is not None:
