@@ -43,16 +43,11 @@ NEGS = {"ain't", "aint", "can't", "cant", "couldn't", "didn't", "doesn't",
 PUNCTS = {',', '.', ':', ';', '!', '?'}
 
 
-stop = set(stopwords.words('english')) | {'rt'}
-
-
-def norm_token(t, remove_stop=True):
+def norm_token(t):
     if t.startswith('@'):
         return '<USER>'
     elif t.startswith('http'):
         return '<URL>'
-    elif remove_stop and (t in stop):
-        return None
     elif re.search('[a-z]', t) is None:
         return None
     
