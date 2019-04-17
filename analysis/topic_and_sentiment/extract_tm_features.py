@@ -158,7 +158,7 @@ def fit_lda(train_max, heldout_max=None, vocab=None, k=10, alpha=1.0, beta=10**-
 def main():
     # read in text matrix
     all_max = scipy.sparse.load_npz(IDF_FEATURE_PATH)
-    onehot_max = all_max.clone()
+    onehot_max = all_max.copy()
     onehot_max[onehot_max.nonzero()] = 1
     
     if PROP_TRAIN < 1.0:
