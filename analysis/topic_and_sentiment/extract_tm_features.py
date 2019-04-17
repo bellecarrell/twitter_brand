@@ -51,14 +51,33 @@ def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=
     else:
         heldout_nmf = None
     
-    reconst_train_max = nmf.inverse_transform(train_nmf)
-    prop_train_reconst_err = np.linalg.norm(reconst_train_max - train_max) / np.linalg.norm(train_max)
-    print('Train reconstruction error: {}'.format(prop_train_reconst_err))
+    batch_size = 100
     
-    if heldout_nmf is not None:
-        reconst_heldout_max = nmf.inverse_transform(heldout_nmf)
-        prop_heldout_reconst_err = np.linalg.norm(reconst_heldout_max - heldout_max) / np.linalg.norm(heldout_max)
-        print('Heldout reconstruction error: {}'.format(prop_heldout_reconst_err))
+    prop_train_reconst_errs = []
+    prop_heldout_reconst_errs = []
+    
+    for iteration in range(20):
+        train_idxes = np.random.sample(train_nmf.shape[0], batch_size, replace=False)
+        
+        reconst_train_max = nmf.inverse_transform(train_nmf[train_idxes])
+        prop_train_reconst_err = np.linalg.norm(reconst_train_max - train_max[train_idxes]) / \
+                                 np.linalg.norm(train_max[train_idxes])
+        prop_train_reconst_errs.append(prop_train_reconst_err)
+        
+        if heldout_nmf is not None:
+            heldout_idxes = np.random.sample(heldout_nmf.shape[0], batch_size, replace=False)
+            
+            reconst_heldout_max = nmf.inverse_transform(heldout_nmf[heldout_idxes])
+            prop_heldout_reconst_err = np.linalg.norm(reconst_heldout_max - heldout_max[heldout_idxes]) / \
+                                       np.linalg.norm(heldout_max[heldout_idxes])
+            prop_heldout_reconst_errs.append(prop_heldout_reconst_err)
+        else:
+            prop_heldout_reconst_errs.append(-1.0)
+        
+        print('Sampled reconstruction error iteration: {}/20'.format(iteration))
+    
+    print('Train reconstruction error: {}'.format(np.mean(prop_train_reconst_errs)))
+    print('Heldout reconstruction error: {}'.format(np.mean(prop_heldout_reconst_errs)))
     
     top_words_per_topic = get_top_words(nmf, vocab, n=10, verbose=True)
     
