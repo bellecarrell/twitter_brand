@@ -71,10 +71,10 @@ class UnsupervisedSentimentScorer:
         self.load_unigram_lexicon()
     
     def load_unigram_lexicon(self):
-        df = pd.read_table(self.contextual_lexicon_path, header=None, columns=['feature',
-                                                                               'score',
-                                                                               'num_pos',
-                                                                               'num_neg'])
+        df = pd.read_table(self.contextual_lexicon_path, header=None, names=['feature',
+                                                                             'score',
+                                                                             'num_pos',
+                                                                             'num_neg'])
         
         self.sentiment_lexicon = {r['feature']: r['score'] for ridx, r in df.iterrows()}
     
