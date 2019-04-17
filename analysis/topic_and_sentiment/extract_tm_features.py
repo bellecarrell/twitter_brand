@@ -88,9 +88,13 @@ def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=
     model_path = os.path.join(TOPIC_DIR, 'nmf-k{}-alpha{}.model.pickle')
     
     # save top words per topic
-    with open(topic_path, 'wt') as topic_file:
+    with open(topic_path, 'wt', encoding='utf8') as topic_file:
         for topic_idx, words in enumerate(top_words_per_topic):
-            topic_file.write('Topic #{}: {}\n'.format(topic_idx, ' '.join(words)))
+            topic_file.write('Topic #{}:'.format(topic_idx))
+            for w in words:
+                topic_file.write(' ')
+                topic_file.write(w)
+            topic_file.write('\n')
     
     # save NMF model
     with open(model_path, 'wb') as model_file:
