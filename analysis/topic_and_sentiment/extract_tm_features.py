@@ -24,7 +24,7 @@ VOCAB_PATH = os.path.join(WORKSPACE_DIR, 'vocab.json')
 
 #IDF_FEATURE_PATH = os.path.join(WORKSPACE_DIR, 'topic_modeling_per_tweet.unigram_idf.npz')
 #IDF_FEATURE_IDX_PATH = os.path.join(WORKSPACE_DIR, 'topic_modeling_per_tweet.index.tsv')
-IDF_FEATURE_PATH = os.path.join(WORKSPACE_DIR, 'topic_modeling_per_user.unigram_idf.npz')
+IDF_FEATURE_PATH = os.path.join(WORKSPACE_DIR, 'topic_modeling_per_user.unigram_sum_idf.npz')
 IDF_FEATURE_IDX_PATH = os.path.join(WORKSPACE_DIR, 'topic_modeling_per_user.index.tsv')
 
 #TOPIC_DIR = os.path.join(WORKSPACE_DIR, 'topic_modeling')
