@@ -113,7 +113,7 @@ def main():
     # read in vocabulary
     with open(VOCAB_PATH, 'rt') as vocab_file:
         vocab = json.load(vocab_file)
-    rev_vocab = {v: k for k, v in vocab.items()}
+    rev_vocab = {int(v): k for k, v in vocab.items()}
     
     arg_lst = []
     
@@ -127,7 +127,6 @@ def main():
     
     for i, args in enumerate(arg_lst):
         start = time.time()
-        import pdb; pdb.set_trace()
         fit_model(train_max, heldout_max, rev_vocab, args)
         end = time.time()
         
