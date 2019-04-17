@@ -25,8 +25,6 @@ def stringify_dict(d):
 
 
 def norm_token(t):
-    # t = t.lower() ## AB: assume sentence is already lower-cased
-    
     if t.startswith('@'):
         return '<USER>'
     elif t.startswith('http'):
@@ -79,13 +77,13 @@ def extract_vocab_and_features(tweets_merged_with_uinfo_path, out_dir, max_rows=
                                  stop_words=stop, ngram_range=(1, 1),
                                  min_df=min_df, max_df=max_df)
     
-    import pdb; pdb.set_trace()
     feature_matrix = vectorizer.fit_transform(unigrams_per_tweet)
     
     vocab = vectorizer.vocabulary_
     vocab = stringify_dict(vocab)
     
-    json.dump(vocab, os.path.join(out_dir, 'vocab.txt'))
+    with os.path.join(out_dir, 'vocab.json') as out_file:
+        json.dump(vocab, out_file)
     print('Restricted to vocabulary size of {}'.format(len(vocab)))
     
     scipy.sparse.save_npz(os.path.join(out_dir, 'topic_modeling_per_tweet.unigram_idf.npz'), feature_matrix)
