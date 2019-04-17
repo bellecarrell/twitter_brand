@@ -9,6 +9,7 @@ import multiprocessing as mp
 import numpy as np
 import os
 import pandas as pd
+import pickle
 import time
 
 from sklearn.decomposition import LatentDirichletAllocation, NMF
@@ -80,9 +81,28 @@ def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=
     print('Train reconstruction error: {}'.format(np.mean(prop_train_reconst_errs)))
     print('Heldout reconstruction error: {}'.format(np.mean(prop_heldout_reconst_errs)))
     
-    top_words_per_topic = get_top_words(nmf, vocab, n=10, verbose=True)
+    top_words_per_topic = get_top_words(nmf, vocab, n=20, verbose=False)
     
-    import pdb; pdb.set_trace()
+    topic_path = os.path.join(TOPIC_DIR, 'nmf-k{}-alpha{}.topics.txt')
+    topic_dist_path = os.path.join(TOPIC_DIR, 'nmf-k{}-alpha{}.topic_distribution_per_tweet.txt')
+    model_path = os.path.join(TOPIC_DIR, 'nmf-k{}-alpha{}.model.pickle')
+    
+    # save top words per topic
+    with open(topic_path, 'wt') as topic_file:
+        for topic_idx, words in enumerate(top_words_per_topic):
+            topic_file.write('Topic #{}: {}\n'.format(topic_idx, ' '.join(words)))
+    
+    # save NMF model
+    with open(model_path, 'wb') as model_file:
+        pickle.dump(nmf, model_file)
+    
+    # save topic activation for each tweet, compressed numpy format
+    if heldout_nmf is not None:
+        all_nmf = np.concatenate((train_nmf, heldout_nmf), axis=0)
+    else:
+        all_nmf = train_nmf
+    
+    np.savez_compressed(topic_dist_path, topics_per_tweet=all_nmf)
 
 
 def fit_lda(train_max, heldout_max=None, vocab=None, k=10, alpha=1.0, beta=10**-3):
@@ -130,7 +150,7 @@ def main():
         fit_model(train_max, heldout_max, rev_vocab, args)
         end = time.time()
         
-        print('({}s) Finished {}/{} ({})'.format(int(end - start), i+1, len(arg_lst), args[0]))
+        print('({}s) Finished {}/{} ({})'.format(int(end - start), i+1, len(arg_lst), args))
 
 
 if __name__ == '__main__':
