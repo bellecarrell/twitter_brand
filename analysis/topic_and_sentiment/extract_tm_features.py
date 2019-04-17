@@ -20,17 +20,26 @@ PROP_TRAIN = 0.9
 
 WORKSPACE_DIR = '/exp/abenton/twitter_brand_workspace_20190417/'
 TWEET_PATH = os.path.join(WORKSPACE_DIR, 'promoting_user_tweets.merged_with_user_info.noduplicates.tsv.gz')
-IDF_FEATURE_PATH = os.path.join(WORKSPACE_DIR, 'topic_modeling_per_tweet.unigram_idf.npz')
-IDF_FEATURE_IDX_PATH = os.path.join(WORKSPACE_DIR, 'topic_modeling_per_tweet.index.tsv')
 VOCAB_PATH = os.path.join(WORKSPACE_DIR, 'vocab.json')
 
-TOPIC_DIR = os.path.join(WORKSPACE_DIR, 'topic_modeling')
+#IDF_FEATURE_PATH = os.path.join(WORKSPACE_DIR, 'topic_modeling_per_tweet.unigram_idf.npz')
+#IDF_FEATURE_IDX_PATH = os.path.join(WORKSPACE_DIR, 'topic_modeling_per_tweet.index.tsv')
+IDF_FEATURE_PATH = os.path.join(WORKSPACE_DIR, 'topic_modeling_per_user.unigram_idf.npz')
+IDF_FEATURE_IDX_PATH = os.path.join(WORKSPACE_DIR, 'topic_modeling_per_user.index.tsv')
+
+#TOPIC_DIR = os.path.join(WORKSPACE_DIR, 'topic_modeling')
+TOPIC_DIR = os.path.join(WORKSPACE_DIR, 'topic_modeling_userlevel')
 
 
-def get_top_words(model, vocab, n=10, verbose=False):
+def get_top_words(model, vocab, n=10, subtract_off_mean=False, verbose=False):
     words_per_topic = []
     
-    for topic_idx, topic in enumerate(model.components_):
+    if not subtract_off_mean:
+        components = model.components_
+    else:
+        components = model.components_ - model.components_.mean(axis=0, keepdims=True)
+    
+    for topic_idx, topic in enumerate(components):
         words = [vocab[i] for i in topic.argsort()[:-n - 1:-1]]
         words_per_topic.append(words)
         
@@ -79,15 +88,28 @@ def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=
     print('Train reconstruction error: {}'.format(np.mean(prop_train_reconst_errs)))
     print('Heldout reconstruction error: {}'.format(np.mean(prop_heldout_reconst_errs)))
     
-    top_words_per_topic = get_top_words(nmf, vocab, n=20, verbose=False)
+    top_words_per_topic = get_top_words(nmf, vocab, n=20, subtract_off_mean=False, verbose=False)
+    top_words_per_topic_womean = get_top_words(nmf, vocab, n=20, subtract_off_mean=True, verbose=False)
     
     topic_path = os.path.join(TOPIC_DIR, 'nmf-k{}-alpha{}.topics.txt'.format(k, alpha_regularization))
-    topic_dist_path = os.path.join(TOPIC_DIR, 'nmf-k{}-alpha{}.topic_distribution_per_tweet.txt'.format(k, alpha_regularization))
+    topic_womean_path = os.path.join(TOPIC_DIR, 'nmf-k{}-alpha{}.topics_without_mean.txt'.format(
+            k, alpha_regularization))
+    topic_dist_path = os.path.join(TOPIC_DIR,
+                                   'nmf-k{}-alpha{}.topic_distribution_per_tweet.txt'.format(k,
+                                                                                             alpha_regularization))
     model_path = os.path.join(TOPIC_DIR, 'nmf-k{}-alpha{}.model.pickle'.format(k, alpha_regularization))
     
     # save top words per topic
     with open(topic_path, 'wt', encoding='utf8') as topic_file:
         for topic_idx, words in enumerate(top_words_per_topic):
+            topic_file.write('Topic #{}:'.format(topic_idx))
+            for w in words:
+                topic_file.write(' ')
+                topic_file.write(w)
+            topic_file.write('\n')
+    
+    with open(topic_womean_path, 'wt', encoding='utf8') as topic_file:
+        for topic_idx, words in enumerate(top_words_per_topic_womean):
             topic_file.write('Topic #{}:'.format(topic_idx))
             for w in words:
                 topic_file.write(' ')
@@ -123,18 +145,29 @@ def fit_lda(train_max, heldout_max=None, vocab=None, k=10, alpha=1.0, beta=10**-
     print('Train perplexity lower bound: '.format(train_ppl_varlowerbound))
     print('Heldout perplexity lower bound: '.format(heldout_ppl_varlowerbound))
     
-    top_words_per_topic = get_top_words(lda, vocab, n=20, verbose=False)
+    top_words_per_topic = get_top_words(lda, vocab, n=20, subtract_off_mean=False, verbose=False)
+    top_words_per_topic_womean = get_top_words(lda, vocab, n=20, subtract_off_mean=True, verbose=False)
     
     topic_path = os.path.join(TOPIC_DIR, 'lda-k{}-alpha{}-beta{}.topics.txt'.format(k, alpha, beta))
+    topic_womean_path = os.path.join(TOPIC_DIR,
+                                     'lda-k{}-alpha{}-beta{}.topics_without_mean.txt'.format(k, alpha, beta))
     topic_dist_path = os.path.join(TOPIC_DIR,
                                    'lda-k{}-alpha{}-beta{}.topic_distribution_per_tweet.txt'.format(k,
                                                                                                     alpha,
                                                                                                     beta))
-    model_path = os.path.join(TOPIC_DIR, 'nmf-k{}-alpha{}-beta{}.model.pickle'.format(k, alpha, beta))
+    model_path = os.path.join(TOPIC_DIR, 'lda-k{}-alpha{}-beta{}.model.pickle'.format(k, alpha, beta))
 
     # save top words per topic
     with open(topic_path, 'wt', encoding='utf8') as topic_file:
         for topic_idx, words in enumerate(top_words_per_topic):
+            topic_file.write('Topic #{}:'.format(topic_idx))
+            for w in words:
+                topic_file.write(' ')
+                topic_file.write(w)
+            topic_file.write('\n')
+
+    with open(topic_womean_path, 'wt', encoding='utf8') as topic_file:
+        for topic_idx, words in enumerate(top_words_per_topic_womean):
             topic_file.write('Topic #{}:'.format(topic_idx))
             for w in words:
                 topic_file.write(' ')
@@ -154,8 +187,6 @@ def fit_lda(train_max, heldout_max=None, vocab=None, k=10, alpha=1.0, beta=10**-
         topic_probs = train_topic_probs
 
     np.savez_compressed(topic_dist_path, topics_per_tweet=topic_probs)
-
-    pass
 
 
 def main():
