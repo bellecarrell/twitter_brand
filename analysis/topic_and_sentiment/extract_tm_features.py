@@ -67,7 +67,7 @@ def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=
     prop_heldout_reconst_errs = []
     
     for iteration in range(20):
-        train_idxes = np.random.choice(train_nmf.shape[0], batch_size, replace=False)
+        train_idxes = np.random.choice(train_nmf.shape[0], batch_size, replace=True)
         
         reconst_train_max = nmf.inverse_transform(train_nmf[train_idxes])
         
@@ -76,7 +76,7 @@ def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=
         prop_train_reconst_errs.append(prop_train_reconst_err)
         
         if heldout_nmf is not None:
-            heldout_idxes = np.random.choice(heldout_nmf.shape[0], batch_size, replace=False)
+            heldout_idxes = np.random.choice(heldout_nmf.shape[0], batch_size, replace=True)
             
             reconst_heldout_max = nmf.inverse_transform(heldout_nmf[heldout_idxes])
             prop_heldout_reconst_err = np.linalg.norm(reconst_heldout_max - heldout_max[heldout_idxes]) / \
