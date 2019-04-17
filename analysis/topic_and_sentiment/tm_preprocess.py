@@ -24,12 +24,12 @@ def stringify_dict(d):
     return dict((str(k), str(v)) for k, v, in d.items())
 
 
-def norm_token(t):
+def norm_token(t, remove_stop=True):
     if t.startswith('@'):
         return '<USER>'
     elif t.startswith('http'):
         return '<URL>'
-    elif t in stop:
+    elif remove_stop and (t in stop):
         return None
     elif re.search('[a-z]', t) is None:
         return None

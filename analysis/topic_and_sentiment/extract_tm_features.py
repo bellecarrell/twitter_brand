@@ -1,6 +1,7 @@
 '''
 Fit topic model to promoting user tweets and extract topic distribution per tweet
-(compare NMF and LDA qualitatively, tuning hyperparameters for heldout perplexity).
+(compare NMF and LDA qualitatively, tuning hyperparameters for heldout
+perplexity/reconstruction error).
 '''
 
 import json
@@ -8,6 +9,7 @@ import multiprocessing as mp
 import numpy as np
 import os
 import pandas as pd
+import time
 
 from sklearn.decomposition import LatentDirichletAllocation, NMF
 
@@ -90,7 +92,8 @@ def main():
     
     # read in vocabulary
     with open(VOCAB_PATH, 'rt') as vocab_file:
-        json.load(vocab_file)
+        vocab = json.load(vocab_file)
+    rev_vocab = {v: k for k, v in vocab.items()}
     
     arg_lst = []
     
@@ -100,12 +103,14 @@ def main():
             arg_lst.append(('nmf', k, alpha_reg))
         
         # LDA runs
-        arg_lst.append(('lda', k, 0.5, 10**-3))
+        arg_lst.append(('lda', k, 0.5, 10.**-3))
     
     for i, args in enumerate(arg_lst):
-        fit_model(args)
+        start = time.time()
+        fit_model(train_max, heldout_max, rev_vocab, args)
+        end = time.time()
         
-        print('Finished {}/{} ({})'.format(i+1, len(arg_lst), args[0]))
+        print('({}s) Finished {}/{} ({})'.format(int(end - start), i+1, len(arg_lst), args[0]))
 
 
 if __name__ == '__main__':
