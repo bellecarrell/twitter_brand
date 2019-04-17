@@ -61,9 +61,8 @@ def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=
         
         reconst_train_max = nmf.inverse_transform(train_nmf[train_idxes])
         
-        import pdb; pdb.set_trace()
         prop_train_reconst_err = np.linalg.norm(reconst_train_max - train_max[train_idxes]) / \
-                                 np.linalg.norm(train_max[train_idxes])
+                                 scipy.sparse.linalg.norm(train_max[train_idxes])
         prop_train_reconst_errs.append(prop_train_reconst_err)
         
         if heldout_nmf is not None:
@@ -71,7 +70,7 @@ def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=
             
             reconst_heldout_max = nmf.inverse_transform(heldout_nmf[heldout_idxes])
             prop_heldout_reconst_err = np.linalg.norm(reconst_heldout_max - heldout_max[heldout_idxes]) / \
-                                       np.linalg.norm(heldout_max[heldout_idxes])
+                                       scipy.sparse.linalg.norm(heldout_max[heldout_idxes])
             prop_heldout_reconst_errs.append(prop_heldout_reconst_err)
         else:
             prop_heldout_reconst_errs.append(-1.0)
