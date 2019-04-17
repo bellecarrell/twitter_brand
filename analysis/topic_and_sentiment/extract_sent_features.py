@@ -60,6 +60,17 @@ def norm_token(t, remove_stop=True):
     
     return t_repl_digits
 
+    
+def normalize_tweet(tweet):
+    '''
+    Break tweet into normalized tokens and append _NEG or _NEGFIRST tags
+    to tokens that appear in negated context since we are using a
+    contextual lexicon.  Returns list of normalized tokens.
+    '''
+    
+    tokens = [norm_token(t) for t in tokenize(tweet.lower())]
+    return [t for t in tokens if t]
+
 
 class UnsupervisedSentimentScorer:
     def __init__(self, contextual_lexicon_path=LEXICON_PATH, negs=NEGS, puncts=PUNCTS):
@@ -78,24 +89,12 @@ class UnsupervisedSentimentScorer:
         
         self.sentiment_lexicon = {r['feature']: r['score'] for ridx, r in df.iterrows()}
     
-    @staticmethod
-    def normalize_tweet(tweet):
-        '''
-        Break tweet into normalized tokens and append _NEG or _NEGFIRST tags
-        to tokens that appear in negated context since we are using a
-        contextual lexicon.  Returns list of normalized tokens.
-        '''
-        
-        tokens = [norm_token(t) for t in tokenize(tweet.lower())]
-        
-        return [t for t in tokens if not t]
-    
     def featurize(self, tweet):
         ''' Extract features belonging to our lexicon. '''
         
         extracted_features = []
         
-        normed_tokens = UnsupervisedSentimentScorer.normalize_tweet(tweet)
+        normed_tokens = normalize_tweet(tweet)
         
         is_neg_span = False
         prev_is_neg = False
