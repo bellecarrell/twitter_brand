@@ -75,6 +75,7 @@ def extract_vocab_and_features(tweets_merged_with_uinfo_path, out_dir, max_rows=
         return doc
     
     vectorizer = TfidfVectorizer(tokenizer=identity,
+                                 preprocessor=identity,
                                  stop_words=stop, ngram_range=(1, 1),
                                  min_df=min_df, max_df=max_df)
     
