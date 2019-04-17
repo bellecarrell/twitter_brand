@@ -127,6 +127,7 @@ def main():
     
     for i, args in enumerate(arg_lst):
         start = time.time()
+        import pdb; pdb.set_trace()
         fit_model(train_max, heldout_max, rev_vocab, args)
         end = time.time()
         
