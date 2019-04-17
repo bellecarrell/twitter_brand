@@ -24,6 +24,21 @@ VOCAB_PATH = os.path.join(WORKSPACE_DIR, 'vocab.json')
 TOPIC_DIR = os.path.join(WORKSPACE_DIR, 'topic_modeling')
 
 
+def get_top_words(nmf_model, vocab, n=10, verbose=False):
+    words_per_topic = []
+    
+    for topic_idx, topic in enumerate(nmf_model.components_):
+        words = [vocab[i] for i in topic.argsort()[:-n - 1:-1]]
+        words_per_topic.append(words)
+        
+        if verbose:
+            message  = 'Topic #{}: '.format(topic_idx)
+            message += ' '.join(words)
+            print(message)
+    
+    return words_per_topic
+
+
 def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=0.0):
     nmf = NMF(k, alpha=alpha_regularization, verbose=True)
     
@@ -31,15 +46,19 @@ def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=
     
     if heldout_max is not None:
         heldout_nmf = nmf.transform(heldout_max)
+    else:
+        heldout_nmf = None
     
     reconst_train_max = nmf.inverse_transform(train_nmf)
-    reconst_heldout_max = nmf.inverse_transform(heldout_nmf)
-    
-    prop_train_reconst_err   = np.linalg.norm(reconst_train_max - train_max) / np.linalg.norm(train_max)
-    prop_heldout_reconst_err = np.linalg.norm(reconst_heldout_max - heldout_max) / np.linalg.norm(heldout_max)
-    
+    prop_train_reconst_err = np.linalg.norm(reconst_train_max - train_max) / np.linalg.norm(train_max)
     print('Train reconstruction error: {}'.format(prop_train_reconst_err))
-    print('Heldout reconstruction error: {}'.format(prop_heldout_reconst_err))
+    
+    if heldout_nmf is not None:
+        reconst_heldout_max = nmf.inverse_transform(heldout_nmf)
+        prop_heldout_reconst_err = np.linalg.norm(reconst_heldout_max - heldout_max) / np.linalg.norm(heldout_max)
+        print('Heldout reconstruction error: {}'.format(prop_heldout_reconst_err))
+    
+    top_words_per_topic = get_top_words(nmf, vocab, n=10, verbose=True)
     
     import pdb; pdb.set_trace()
 
@@ -58,7 +77,6 @@ def fit_model(train_max, heldout_max, vocab, args):
 
 
 def main():
-    
     # read in text matrix
     all_max = scipy.sparse.load_npz(IDF_FEATURE_PATH)
     

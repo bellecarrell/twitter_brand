@@ -82,7 +82,7 @@ def extract_vocab_and_features(tweets_merged_with_uinfo_path, out_dir, max_rows=
     vocab = vectorizer.vocabulary_
     vocab = stringify_dict(vocab)
     
-    with open(os.path.join(out_dir, 'vocab.json'), 'rt') as out_file:
+    with open(os.path.join(out_dir, 'vocab.json'), 'wt') as out_file:
         json.dump(vocab, out_file)
     print('Restricted to vocabulary size of {}'.format(len(vocab)))
     
