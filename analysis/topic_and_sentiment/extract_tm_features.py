@@ -194,7 +194,7 @@ def main():
         start = time.time()
         
         if args[0] == 'nmf':
-            fit_nmf(train_max, heldout_max, vocab, args[1], args[2])
+            fit_nmf(train_max, heldout_max, rev_vocab, args[1], args[2])
         elif args[0] == 'lda':
             fit_lda(onehot_train_max, onehot_heldout_max, rev_vocab, args[1], args[2], args[3])
         else:
