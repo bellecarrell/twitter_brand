@@ -120,6 +120,9 @@ def fit_lda(train_max, heldout_max=None, vocab=None, k=10, alpha=1.0, beta=10**-
     train_ppl_varlowerbound   = lda.perplexity(train_max)
     heldout_ppl_varlowerbound = lda.perplexity(heldout_max)
     
+    print('Train perplexity lower bound: '.format(train_ppl_varlowerbound))
+    print('Heldout perplexity lower bound: '.format(heldout_ppl_varlowerbound))
+    
     top_words_per_topic = get_top_words(lda, vocab, n=20, verbose=False)
     
     topic_path = os.path.join(TOPIC_DIR, 'lda-k{}-alpha{}-beta{}.topics.txt'.format(k, alpha, beta))
@@ -184,7 +187,7 @@ def main():
     
     for k in [10, 20, 50, 100]:
         # NMF runs
-        for alpha_reg in [0.0, 1.0, 10.0]:
+        for alpha_reg in [0.0]:
             arg_lst.append(('nmf', k, alpha_reg))
         
         # LDA runs
