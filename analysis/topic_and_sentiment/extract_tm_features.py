@@ -108,7 +108,7 @@ def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=
 
 
 def fit_lda(train_max, heldout_max=None, vocab=None, k=10, alpha=1.0, beta=10**-3):
-    lda = LatentDirichletAllocation(k, alpha, beta)
+    lda = LatentDirichletAllocation(k, alpha, beta, learning_method='batch')
     
     train_topic_probs = lda.fit_transform(train_max)
 
