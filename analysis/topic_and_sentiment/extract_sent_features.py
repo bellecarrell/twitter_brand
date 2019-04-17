@@ -88,7 +88,7 @@ class UnsupervisedSentimentScorer:
         
         tokens = [norm_token(t) for t in tokenize(tweet.lower())]
         
-        return tokens
+        return [t for t in tokens if not t]
     
     def featurize(self, tweet):
         ''' Extract features belonging to our lexicon. '''
