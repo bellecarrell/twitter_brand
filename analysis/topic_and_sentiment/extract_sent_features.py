@@ -22,15 +22,18 @@ the tweet sentiment.  Features occurring in a negated context (span from a negat
 to punctuation or the end of the utterance) are treated separately from an affirmative context (everything else).
 '''
 
+from nltk.corpus import stopwords
 import os
 import pandas as pd
+import re
 
-from .tm_preprocess import norm_token
 from twokenize.twokenize import tokenizeRawTweetText as tokenize
 
 WORKSPACE_DIR = '/exp/abenton/twitter_brand_workspace_20190417/'
 TWEET_PATH = os.path.join(WORKSPACE_DIR, 'promoting_user_tweets.merged_with_user_info.noduplicates.tsv.gz')
-LEXICON_PATH = '/exp/abenton/twitter_brand/twitter_brand/analysis/topic_and_sentiment/resources/Emoticon-AFFLEX-NEGLEX-unigrams.txt.gz'
+
+# Under: /exp/abenton/twitter_brand/twitter_brand/analysis/topic_and_sentiment/
+LEXICON_PATH = 'resources/Emoticon-AFFLEX-NEGLEX-unigrams.txt.gz'
 
 SENT_DIR = os.path.join(WORKSPACE_DIR, 'sentiment')
 
@@ -38,6 +41,24 @@ NEGS = {"ain't", "aint", "can't", "cant", "couldn't", "didn't", "doesn't",
         "don't", "dont", "hasn't", "haven't", "never", "no", "not",
         "nothing", "won't"}
 PUNCTS = {',', '.', ':', ';', '!', '?'}
+
+
+stop = set(stopwords.words('english')) | {'rt'}
+
+
+def norm_token(t, remove_stop=True):
+    if t.startswith('@'):
+        return '<USER>'
+    elif t.startswith('http'):
+        return '<URL>'
+    elif remove_stop and (t in stop):
+        return None
+    elif re.search('[a-z]', t) is None:
+        return None
+    
+    t_repl_digits = re.sub('\d', '0', t)  # normalize digits
+    
+    return t_repl_digits
 
 
 class UnsupervisedSentimentScorer:
