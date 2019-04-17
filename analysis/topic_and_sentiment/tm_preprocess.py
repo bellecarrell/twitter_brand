@@ -115,6 +115,6 @@ def main(tweet_merged_with_uinfo_path, out_dir, min_df=10, max_df=0.5):
 
 
 if __name__ == '__main__':
-    WORKSPACE_DIR = '/exp/abenton/twitter_brand_workspace/20190417/'
+    WORKSPACE_DIR = '/exp/abenton/twitter_brand_workspace_20190417/'
     main(os.path.join(WORKSPACE_DIR, 'promoting_user_tweets.merged_with_user_info.noduplicates.tsv.gz'),
          WORKSPACE_DIR, min_df=10, max_df=0.5)
