@@ -43,7 +43,7 @@ def get_top_words(nmf_model, vocab, n=10, verbose=False):
 
 
 def fit_nmf(train_max, heldout_max=None, vocab=None, k=10, alpha_regularization=0.0):
-    nmf = NMF(k, alpha=alpha_regularization, verbose=True)
+    nmf = NMF(k, alpha=alpha_regularization, verbose=False)
     
     train_nmf = nmf.fit_transform(train_max)
     
