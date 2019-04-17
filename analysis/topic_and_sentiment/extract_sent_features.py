@@ -22,27 +22,88 @@ the tweet sentiment.  Features occurring in a negated context (span from a negat
 to punctuation or the end of the utterance) are treated separately from an affirmative context (everything else).
 '''
 
+import os
+import pandas as pd
 
 from .tm_preprocess import norm_token
 from twokenize.twokenize import tokenizeRawTweetText as tokenize
 
+WORKSPACE_DIR = '/exp/abenton/twitter_brand_workspace_20190417/'
+TWEET_PATH = os.path.join(WORKSPACE_DIR, 'promoting_user_tweets.merged_with_user_info.noduplicates.tsv.gz')
+LEXICON_PATH = '/exp/abenton/twitter_brand/twitter_brand/analysis/topic_and_sentiment/resources/Emoticon-AFFLEX-NEGLEX-unigrams.txt.gz'
+
+SENT_DIR = os.path.join(WORKSPACE_DIR, 'sentiment')
+
+NEGS = {"ain't", "aint", "can't", "cant", "couldn't", "didn't", "doesn't",
+        "don't", "dont", "hasn't", "haven't", "never", "no", "not",
+        "nothing", "won't"}
+PUNCTS = {',', '.', ':', ';', '!', '?'}
+
 
 class UnsupervisedSentimentScorer:
-    def __init__(self, contextual_lexicon_path, negation_path):
-        pass
-
-    def normalize_tweet(self, tweet):
+    def __init__(self, contextual_lexicon_path=LEXICON_PATH, negs=NEGS, puncts=PUNCTS):
+        self.contextual_lexicon_path = contextual_lexicon_path
+        self.negs = negs
+        self.puncts = puncts
+        self.sentiment_lexicon = None
+        
+        self.load_unigram_lexicon()
+    
+    def load_unigram_lexicon(self):
+        df = pd.read_table(self.contextual_lexicon_path, header=None, columns=['feature',
+                                                                               'score',
+                                                                               'num_pos',
+                                                                               'num_neg'])
+        
+        self.sentiment_lexicon = {r['feature']: r['score'] for ridx, r in df.iterrows()}
+    
+    @staticmethod
+    def normalize_tweet(tweet):
         '''
-        Break tweet into normalized tokens and append _NEG or _NEGFIRST tags to tokens that appear in negated context
-        since we are using a contextual lexicon.  Returns list of normalized tokens.
+        Break tweet into normalized tokens and append _NEG or _NEGFIRST tags
+        to tokens that appear in negated context since we are using a
+        contextual lexicon.  Returns list of normalized tokens.
         '''
         
         tokens = [norm_token(t) for t in tokenize(tweet.lower())]
         
         return tokens
     
-    def score(self, t):
-        pass
+    def featurize(self, tweet):
+        ''' Extract features belonging to our lexicon. '''
+        
+        extracted_features = []
+        
+        normed_tokens = UnsupervisedSentimentScorer.normalize_tweet(tweet)
+        
+        is_neg_span = False
+        prev_is_neg = False
+        for t in normed_tokens:
+            # use feature suffix to encode whether we are in a negation span
+            if prev_is_neg:
+                suffix = '_NEGFIRST'
+            elif is_neg_span:
+                suffix = '_NEG'
+            else:
+                suffix = ''
+            
+            feat = t + suffix
+            if feat in self.sentiment_lexicon:
+                extracted_features.append(feat)
+            
+            prev_is_neg = False
+            if t in self.negs:
+                prev_is_neg = True
+                is_neg_span = True
+            
+            if t in self.puncts:
+                is_neg_span = False
+        
+        return extracted_features
+    
+    def score(self, tweet):
+        lex_features = self.featurize(tweet)
+        return sum([self.sentiment_lexicon[f] for f in lex_features])
     
     def classify(self, tweet):
         tweet_score = self.score(tweet)
@@ -53,11 +114,27 @@ class UnsupervisedSentimentScorer:
             return -1
         else:
             return 0
-        
+
 
 def main():
-    pass
+    sentiment_scorer = UnsupervisedSentimentScorer(LEXICON_PATH, NEGS, PUNCTS)
+    
+    df = pd.read_table(TWEET_PATH)
+    
+    df['tweet_sentiment_score'] = df['text'].map(lambda tweet: sentiment_scorer.score(tweet))
+    df['tweet_sentiment_class'] = df['text'].map(lambda tweet: sentiment_scorer.classify(tweet))
+
+    df.to_csv(
+            os.path.join(SENT_DIR,
+                         'promoting_user_tweets.with_lexiconbased_sentiment.noduplicates.tsv.gz'),
+            compression='gzip',
+            sep='\t',
+            header=True,
+            index=False)
 
 
 if __name__ == '__main__':
-    pass
+    if not os.path.exists(SENT_DIR):
+        os.mkdir(SENT_DIR)
+    
+    main()
