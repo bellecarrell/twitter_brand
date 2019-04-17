@@ -142,8 +142,8 @@ def fit_lda(train_max, heldout_max=None, vocab=None, k=10, alpha=1.0, beta=10**-
     train_ppl_varlowerbound   = lda.perplexity(train_max)
     heldout_ppl_varlowerbound = lda.perplexity(heldout_max)
     
-    print('Train perplexity lower bound: '.format(train_ppl_varlowerbound))
-    print('Heldout perplexity lower bound: '.format(heldout_ppl_varlowerbound))
+    print('Train perplexity lower bound: {}'.format(train_ppl_varlowerbound))
+    print('Heldout perplexity lower bound: {}'.format(heldout_ppl_varlowerbound))
     
     top_words_per_topic = get_top_words(lda, vocab, n=20, subtract_off_mean=False, verbose=False)
     top_words_per_topic_womean = get_top_words(lda, vocab, n=20, subtract_off_mean=True, verbose=False)
