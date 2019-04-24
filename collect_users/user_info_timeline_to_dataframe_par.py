@@ -45,7 +45,7 @@ def dump_infos(in_paths, out_dir, num_procs):
                         
                         r = [ts, info['id_str'], info['followers_count'],
                              info['friends_count'], info['listed_count'],
-                             info['statuses_count']]
+                             info['statuses_count'], info['location']]
                         
                         rows.append(r)
                         nrows += 1
@@ -55,7 +55,7 @@ def dump_infos(in_paths, out_dir, num_procs):
             except Exception as ex:
                 print('problem opening file "{}" -- {}'.format(p, ex))
         
-        df = pd.DataFrame(rows, columns=['timestamp', 'user_id', 'followers_count', 'friends_count', 'listed_count', 'statuses_count'])
+        df = pd.DataFrame(rows, columns=['timestamp', 'user_id', 'followers_count', 'friends_count', 'listed_count', 'statuses_count', 'location'])
         df.to_csv(out_path, sep='\t', encoding='utf8', header=True, index=False, compression='gzip')
     
     path_subsets = [[p for j, p in enumerate(in_paths) if (j%num_procs) == i] for i in range(num_procs)]
@@ -111,10 +111,22 @@ def dump_tweets(in_paths, out_dir, num_procs):
                             continue
                         else:
                             tweet_idxes.add(id)
-                        
+
+                        mention = 0
+                        url = 0
+                        rt = 0
+
+                        entities = tweet['entities']
+                        if entities['user_mentions']:
+                            mention = 1
+                        if entities['urls']:
+                            url = 1
+                        if tweet['retweeted_status']:
+                            rt = 1
+
                         created_at = int(datetime.datetime.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y').timestamp())
                         r = [tweet['id_str'], created_at, tweet['text'].replace('\r', ' ').replace('\t', ' ').replace('\n', ' '),
-                             tweet['user']['id_str']]
+                             tweet['user']['id_str'], mention, url, rt]
                         
                         rows.append(r)
                         nrows += 1
@@ -125,7 +137,7 @@ def dump_tweets(in_paths, out_dir, num_procs):
             except Exception as ex:
                 print('problem opening file "{}" -- {}'.format(p, ex))
         
-        df = pd.DataFrame(rows, columns=['tweet_id', 'created_at', 'text', 'user_id'])
+        df = pd.DataFrame(rows, columns=['tweet_id', 'created_at', 'text', 'user_id', 'mention', 'url', 'rt'])
         df.to_csv(out_path, sep='\t', encoding='utf8', header=True, index=False, compression='gzip')
     
     path_subsets = [[p for j, p in enumerate(in_paths) if (j%num_procs) == i] for i in range(num_procs)]
@@ -144,7 +156,7 @@ def dump_tweets(in_paths, out_dir, num_procs):
     else:
         _write_tweets(path_subsets[0], out_paths[0], 0)
     
-    df = pd.read_table('user_tweets.noduplicates.tsv.gz', compression='gzip', encoding='utf8', low_memory=False)
+    #df = pd.read_table('user_tweets.noduplicates.tsv.gz', compression='gzip', encoding='utf8', low_memory=False)
     subset_dfs = [pd.read_table(p, sep='\t', encoding='utf8', low_memory=False, dtype={'tweet_id': str,
                                                                                        'created_at': str,
                                                                                        'text': str,
