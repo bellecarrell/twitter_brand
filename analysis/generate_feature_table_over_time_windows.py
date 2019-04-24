@@ -19,13 +19,17 @@ def main(in_dir, out_dir):
            datetime.timedelta(days=7), datetime.timedelta(weeks=2), datetime.timedelta(weeks=3), datetime.timedelta(weeks=4)]
     dv_types = [('delta', 'followers_count'), ('percent','followers_count')]
     iv_types = [('average', 'rt')]
-
+    
+    EST = datetime.timezone(datetime.timedelta(hours=-5))
+    
     rows = []
     for user in promoting_users:
         # AB: need to iterate over all dates that the user was active, not just the days on which they tweeted
         tweet_dates = timeline.loc[timeline['user_id']==user]['created_at'].unique().tolist()
         min_tweet_ts = datetime.datetime.fromtimestamp(min(tweet_dates))
         max_tweet_ts = datetime.datetime.fromtimestamp(max(tweet_dates))
+        min_tweet_ts = min_tweet_ts.astimezone(EST)
+        max_tweet_ts = max_tweet_ts.astimezone(EST)
         
         tweet_dates = []
         
@@ -34,7 +38,7 @@ def main(in_dir, out_dir):
                                     min_tweet_ts.month,
                                     min_tweet_ts.day,
                                     18, 0, 0, 0,
-                                    datetime.timezone(datetime.timedelta(hours=-5)))
+                                    EST)
         while curr_ts < max_tweet_ts:
             tweet_dates.append(curr_ts)
             curr_ts += datetime.timedelta(days=1)
