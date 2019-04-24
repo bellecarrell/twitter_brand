@@ -3,6 +3,7 @@ import os
 import argparse
 import datetime
 
+
 def main(in_dir, out_dir):
     i = 0
 
@@ -74,6 +75,7 @@ def main(in_dir, out_dir):
 
     ft.to_csv(os.path.join(out_dir,'feature_table.csv.gz'),compression='gzip')
 
+
 if __name__ == '__main__':
     """
     build a vocabulary from corpus and save to file.
@@ -93,5 +95,8 @@ if __name__ == '__main__':
 
     in_dir = args.input_dir
     out_dir = args.out_dir
-
+    
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+    
     main(in_dir, out_dir)
