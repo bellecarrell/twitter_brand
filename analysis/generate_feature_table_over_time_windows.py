@@ -15,8 +15,7 @@ def main(in_dir, out_dir):
     ]['user_id'].dropna().unique().tolist()
     promoting_users = [promoting_users[0]]
     
-    tws = [datetime.timedelta(days=1), datetime.timedelta(days=2), datetime.timedelta(days=3), datetime.timedelta(days=4), datetime.timedelta(days=5), datetime.timedelta(days=6),
-           datetime.timedelta(days=7), datetime.timedelta(weeks=2), datetime.timedelta(weeks=3), datetime.timedelta(weeks=4)]
+    tws = [datetime.timedelta(days=d) for d in [1, 2, 3, 4, 5, 6, 7, 14, 21, 28]]
     dv_types = [('delta', 'followers_count'), ('percent', 'followers_count')]
     iv_types = [('average', 'rt')]
     
@@ -102,7 +101,6 @@ def main(in_dir, out_dir):
                                      'iv_type', 'iv_value', 'dv_type', 'dv_value'])
     
     ft.to_csv(os.path.join(out_dir, 'feature_table.csv.gz'), compression='gzip')
-    import pdb; pdb.set_trace()
 
 
 if __name__ == '__main__':
