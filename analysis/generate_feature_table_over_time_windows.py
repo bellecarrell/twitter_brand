@@ -7,9 +7,7 @@ import datetime
 def main(in_dir, out_dir):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
     info = pd.read_table(os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz'))
-    print('read dynamic user info')
     timeline = pd.read_table(os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz'))
-    print('read tweets')
     promoting_users = static_info.loc[
         static_info['classify_account-mace_label'] == 'promoting'
     ]['user_id'].dropna().unique().tolist()
@@ -58,7 +56,6 @@ def main(in_dir, out_dir):
         max_info_date = max(info_dates)
         
         for date_idx, date in enumerate(tweet_dates):
-            print('Start gen features for user {} day {}/{}'.format(user, date_idx, len(info_dates)))
             for i, window in enumerate(tws):
                 end = date + window
                 if end <= max(tweet_dates):
@@ -96,9 +93,7 @@ def main(in_dir, out_dir):
                     
                     rows.append(row)
 
-    ft = pd.DataFrame(rows, columns=['user_id', 'window_size_days', 'window_start',
-                                     'window_stop', 'eval_date',
-                                     'iv_type', 'iv_value', 'dv_type', 'dv_value'])
+    ft = pd.DataFrame(rows, columns=COLUMNS)
     
     ft.to_csv(os.path.join(out_dir, 'feature_table.csv.gz'), compression='gzip')
 
