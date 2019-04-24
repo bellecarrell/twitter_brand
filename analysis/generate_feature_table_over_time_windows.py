@@ -13,8 +13,8 @@ def main(in_dir, out_dir):
     promoting_users = static_info.loc[
         static_info['classify_account-mace_label'] == 'promoting'
     ]['user_id'].dropna().unique().tolist()
-    promoting_users = promoting_users[0]
-
+    promoting_users = [promoting_users[0]]
+    
     tws = [datetime.timedelta(days=1), datetime.timedelta(days=2), datetime.timedelta(days=3), datetime.timedelta(days=4), datetime.timedelta(days=5), datetime.timedelta(days=6),
            datetime.timedelta(days=7), datetime.timedelta(weeks=2), datetime.timedelta(weeks=3), datetime.timedelta(weeks=4)]
     dv_types = [('delta', 'followers_count'), ('percent','followers_count')]
