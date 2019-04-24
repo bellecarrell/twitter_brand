@@ -26,10 +26,8 @@ def main(in_dir, out_dir):
     for user in promoting_users:
         # AB: need to iterate over all dates that the user was active, not just the days on which they tweeted
         tweet_dates = timeline.loc[timeline['user_id']==user]['created_at'].unique().tolist()
-        min_tweet_ts = datetime.datetime.fromtimestamp(min(tweet_dates))
-        max_tweet_ts = datetime.datetime.fromtimestamp(max(tweet_dates))
-        min_tweet_ts = min_tweet_ts.astimezone(EST)
-        max_tweet_ts = max_tweet_ts.astimezone(EST)
+        min_tweet_ts = datetime.datetime.fromtimestamp(min(tweet_dates), tz=EST)
+        max_tweet_ts = datetime.datetime.fromtimestamp(max(tweet_dates), tz=EST)
         
         tweet_dates = []
         
