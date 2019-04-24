@@ -5,22 +5,14 @@ import datetime
 
 
 def main(in_dir, out_dir):
-    i = 0
-
-    print('spot {}'.format(i))
-    i +=1
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
-    print('spot {}'.format(i))
-    i += 1
-    info = pd.read_csv(os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz'),compression='gzip', sep='\t', error_bad_lines=False)
-    print('spot {}'.format(i))
-    i += 1
-    timeline = pd.read_csv(os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz'))
+    info = pd.read_table(os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz'))
+    print('read dynamic user info')
+    timeline = pd.read_table(os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz'))
+    print('read tweets')
     promoting_users = static_info.loc[
         static_info['classify_account-mace_label'] == 'promoting'
     ]['user_id'].dropna().unique().tolist()
-    print('spot {}'.format(i))
-    i += 1
     promoting_users = promoting_users[0]
 
     tws = [datetime.timedelta(days=1), datetime.timedelta(days=2), datetime.timedelta(days=3), datetime.timedelta(days=4), datetime.timedelta(days=5), datetime.timedelta(days=6),
