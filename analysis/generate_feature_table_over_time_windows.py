@@ -22,10 +22,28 @@ def main(in_dir, out_dir):
 
     rows = []
     for user in promoting_users:
+        # AB: need to iterate over all dates that the user was active, not just the days on which they tweeted
         tweet_dates = timeline.loc[timeline['user_id']==user]['created_at'].unique().tolist()
+        min_tweet_ts = datetime.datetime.fromtimestamp(min(tweet_dates))
+        max_tweet_ts = datetime.datetime.fromtimestamp(max(tweet_dates))
+        
+        tweet_dates = []
+        
+        # compute features from 6pm - 6pm each day, Eastern time zone
+        curr_ts = datetime.datetime(min_tweet_ts.year,
+                                    min_tweet_ts.month,
+                                    min_tweet_ts.day,
+                                    18, 0, 0, 0,
+                                    datetime.timezone(datetime.timedelta(hours=-5)))
+        while curr_ts < max_tweet_ts:
+            tweet_dates.append(curr_ts)
+            curr_ts += datetime.timedelta(days=1)
+        
         info_dates = info.loc[info['user_id']==user]['timestamp'].unique().tolist()
-
-        for date in tweet_dates:
+        max_info_date = max(info_dates)
+        
+        for date_idx, date in enumerate(tweet_dates):
+            print('Start gen features for day {}/{}'.format(date_idx, len(info_dates)))
             for i, window in enumerate(tws):
                 end = date + window
                 if end <= max(tweet_dates):
@@ -36,11 +54,10 @@ def main(in_dir, out_dir):
                             iv_val = sum(iv_vals)/len(iv_vals)
                         iv_type = compute + '_' + column
 
-
                         for j, horizon in enumerate(tws):
                             h_start = end
                             h_end = h_start + horizon
-                            if datetime.datetime.timestamp(h_end) <= max(info_dates):
+                            if datetime.datetime.timestamp(h_end) <= max_info_date:
 
                                 #compute dependent var values
                                 datetime.datetime.timestamp(h_start)
@@ -59,11 +76,14 @@ def main(in_dir, out_dir):
                                         dv_val = (c_end - c_start)/c_start
                                     dv_type = compute + '_' + column
 
-                                    row = [user, i, j, date, end, h_start, h_end, iv_type, iv_val, dv_type, dv_val]
+                                    row = [user, window.days, horizon.days,
+                                           date, end, end, h_start, h_end,
+                                           iv_type, iv_val, dv_type, dv_val]
                                     rows.append(row)
 
-    ft = pd.DataFrame(rows, columns=['user_id','window_size','horizon_size', 'window_start',
-                               'window_stop', 'horizon_start','horizon_stop','iv_type','iv_value', 'dv_type','dv_value'])
+    ft = pd.DataFrame(rows, columns=['user_id', 'window_size_days','horizon_size', 'window_start',
+                                     'window_stop', 'eval_date', 'horizon_start', 'horizon_stop',
+                                     'iv_type', 'iv_value', 'dv_type', 'dv_value'])
 
     ft.to_csv(os.path.join(out_dir,'feature_table.csv.gz'),compression='gzip')
 
