@@ -113,20 +113,25 @@ def dump_tweets(in_paths, out_dir, num_procs):
                             tweet_idxes.add(id)
 
                         mention = 0
+                        mention_count = 0
                         url = 0
                         rt = 0
+                        reply = 0
 
                         entities = tweet['entities']
                         if entities['user_mentions']:
                             mention = 1
+                            mention_count = len(entities['user_mentions'])
                         if entities['urls']:
                             url = 1
-                        if tweet['retweeted_status']:
+                        if 'retweeted_status' in tweet:
                             rt = 1
+                        if type(tweet['in_reply_to_status_id']) is int:
+                            reply = 1
 
                         created_at = int(datetime.datetime.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y').timestamp())
                         r = [tweet['id_str'], created_at, tweet['text'].replace('\r', ' ').replace('\t', ' ').replace('\n', ' '),
-                             tweet['user']['id_str'], mention, url, rt]
+                             tweet['user']['id_str'], mention, mention_count, url, rt, reply]
                         
                         rows.append(r)
                         nrows += 1
@@ -137,7 +142,7 @@ def dump_tweets(in_paths, out_dir, num_procs):
             except Exception as ex:
                 print('problem opening file "{}" -- {}'.format(p, ex))
         
-        df = pd.DataFrame(rows, columns=['tweet_id', 'created_at', 'text', 'user_id', 'mention', 'url', 'rt'])
+        df = pd.DataFrame(rows, columns=['tweet_id', 'created_at', 'text', 'user_id', 'mention', 'mention_count', 'url','rt','reply'])
         df.to_csv(out_path, sep='\t', encoding='utf8', header=True, index=False, compression='gzip')
     
     path_subsets = [[p for j, p in enumerate(in_paths) if (j%num_procs) == i] for i in range(num_procs)]

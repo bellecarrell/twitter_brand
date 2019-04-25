@@ -15,7 +15,8 @@ def main(in_dir, out_dir):
     
     tws = [datetime.timedelta(days=d) for d in [1, 2, 3, 4, 5, 6, 7, 14, 21, 28]]
     dv_types = [('delta', 'followers_count'), ('percent', 'followers_count')]
-    iv_types = [('average', 'rt')]
+    iv_types = [('rate','tweets_day'),('rate','mentions_tweet'),
+                ('bool_percent', 'rt'), ('bool_percent', 'mention'), ('bool_percent','url'), ('bool_percent','reply')]
     
     EST = datetime.timezone(datetime.timedelta(hours=-5))
     
@@ -60,16 +61,28 @@ def main(in_dir, out_dir):
                 end = date + window
                 if end <= max(tweet_dates):
                     row = [user, window.days, date, end, end]
-                    
+                    window_df = timeline.loc[(timeline['user_id'] == user) &
+                                               (date <= timeline['created_at'] <= end)]
+                    n_tweets = len(window_df.index)
+
+                    #todo: finish # days with tweets
+                    #n_days_w_tweet = 0
+                    #for d in range(window.days):
+
                     # compute independent var values
                     for compute, column in iv_types:
-                        iv_vals = timeline.loc[(timeline['user_id'] == user) &
-                                               (date <= timeline['created_at'] <= end)][column].tolist()
-                        if compute == 'average':
-                            iv_val = sum(iv_vals)/len(iv_vals)
-                            row.append(iv_val)
+                        if column == 'tweets_day':
+                            row.append(n_tweets/window.days)
+                        if column == 'mentions_tweet':
+                            row.append(sum(window_df['mention_count'].tolist())/n_tweets)
                         else:
-                            raise Exception('Do not recognize IV aggregation type: "{}"'.format(compute))
+                            iv_vals = window_df[column].tolist()
+                            num_tweets = len(iv_vals)
+                            if compute == 'bool_percent':
+                                iv_val = sum(iv_vals)/len(iv_vals)
+                                row.append(iv_val)
+                            else:
+                                raise Exception('Do not recognize IV aggregation type: "{}"'.format(compute))
                     
                     # compute dependent vars for each horizon
                     for j, horizon in enumerate(tws):
@@ -100,8 +113,8 @@ def main(in_dir, out_dir):
 
 if __name__ == '__main__':
     """
-    build a vocabulary from corpus and save to file.
-    documents per user that are promoting in the static_info file.
+    Build table of features calculated from user activity (independent variables) 
+    and corresponding future change in influence such as follower count (dependent variables)
     """
 
     parser = argparse.ArgumentParser(
