@@ -2,24 +2,32 @@ import pandas as pd
 import os
 import argparse
 import datetime
-
+import pytz
+import time
+import gzip
+import sys
+sys.path.append('/home/hltcoe/acarrell/PycharmProjects/twitter_brand/')
+from analysis.category_binary_words import *
 
 def main(in_dir, out_dir):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
     info = pd.read_table(os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz'))
-    timeline = pd.read_table(os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz'))
+    t = gzip.open(os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz'), 'rt')
+
     promoting_users = static_info.loc[
         static_info['classify_account-mace_label'] == 'promoting'
     ]['user_id'].dropna().unique().tolist()
     promoting_users = [promoting_users[0]]
-    
+    tweets_dates = dated_tweets_by_user(t,promoting_users)
+
     tws = [datetime.timedelta(days=d) for d in [1, 2, 3, 4, 5, 6, 7, 14, 21, 28]]
     dv_types = [('delta', 'followers_count'), ('percent', 'followers_count')]
     iv_types = [('rate','tweets_day'),('rate','mentions_tweet'),
                 ('bool_percent', 'rt'), ('bool_percent', 'mention'), ('bool_percent','url'), ('bool_percent','reply')]
     
-    EST = datetime.timezone(datetime.timedelta(hours=-5))
-    
+    #EST = datetime.datetime.astimezone(datetime.timedelta(hours=-5))
+    EST = pytz.timezone('US/Eastern')
+
     rows = []
     
     # AB: Refactored to write one row per <user_id, window_size_days, eval_date> triple.
@@ -29,14 +37,24 @@ def main(in_dir, out_dir):
     COLUMNS += ['DV_horizon{}_{}-{}'.format(horizon_width.days, dv_agg_name, dv_name)
                 for horizon_width in tws
                 for dv_agg_name, dv_name in dv_types]
-    
+
+    info['datetime'] = datetime.datetime.fromtimestamp(time.time())
+    info['date'] = datetime.date(1990, 12, 1)
     for user in promoting_users:
         u_infos = info.loc[info['user_id'] == user]
-        u_infos['datetime'] = u_infos['timestamp'].map(lambda x: datetime.datetime.fromtimestamp(x, tz=EST))
-        u_infos['date'] = u_infos['datetime'].map(lambda x: datetime.date(x.year, x.month, x.day))
-        
+        print(len(u_infos.index))
+        #u_infos['datetime'] = u_infos['timestamp'].map(lambda x: datetime.datetime.fromtimestamp(x, tz=EST))
+        #u_infos['date'] = u_infos['datetime'].map(lambda x: datetime.date(x.year, x.month, x.day))
+
+        for index, row in u_infos.iterrows():
+            row['datetime'] = datetime.datetime.fromtimestamp(row['timestamp'],tz=EST)
+            row['date'] = datetime.date(row['datetime'].year, row['datetime'].month,row['datetime'].day)
+
+
         # AB: need to iterate over all dates that the user was active, not just the days on which they tweeted
-        tweet_dates = timeline.loc[timeline['user_id']==user]['created_at'].unique().tolist()
+        #tweet_dates = timeline.loc[timeline['user_id']==user]['created_at'].unique().tolist()
+        git
+        print(len(tweet_dates))
         min_tweet_ts = datetime.datetime.fromtimestamp(min(tweet_dates), tz=EST)
         max_tweet_ts = datetime.datetime.fromtimestamp(max(tweet_dates), tz=EST)
         
@@ -118,7 +136,6 @@ if __name__ == '__main__':
     """
 
     parser = argparse.ArgumentParser(
-        description='build vocabulary and extracted features for each tweet'
     )
     parser.add_argument('--input_dir', required=True,
                         dest='input_dir', metavar='INPUT_DIR',
