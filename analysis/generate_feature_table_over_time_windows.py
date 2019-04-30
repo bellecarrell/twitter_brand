@@ -9,6 +9,32 @@ import sys
 sys.path.append('/home/hltcoe/acarrell/PycharmProjects/twitter_brand/')
 from analysis.category_binary_words import *
 
+def tweets_by_user(f, users):
+    """
+    Get tweets from the timeline compressed file and place in dict sorted by user.
+    :param in_dir: top-level directory containing promoting user dfs
+    :return: dict of tweets by user ID
+    """
+    reader = csv.reader(f)
+    tweets = defaultdict(list)
+    count = 0
+
+    print('Reading rows from timeline file to filter users')
+    for row in reader:
+        if count == 0:
+            count += 1
+            continue
+        created_at, user_id = int(created_at), int(user_id)
+        if user_id in users:
+            tweets[user_id].append(row)
+
+        count += 1
+        if count % 100000 == 0:
+            print('Read {} rows'.format(count))
+
+    return tweets.keys(), tweets
+
+
 def main(in_dir, out_dir):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
     info = pd.read_table(os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz'))
@@ -18,7 +44,7 @@ def main(in_dir, out_dir):
         static_info['classify_account-mace_label'] == 'promoting'
     ]['user_id'].dropna().unique().tolist()
     promoting_users = [promoting_users[0]]
-    tweets_dates = dated_tweets_by_user(t,promoting_users)
+    tweets = tweets_by_user(t,promoting_users)
 
     tws = [datetime.timedelta(days=d) for d in [1, 2, 3, 4, 5, 6, 7, 14, 21, 28]]
     dv_types = [('delta', 'followers_count'), ('percent', 'followers_count')]
@@ -37,6 +63,7 @@ def main(in_dir, out_dir):
     COLUMNS += ['DV_horizon{}_{}-{}'.format(horizon_width.days, dv_agg_name, dv_name)
                 for horizon_width in tws
                 for dv_agg_name, dv_name in dv_types]
+    tweet_cols = ['tweet_id', 'created_at', 'text', 'user_id', 'mention', 'mention_count', 'url','rt','reply']
 
     info['datetime'] = datetime.datetime.fromtimestamp(time.time())
     info['date'] = datetime.date(1990, 12, 1)
@@ -53,7 +80,7 @@ def main(in_dir, out_dir):
 
         # AB: need to iterate over all dates that the user was active, not just the days on which they tweeted
         #tweet_dates = timeline.loc[timeline['user_id']==user]['created_at'].unique().tolist()
-        git
+        tweet_dates = [t[1] for t in tweets[user]]
         print(len(tweet_dates))
         min_tweet_ts = datetime.datetime.fromtimestamp(min(tweet_dates), tz=EST)
         max_tweet_ts = datetime.datetime.fromtimestamp(max(tweet_dates), tz=EST)
@@ -79,9 +106,8 @@ def main(in_dir, out_dir):
                 end = date + window
                 if end <= max(tweet_dates):
                     row = [user, window.days, date, end, end]
-                    window_df = timeline.loc[(timeline['user_id'] == user) &
-                                               (date <= timeline['created_at'] <= end)]
-                    n_tweets = len(window_df.index)
+                    window_tweets = [t for t in tweets[user] if date <= t[1] <= end]
+                    n_tweets = len(window_tweets)
 
                     #todo: finish # days with tweets
                     #n_days_w_tweet = 0
@@ -92,9 +118,10 @@ def main(in_dir, out_dir):
                         if column == 'tweets_day':
                             row.append(n_tweets/window.days)
                         if column == 'mentions_tweet':
-                            row.append(sum(window_df['mention_count'].tolist())/n_tweets)
+                            mention_counts = [t[-4] for t in tweets[user]]
+                            row.append(sum(mention_counts)/n_tweets)
                         else:
-                            iv_vals = window_df[column].tolist()
+                            iv_vals = [t[tweet_cols.index(column)] for f in tweets[user]]
                             num_tweets = len(iv_vals)
                             if compute == 'bool_percent':
                                 iv_val = sum(iv_vals)/len(iv_vals)
@@ -125,9 +152,7 @@ def main(in_dir, out_dir):
                     rows.append(row)
 
     ft = pd.DataFrame(rows, columns=COLUMNS)
-    
     ft.to_csv(os.path.join(out_dir, 'feature_table.csv.gz'), compression='gzip')
-
 
 if __name__ == '__main__':
     """

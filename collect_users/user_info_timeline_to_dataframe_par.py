@@ -137,11 +137,11 @@ def dump_tweets(in_paths, out_dir, num_procs):
                         nrows += 1
                     except Exception as ex:
                         print('problem parsing json: "{}" -- {}'.format(ln, ex))
-                        import pdb; pdb.set_trace()
                 f.close()
             except Exception as ex:
+                import pdb;pdb.set_trace()
                 print('problem opening file "{}" -- {}'.format(p, ex))
-        
+        print('rows writing to df: {}'.format(len(rows)))
         df = pd.DataFrame(rows, columns=['tweet_id', 'created_at', 'text', 'user_id', 'mention', 'mention_count', 'url','rt','reply'])
         df.to_csv(out_path, sep='\t', encoding='utf8', header=True, index=False, compression='gzip')
     
@@ -234,5 +234,5 @@ if __name__ == '__main__':
         tweet_paths = tweet_paths[:args.max_paths]
         print('Restricted to {} paths'.format(args.max_paths))
     
-    dump_infos(info_paths, out_info_dir, num_procs)
+    #dump_infos(info_paths, out_info_dir, num_procs)
     dump_tweets(tweet_paths, out_timeline_dir, num_procs)
