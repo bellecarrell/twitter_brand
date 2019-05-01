@@ -139,11 +139,14 @@ def dump_tweets(in_paths, out_dir, num_procs):
                         print('problem parsing json: "{}" -- {}'.format(ln, ex))
                 f.close()
             except Exception as ex:
-                import pdb;pdb.set_trace()
+
                 print('problem opening file "{}" -- {}'.format(p, ex))
         print('rows writing to df: {}'.format(len(rows)))
+
         df = pd.DataFrame(rows, columns=['tweet_id', 'created_at', 'text', 'user_id', 'mention', 'mention_count', 'url','rt','reply'])
+        #import pdb;pdb.set_trace()
         df.to_csv(out_path, sep='\t', encoding='utf8', header=True, index=False, compression='gzip')
+        #import pdb;pdb.set_trace()
     
     path_subsets = [[p for j, p in enumerate(in_paths) if (j%num_procs) == i] for i in range(num_procs)]
     
@@ -198,6 +201,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     in_dirs = ['/exp/acarrell/twitter_brand_data','/exp/abenton/twitter_brand_data']
+    #in_dirs = ['/exp/abenton/twitter_brand_data/1547687722', '/exp/abenton/twitter_brand_data/1540298550', '/exp/abenton/twitter_brand_data/1540313909']
     out_dir = args.out_dir
     num_procs = args.num_procs
     
@@ -224,10 +228,12 @@ if __name__ == '__main__':
                    for p in filenames if p.endswith('.statuses.json.gz')]
         tweet_paths = tweet_paths + tps
 
-
     random.shuffle(info_paths)
     random.shuffle(tweet_paths)
-    
+    #tweet_paths = tweet_paths[:20]
+    print(len(tweet_paths))
+    #import pdb;pdb.set_trace()
+
     print('# info paths: {}; # tweet paths: {}'.format(len(info_paths), len(tweet_paths)))
     if args.max_paths is not None:
         info_paths = info_paths[:args.max_paths]
