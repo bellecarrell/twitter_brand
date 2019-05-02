@@ -149,7 +149,14 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
         feature_rows = []
         user_df = df[df['user_id']==uid]  # restrict to a single user and extract samples for this one person
         
-        for curr_dt in sampled_dts:
+        for dt_idx, curr_dt in enumerate(sampled_dts):
+            if not (dt_idx % 10):
+                print('({}s) Starting user {}/{}, sample {}/{}'.format(int(time.time() - start),
+                                                                       uid_idx+1,
+                                                                       len(uid_uniq),
+                                                                       dt_idx+1,
+                                                                       len(sampled_dts)))
+            
             # extract current day features
             curr_day_idx = str((curr_dt.year, curr_dt.month, curr_dt.day))
             
