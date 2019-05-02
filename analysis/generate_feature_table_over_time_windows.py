@@ -1,14 +1,14 @@
-import pandas as pd
-import os
 import argparse
+from collections import defaultdict
+import csv
 import datetime
-import pytz
-import numpy as np
-import time
 import gzip
-import sys
-sys.path.append('/home/hltcoe/acarrell/PycharmProjects/twitter_brand/')
-from analysis.category_binary_words import *
+import multiprocessing as mp
+import numpy as np
+import os
+import pytz
+import time
+import pandas as pd
 
 
 def tweets_by_user(f, users):
@@ -95,6 +95,7 @@ def tweets_by_user(f, users):
 
 
 def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
+                                     out_path,
                                      tws=[1, 2, 3, 4, 5, 6, 7, 14, 21, 28],
                                      min_timestamp=datetime.datetime(2018, 10, 14, 12),
                                      max_timestamp=datetime.datetime(2019, 4, 5, 12)):
@@ -156,6 +157,7 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                                                                        len(uid_uniq),
                                                                        dt_idx+1,
                                                                        len(sampled_dts)))
+                import pdb; pdb.set_trace()
             
             # extract current day features
             curr_day_idx = str((curr_dt.year, curr_dt.month, curr_dt.day))
@@ -257,21 +259,39 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
     
     extracted_features = pd.DataFrame(all_feature_rows, columns=COLUMNS)
     
-    return extracted_features
+    extracted_features.to_csv(out_path, compression='gzip', sep='\t', header=True, index=False)
 
 
-def main(in_dir, out_dir):
+def main(in_dir, out_dir, num_procs):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
     promoting_users = static_info.loc[
         static_info['classify_account-mace_label'] == 'promoting'
         ]['user_id'].dropna().unique().tolist()
     
+    promoting_user_subsets = [[p_user for i, p_user
+                               in enumerate(promoting_users)
+                               if ((i % j) == 0)] for j in range(num_procs)]
+    out_paths = [os.path.join(out_dir, 'net_features.{}.tsv.gz'.format(i)) for i in range(num_procs)]
+    
+    dynamic_info_path = os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz')
+    
     # extract network features for each user and sample date
-    net_tbl = collect_dvs_from_user_info_table(os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz'),
-                                               set(promoting_users),
-                                               tws=[1, 2, 3, 4, 5, 6, 7, 14, 21, 28],
-                                               min_timestamp=datetime.datetime(2018, 10, 14, 12),
-                                               max_timestamp=datetime.datetime(2019, 4, 5, 12))
+    if num_procs == 1:
+        collect_dvs_from_user_info_table(dynamic_info_path,
+                                         set(promoting_users),
+                                         out_paths[0],
+                                         tws=[1, 2, 3, 4, 5, 6, 7, 14, 21, 28],
+                                         min_timestamp=datetime.datetime(2018, 10, 14, 12),
+                                         max_timestamp=datetime.datetime(2019, 4, 5, 12))
+    else:
+        procs = [mp.Process(target=collect_dvs_from_user_info_table,
+                            args=(dynamic_info_path, op, p_users))
+                 for p_users, op in zip(promoting_user_subsets, out_paths)]
+        
+        for p in procs:
+            p.start()
+        for p in procs:
+            p.join()
     
     import pdb; pdb.set_trace()
     
@@ -407,6 +427,8 @@ if __name__ == '__main__':
     parser.add_argument('--out_dir', required=True,
                         dest='out_dir', metavar='OUTPUT_PREFIX',
                         help='output directory')
+    parser.add_argument('--num_procs', required=True, type=int,
+                        default=1, help='number of processes working in parallel')
     args = parser.parse_args()
 
     in_dir = args.input_dir
