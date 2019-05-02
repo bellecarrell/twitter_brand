@@ -269,13 +269,13 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
 def main(in_dir, out_dir, num_procs):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
     promoting_users = static_info.loc[
-        static_info['classify_account-mace_label'] == 'promoting'
-        ]['user_id'].dropna().unique().tolist()
+                        static_info['classify_account-mace_label'] == 'promoting'
+                      ]['user_id'].dropna().unique().tolist()
     
     promoting_user_subsets = [[p_user for i, p_user
                                in enumerate(promoting_users)
                                if ((i % num_procs) == j)] for j in range(num_procs)]
-    out_paths = [os.path.join(out_dir, 'net_features.{}.tsv.gz'.format(i)) for i in range(num_procs)]
+    net_out_paths = [os.path.join(out_dir, 'net_features.{}.tsv.gz'.format(i)) for i in range(num_procs)]
     
     dynamic_info_path = os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz')
     
@@ -283,19 +283,31 @@ def main(in_dir, out_dir, num_procs):
     if num_procs == 1:
         collect_dvs_from_user_info_table(dynamic_info_path,
                                          set(promoting_users),
-                                         out_paths[0],
+                                         net_out_paths[0],
                                          tws=[1, 2, 3, 4, 5, 6, 7, 14, 21, 28],
                                          min_timestamp=datetime.datetime(2018, 10, 14, 12),
                                          max_timestamp=datetime.datetime(2019, 4, 5, 12))
     else:
         procs = [mp.Process(target=collect_dvs_from_user_info_table,
                             args=(dynamic_info_path, set(p_users), op))
-                 for p_users, op in zip(promoting_user_subsets, out_paths)]
+                 for p_users, op in zip(promoting_user_subsets, net_out_paths)]
         
         for p in procs:
             p.start()
         for p in procs:
             p.join()
+    
+    # concatenate network features for all users
+    joined_net_out_path = os.path.join(out_dir, 'net_features.joined.tsv.gz')
+    joined_df = None
+    for op in net_out_paths:
+        if joined_df is None:
+            joined_df = pd.read_table(op)
+        else:
+            joined_df = pd.concat([joined_df, pd.read_table(op)])
+    
+    joined_df.sort_values(by=['history_agg_window', 'user_id', 'sampled_datetime'], inplace=True)
+    joined_df.to_csv(joined_net_out_path, compression='gzip', sep='\t', header=True, index=False)
     
     import pdb; pdb.set_trace()
     
