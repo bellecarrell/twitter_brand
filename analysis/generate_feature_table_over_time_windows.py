@@ -270,7 +270,7 @@ def main(in_dir, out_dir, num_procs):
     
     promoting_user_subsets = [[p_user for i, p_user
                                in enumerate(promoting_users)
-                               if ((i % j) == 0)] for j in range(num_procs)]
+                               if ((i % num_procs) == j)] for j in range(num_procs)]
     out_paths = [os.path.join(out_dir, 'net_features.{}.tsv.gz'.format(i)) for i in range(num_procs)]
     
     dynamic_info_path = os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz')
