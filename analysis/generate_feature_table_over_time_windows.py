@@ -119,13 +119,13 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
     '''
     
     COLUMNS  = ['user_id', 'sampled_datetime', 'history_agg_window']
-    COLUMNS += ['past-' + k for k in ['mean_friendsPerDay', 'mean_followersPerDay']]
     COLUMNS += ['current-' + k for k in ['follower_count', 'log_follower_count',
                                          'friend_count', 'log_friend_count',
                                          'list_count', 'user_impact_score']]
     COLUMNS += ['future-horizon{}-'.format(tw) + k for tw in tws
                 for k in ['follower_count', 'log_follower_count', 'pct_change_follower_count',
                           'user_impact_score']]
+    COLUMNS += ['past-' + k for k in ['mean_friendsPerDay', 'mean_followersPerDay']]
     
     df = pd.read_table(dynamic_user_info_path)
     df = df[df['user_id'].isin(tracked_uids)]  # restrict to users in our sample
@@ -157,7 +157,6 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                                                                        len(uid_uniq),
                                                                        dt_idx+1,
                                                                        len(sampled_dts)))
-                import pdb; pdb.set_trace()
             
             # extract current day features
             curr_day_idx = str((curr_dt.year, curr_dt.month, curr_dt.day))
@@ -223,35 +222,35 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
             
             # extract past features
             for agg_window in tws:
-                past_idx_dts = [curr_dt-datetime.timedelta(days=delta) for delta in range(1, agg_window+1)]
-                past_idxes = [str((d.year, d.month, d.day)) for d in past_idx_dts]
                 tmp_row = [uid, curr_dt, agg_window] + curr_vals + future_vals
-
-                for past_idx, past_idx_dt in zip(past_idxes, past_idx_dts):
-                    try:
-                        past_df = user_df.loc[past_idx]
-                    except Exception as ex:
-                        # we are missing samples for this day, insert null
-                        feature_rows.append( tmp_row + [None, None] )
-                        continue
-                    
-                    # pick value closest to 12pm
-                    if len(past_df.shape) > 1:
-                        past_df['distfrom12'] = (past_df['curr_datetime'] - past_idx_dt).map(
-                                lambda x: abs(x.total_seconds())
-                        )
-                        min_row = past_df.iloc[past_df['distfrom12'].values.argmin()]
-                    else:
-                        min_row = curr_df
-                    
-                    follower_count = min_row['followers_count']
-                    friend_count = min_row['friends_count']
-                    
-                    mean_followers_per_day = (curr_vals[0] - follower_count) / float(agg_window)
-                    mean_friends_per_day = (curr_vals[2] - friend_count) / float(agg_window)
-                    
-                    # add another sample to the table
-                    feature_rows.append( tmp_row + [mean_followers_per_day, mean_friends_per_day] )
+                
+                past_idx_dt = curr_dt-datetime.timedelta(days=agg_window)
+                past_idx = str((past_idx_dt.year, past_idx_dt.month, past_idx_dt.day))
+                
+                try:
+                    past_df = user_df.loc[past_idx]
+                except Exception as ex:
+                    # we are missing samples for this day, insert null
+                    feature_rows.append( tmp_row + [None, None] )
+                    continue
+                
+                # pick value closest to 12pm
+                if len(past_df.shape) > 1:
+                    past_df['distfrom12'] = (past_df['curr_datetime'] - past_idx_dt).map(
+                            lambda x: abs(x.total_seconds())
+                    )
+                    min_row = past_df.iloc[past_df['distfrom12'].values.argmin()]
+                else:
+                    min_row = past_df
+                
+                follower_count = min_row['followers_count']
+                friend_count = min_row['friends_count']
+                
+                mean_followers_per_day = (curr_vals[0] - follower_count) / float(agg_window)
+                mean_friends_per_day = (curr_vals[2] - friend_count) / float(agg_window)
+                
+                # add another sample to the table
+                feature_rows.append( tmp_row + [mean_followers_per_day, mean_friends_per_day] )
         
         all_feature_rows += feature_rows
         print('({}s) Extracted total of {} samples for user {}/{}'.format(int(time.time() - start),
