@@ -157,16 +157,18 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                 # user has no user information sampled on this day, skip
                 continue
             
-            last_row = curr_df.tail(1)  # TODO: this is an arbitrary sample, should pick the closest to 12pm
+            # pick value closest to 12pm
+            curr_df['distfrom12'] = (curr_df['curr_datetime'] - curr_dt).map(lambda x: abs(x.total_seconds()))
+            min_row = curr_df.iloc[curr_df['distfrom12'].values.argmin()]
             
-            follower_count = last_row['followers_count']
-            friend_count = last_row['friends_count']
-            user_impact = np.log( (1. + last_row['listed_count']) *
+            follower_count = min_row['followers_count']
+            friend_count = min_row['friends_count']
+            user_impact = np.log( (1. + min_row['listed_count']) *
                                   (1. + follower_count)**2. /
                                   (1. + friend_count) )
             curr_vals = [follower_count, np.log(1. + follower_count),
                          friend_count, np.log(1. + friend_count),
-                         last_row['listed_count'], user_impact]
+                         min_row['listed_count'], user_impact]
             
             # extract future features
             future_vals = []
@@ -191,7 +193,7 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                     user_impact = np.log( (1. + min_row['listed_count']) *
                                           (1. + follower_count)**2. /
                                           (1. + friend_count) )
-
+                    
                     # add small value to avoid inf if user had zero followers previously
                     pct_follower_change = 100.* ((follower_count + 0.01) / (curr_vals[0] + 0.01) - 1.)
                     
