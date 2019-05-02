@@ -437,4 +437,4 @@ if __name__ == '__main__':
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
     
-    main(in_dir, out_dir)
+    main(in_dir, out_dir, args.num_procs)
