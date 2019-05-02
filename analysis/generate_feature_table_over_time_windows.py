@@ -225,7 +225,7 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                         continue
                     
                     # pick value closest to 12pm
-                    if len(past_df.shape) > 0:
+                    if len(past_df.shape) > 1:
                         past_df['distfrom12'] = (past_df['curr_datetime'] - past_idx_dt).map(
                                 lambda x: abs(x.total_seconds())
                         )
