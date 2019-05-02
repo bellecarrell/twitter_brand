@@ -158,7 +158,7 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                 continue
             
             # pick value closest to 12pm
-            if curr_df.shape[0] > 1:
+            if len(curr_df.shape) > 1:
                 try:
                     curr_df['distfrom12'] = (curr_df['curr_datetime'] -
                                              curr_dt).map(lambda x: abs(x.total_seconds()))
@@ -192,7 +192,7 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                         continue
                     
                     # pick value closest to 12pm
-                    if fut_df.shape[0] > 1:
+                    if len(fut_df.shape) > 1:
                         fut_df['distfrom12'] = (fut_df['curr_datetime'] -
                                                 fut_idx_dt).map(lambda x: abs(x.total_seconds()) )
                         min_row = fut_df.iloc[fut_df['distfrom12'].values.argmin()]
@@ -226,7 +226,7 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                         continue
                     
                     # pick value closest to 12pm
-                    if past_df.shape[0] > 0:
+                    if len(past_df.shape[0]) > 0:
                         past_df['distfrom12'] = (past_df['curr_datetime'] - past_idx_dt).map(
                                 lambda x: abs(x.total_seconds())
                         )
