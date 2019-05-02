@@ -142,6 +142,8 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
     
     all_feature_rows = []
     
+    start = time.time()
+    
     uid_uniq = df['user_id'].unique()
     for uid_idx, uid in enumerate(uid_uniq):
         feature_rows = []
@@ -159,12 +161,9 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
             
             # pick value closest to 12pm
             if len(curr_df.shape) > 1:
-                try:
-                    curr_df['distfrom12'] = (curr_df['curr_datetime'] -
-                                             curr_dt).map(lambda x: abs(x.total_seconds()))
-                    min_row = curr_df.iloc[curr_df['distfrom12'].values.argmin()]
-                except Exception as ex:
-                    import pdb; pdb.set_trace()
+                curr_df['distfrom12'] = (curr_df['curr_datetime'] -
+                                         curr_dt).map(lambda x: abs(x.total_seconds()))
+                min_row = curr_df.iloc[curr_df['distfrom12'].values.argmin()]
             else:
                 min_row = curr_df
             
@@ -226,7 +225,7 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                         continue
                     
                     # pick value closest to 12pm
-                    if len(past_df.shape[0]) > 0:
+                    if len(past_df.shape) > 0:
                         past_df['distfrom12'] = (past_df['curr_datetime'] - past_idx_dt).map(
                                 lambda x: abs(x.total_seconds())
                         )
@@ -244,9 +243,10 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                     feature_rows.append( tmp_row + [mean_followers_per_day, mean_friends_per_day] )
         
         all_feature_rows += feature_rows
-        print('Extracted total of {} samples for user {}/{}'.format(len(feature_rows),
-                                                                    uid_idx,
-                                                                    len(uid_uniq)))
+        print('({}s) Extracted total of {} samples for user {}/{}'.format(int(time.time() - start),
+                                                                          len(feature_rows),
+                                                                          uid_idx,
+                                                                          len(uid_uniq)))
     
     extracted_features = pd.DataFrame(all_feature_rows, columns=COLUMNS)
     
