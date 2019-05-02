@@ -158,8 +158,12 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                 continue
             
             # pick value closest to 12pm
-            curr_df['distfrom12'] = (curr_df['curr_datetime'] - curr_dt).map(lambda x: abs(x.total_seconds()))
-            min_row = curr_df.iloc[curr_df['distfrom12'].values.argmin()]
+            if curr_df.shape[0] > 1:
+                curr_df['distfrom12'] = (curr_df['curr_datetime'] -
+                                         curr_dt).map(lambda x: abs(x.total_seconds()))
+                min_row = curr_df.iloc[curr_df['distfrom12'].values.argmin()]
+            else:
+                min_row = curr_df
             
             follower_count = min_row['followers_count']
             friend_count = min_row['friends_count']
@@ -185,9 +189,13 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                         continue
                     
                     # pick value closest to 12pm
-                    fut_df['distfrom12'] = (fut_df['curr_datetime'] -
-                                            fut_idx_dt).map(lambda x: abs(x.total_seconds()) )
-                    min_row = fut_df.iloc[fut_df['distfrom12'].values.argmin()]
+                    if fut_df.shape[0] > 1:
+                        fut_df['distfrom12'] = (fut_df['curr_datetime'] -
+                                                fut_idx_dt).map(lambda x: abs(x.total_seconds()) )
+                        min_row = fut_df.iloc[fut_df['distfrom12'].values.argmin()]
+                    else:
+                        min_row = fut_df
+                    
                     follower_count = min_row['followers_count']
                     friend_count = min_row['friends_count']
                     user_impact = np.log( (1. + min_row['listed_count']) *
@@ -215,11 +223,13 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                         continue
                     
                     # pick value closest to 12pm
-                    past_df['distfrom12'] = (past_df['curr_datetime'] - past_idx_dt).map(
-                            lambda x: abs(x.total_seconds())
-                    )
-
-                    min_row = past_df.iloc[past_df['distfrom12'].values.argmin()]
+                    if past_df.shape[0] > 0:
+                        past_df['distfrom12'] = (past_df['curr_datetime'] - past_idx_dt).map(
+                                lambda x: abs(x.total_seconds())
+                        )
+                        min_row = past_df.iloc[past_df['distfrom12'].values.argmin()]
+                    else:
+                        min_row = curr_df
                     
                     follower_count = min_row['followers_count']
                     friend_count = min_row['friends_count']
