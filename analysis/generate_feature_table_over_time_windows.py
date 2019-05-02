@@ -289,7 +289,7 @@ def main(in_dir, out_dir, num_procs):
                                          max_timestamp=datetime.datetime(2019, 4, 5, 12))
     else:
         procs = [mp.Process(target=collect_dvs_from_user_info_table,
-                            args=(dynamic_info_path, op, p_users))
+                            args=(dynamic_info_path, set(p_users), op))
                  for p_users, op in zip(promoting_user_subsets, out_paths)]
         
         for p in procs:
