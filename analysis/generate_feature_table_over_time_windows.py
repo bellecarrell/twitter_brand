@@ -242,17 +242,19 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
 
 def main(in_dir, out_dir):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
+    promoting_users = static_info.loc[
+        static_info['classify_account-mace_label'] == 'promoting'
+        ]['user_id'].dropna().unique().tolist()
+    
+    # extract network features for each user and sample date
+    net_tbl = collect_dvs_from_user_info_table(os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz'),
+                                               set(promoting_users),
+                                               tws=[1, 2, 3, 4, 5, 6, 7, 14, 21, 28],
+                                               min_timestamp=datetime.datetime(2018, 10, 14, 12),
+                                               max_timestamp=datetime.datetime(2019, 4, 5, 12))
+    
     import pdb; pdb.set_trace()
     
-    collect_dvs_from_user_info_table(os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz'),
-                                     set(static_info['user_id'].unique()),
-                                     tws=[1, 2, 3, 4, 5, 6, 7, 14, 21, 28],
-                                     min_timestamp=datetime.datetime(2018, 10, 14, 12),
-                                     max_timestamp=datetime.datetime(2019, 4, 5, 12))
-    
-    import pdb; pdb.set_trace()
-    
-    static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
     info = pd.read_table(os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz'))
     t = gzip.open(os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz'), 'rt')
 
