@@ -125,7 +125,7 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                                          'list_count', 'user_impact_score']]
     COLUMNS += ['future-horizon{}-'.format(tw) + k for tw in tws
                 for k in ['follower_count', 'log_follower_count', 'pct_change_follower_count',
-                          'user_impact_score', 'pct_change_user_impact_score']]
+                          'user_impact_score']]
     
     df = pd.read_table(dynamic_user_info_path)
     df = df[df['user_id'].isin(tracked_uids)]  # restrict to users in our sample
@@ -148,7 +148,7 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
     uid_uniq = df['user_id'].unique()
     for uid_idx, uid in enumerate(uid_uniq):
         feature_rows = []
-        user_df = df[df['user_id']==uid]  # restrict to a single user and extract samples for this one person
+        user_df = df[df['user_id'] == uid]  # restrict to a single user and extract samples for this one person
         
         for dt_idx, curr_dt in enumerate(sampled_dts):
             if not (dt_idx % 10):
@@ -190,40 +190,42 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
             for horizon in tws:
                 future_idx_dts = [curr_dt + datetime.timedelta(days=delta) for delta in range(1, horizon+1)]
                 future_idxes   = [str((d.year, d.month, d.day)) for d in future_idx_dts]
+
+                fut_idx_dt = curr_dt + datetime.timedelta(days=horizon)
+                fut_idx = str((fut_idx_dt.year, fut_idx_dt.month, fut_idx_dt.day))
                 
-                for fut_idx, fut_idx_dt in zip(future_idxes, future_idx_dts):
-                    try:
-                        fut_df = user_df.loc[fut_idx]
-                    except Exception as ex:
-                        # we are missing samples for this day, insert null values
-                        future_vals += [None, None, None, None, None]
-                        continue
-                    
-                    # pick value closest to 12pm
-                    if len(fut_df.shape) > 1:
-                        fut_df['distfrom12'] = (fut_df['curr_datetime'] -
-                                                fut_idx_dt).map(lambda x: abs(x.total_seconds()) )
-                        min_row = fut_df.iloc[fut_df['distfrom12'].values.argmin()]
-                    else:
-                        min_row = fut_df
-                    
-                    follower_count = min_row['followers_count']
-                    friend_count = min_row['friends_count']
-                    user_impact = np.log( (1. + min_row['listed_count']) *
-                                          (1. + follower_count)**2. /
-                                          (1. + friend_count) )
-                    
-                    # add small value to avoid inf if user had zero followers previously
-                    pct_follower_change = 100.* ((follower_count + 0.01) / (curr_vals[0] + 0.01) - 1.)
-                    
-                    future_vals += [follower_count, pct_follower_change,
-                                    np.log(1. + follower_count), user_impact]
+                try:
+                    fut_df = user_df.loc[fut_idx]
+                except Exception as ex:
+                    # we are missing samples for this day, insert null values
+                    future_vals += [None, None, None, None]
+                    continue
+                
+                # pick value closest to 12pm
+                if len(fut_df.shape) > 1:
+                    fut_df['distfrom12'] = (fut_df['curr_datetime'] -
+                                            fut_idx_dt).map(lambda x: abs(x.total_seconds()) )
+                    min_row = fut_df.iloc[fut_df['distfrom12'].values.argmin()]
+                else:
+                    min_row = fut_df
+                
+                follower_count = min_row['followers_count']
+                friend_count = min_row['friends_count']
+                user_impact = np.log( (1. + min_row['listed_count']) *
+                                      (1. + follower_count)**2. /
+                                       (1. + friend_count) )
+                
+                # add small value to avoid inf if user had zero followers previously
+                pct_follower_change = 100.* ((follower_count + 0.01) / (curr_vals[0] + 0.01) - 1.)
+                
+                future_vals += [follower_count, pct_follower_change,
+                                np.log(1. + follower_count), user_impact]
             
             # extract past features
             for agg_window in tws:
                 past_idx_dts = [curr_dt-datetime.timedelta(days=delta) for delta in range(1, agg_window+1)]
                 past_idxes = [str((d.year, d.month, d.day)) for d in past_idx_dts]
-                tmp_row  = [uid, curr_dt, agg_window] + curr_vals + future_vals
+                tmp_row = [uid, curr_dt, agg_window] + curr_vals + future_vals
 
                 for past_idx, past_idx_dt in zip(past_idxes, past_idx_dts):
                     try:
