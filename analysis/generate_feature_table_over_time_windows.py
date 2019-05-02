@@ -215,10 +215,12 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                                        (1. + friend_count) )
                 
                 # add small value to avoid inf if user had zero followers previously
-                pct_follower_change = 100.* ((follower_count + 0.01) / (curr_vals[0] + 0.01) - 1.)
+                pct_follower_change = 100. * ((follower_count + 0.01) / (curr_vals[0] + 0.01) - 1.)
                 
-                future_vals += [follower_count, pct_follower_change,
-                                np.log(1. + follower_count), user_impact]
+                future_vals += [follower_count,
+                                np.log(1. + follower_count),
+                                pct_follower_change,
+                                user_impact]
             
             # extract past features
             for agg_window in tws:
@@ -253,7 +255,6 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
                 feature_rows.append( tmp_row + [mean_followers_per_day, mean_friends_per_day] )
         
         all_feature_rows += feature_rows
-        import pdb; pdb.set_trace()
         
         print('({}s) Extracted total of {} samples for user {}/{}'.format(int(time.time() - start),
                                                                           len(feature_rows),
