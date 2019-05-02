@@ -159,9 +159,12 @@ def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
             
             # pick value closest to 12pm
             if curr_df.shape[0] > 1:
-                curr_df['distfrom12'] = (curr_df['curr_datetime'] -
-                                         curr_dt).map(lambda x: abs(x.total_seconds()))
-                min_row = curr_df.iloc[curr_df['distfrom12'].values.argmin()]
+                try:
+                    curr_df['distfrom12'] = (curr_df['curr_datetime'] -
+                                             curr_dt).map(lambda x: abs(x.total_seconds()))
+                    min_row = curr_df.iloc[curr_df['distfrom12'].values.argmin()]
+                except Exception as ex:
+                    import pdb; pdb.set_trace()
             else:
                 min_row = curr_df
             
