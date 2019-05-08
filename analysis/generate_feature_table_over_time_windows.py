@@ -102,8 +102,8 @@ def extract_tweet_level_features_from_row(tweet_row):
     is_friday = (curr_dt.weekday() == 4)
     
     # time of posting
-    is_9to12_utc = 9  <= curr_dt.hour() <= 12
-    is_9to12_est = 13 <= curr_dt.hour() <= 16
+    is_9to12_utc = 9  <= curr_dt.hour <= 12
+    is_9to12_est = 13 <= curr_dt.hour <= 16
     is_9to12_local = -1  # TODO: how to identify local time
     
     # RTs
