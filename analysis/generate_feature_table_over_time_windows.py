@@ -1,13 +1,15 @@
-import pandas as pd
-import os
 import argparse
+from collections import defaultdict
+import csv
 import datetime
+import gzip
+import multiprocessing as mp
+import numpy as np
+import os
 import pytz
 import time
-import gzip
-import sys
-sys.path.append('/home/hltcoe/acarrell/PycharmProjects/twitter_brand/')
-from analysis.category_binary_words import *
+import pandas as pd
+
 
 def tweets_by_user(f, users):
     """
@@ -35,8 +37,268 @@ def tweets_by_user(f, users):
     return tweets.keys(), tweets
 
 
-def main(in_dir, out_dir):
+### Checklist of features to extract.  "| +" indicates ###
+### we have extracted this feature, else it is still TODO ###
+
+### Controls to extract ###
+'''
+- current follower count (raw + log-scaled) | +
+- user impact score (log[ (num_lists + 1) * (num_followers + 1)^(2) / (num_friends + 1) ]) | +
+- mean # followers gained/day in recent past (momentum over X previous days) | +
+- geo_enabled (binary)
+- main specialization domain (categorical)
+'''
+
+### Hypotheses to extract ###
+'''
+- Tweet was posted on the most recent Friday (binary, null if Friday not in preceding window)
+- % messages occurring on Friday ($\in [0,1]$, null if no Friday in preceding window)
+- % last Fridays with at least one tweet ($\in [0,1]$, null if no Friday)
+- % messages posted between 9-12 ET ([0,1])
+- % messages posted between 9-12 local time (TODO: how to find local time)
+- % messages that are RTs ([0,1])
+- % days with >= 1 message ([0,1])
+- mean # tweets/day (float)
+- message count/day distribution (list[float])
+- message count/hour distribution (list[float])
+- entropy of messages/day distribution, add-1 smoothed (float)
+- entropy of messages/hour distribution, add-0.1 smoothed (float)
+- maximum messages/hour (int)
+- mean # new friends/day (float) | +
+- mean # RTs/day (float)
+- % messages that are replies ([0,1])
+- mean # replies/day (float)
+- mean @-mentions per tweet (float)
+- % messages containing user mention ([0,1])
+- % messages with pointer to URL
+- % messages with URL to user's blog
+- Interactivity -- user falls in top 50% of for # of tweets/day, % replies,
+  mean # user mentions/tweets (binary)
+- % messages with positive sentiment ([0,1])
+- mean sentiment (float)
+- median sentiment (float)
+- variance sentiment (float)
+- topic counts (list[int])
+- topic distribution, add-1 smoothed (list[float])
+- entropy of topic distribution, add-1 smoothed (float)
+- % messages tagged with plurality topic, add-1 smoother ([0,1])
+'''
+
+
+### DVs to extract ###
+'''
+- % change in follower count | +
+- future follower count | +
+  + computed from 12pm - 12pm, take nearest sample above current time (within 12 hours, else value is null):
+    days in the future {1, 2, 3, 4, 5, 6, 7, 14, 21, 28}
+'''
+
+
+def collect_dvs_from_user_info_table(dynamic_user_info_path, tracked_uids,
+                                     out_path,
+                                     tws=[1, 2, 3, 4, 5, 6, 7, 14, 21, 28],
+                                     min_timestamp=datetime.datetime(2018, 10, 14, 12),
+                                     max_timestamp=datetime.datetime(2019, 4, 5, 12)):
+    '''
+    Process dynamic user info file to compute:
+    - past {1, 2, 3, 4, 5, 6, 7, 14, 21, 28}
+      + mean # friends/day
+      + mean # followers/day
+    - current
+      + raw follower count
+      + log follower count
+      + raw friend count
+      + log friend count
+      + number of lists
+      + user impact score
+    - future {1, 2, 3, 4, 5, 6, 7, 14, 21, 28}
+      + raw follower count
+      + % change follower count
+      + log follower count
+      + user impact score
+    '''
+    
+    COLUMNS  = ['user_id', 'sampled_datetime', 'history_agg_window']
+    COLUMNS += ['current-' + k for k in ['follower_count', 'log_follower_count',
+                                         'friend_count', 'log_friend_count',
+                                         'list_count', 'user_impact_score']]
+    COLUMNS += ['future-horizon{}-'.format(tw) + k for tw in tws
+                for k in ['follower_count', 'log_follower_count', 'pct_change_follower_count',
+                          'user_impact_score']]
+    COLUMNS += ['past-' + k for k in ['mean_friendsPerDay', 'mean_followersPerDay']]
+    
+    df = pd.read_table(dynamic_user_info_path)
+    df = df[df['user_id'].isin(tracked_uids)]  # restrict to users in our sample
+    df['curr_datetime'] = df['timestamp'].map(lambda x: datetime.datetime.fromtimestamp(x))
+    df['curr_day'] = df['curr_datetime'].map(lambda x: (x.year, x.month, x.day))
+    df = df.set_index(df['curr_day'].map(str))
+    
+    # list days to build samples for
+    sampled_dts = []
+    curr_dt = min_timestamp
+    one_day = datetime.timedelta(days=1)
+    while curr_dt <= max_timestamp:
+        sampled_dts.append(curr_dt)
+        curr_dt += one_day
+    
+    all_feature_rows = []
+    
+    start = time.time()
+    
+    uid_uniq = df['user_id'].unique()
+    for uid_idx, uid in enumerate(uid_uniq):
+        feature_rows = []
+        user_df = df[df['user_id'] == uid]  # restrict to a single user and extract samples for this one person
+        
+        for dt_idx, curr_dt in enumerate(sampled_dts):
+            if not (dt_idx % 10):
+                print('({}s) Starting user {}/{}, sample {}/{}'.format(int(time.time() - start),
+                                                                       uid_idx+1,
+                                                                       len(uid_uniq),
+                                                                       dt_idx+1,
+                                                                       len(sampled_dts)))
+            
+            # extract current day features
+            curr_day_idx = str((curr_dt.year, curr_dt.month, curr_dt.day))
+            
+            try:
+                curr_df = user_df.loc[curr_day_idx]
+            except Exception as ex:
+                # user has no user information sampled on this day, skip
+                continue
+            
+            # pick value closest to 12pm
+            if len(curr_df.shape) > 1:
+                curr_df['distfrom12'] = (curr_df['curr_datetime'] -
+                                         curr_dt).map(lambda x: abs(x.total_seconds()))
+                min_row = curr_df.iloc[curr_df['distfrom12'].values.argmin()]
+            else:
+                min_row = curr_df
+            
+            follower_count = min_row['followers_count']
+            friend_count = min_row['friends_count']
+            user_impact = np.log( (1. + min_row['listed_count']) *
+                                  (1. + follower_count)**2. /
+                                  (1. + friend_count) )
+            curr_vals = [follower_count, np.log(1. + follower_count),
+                         friend_count, np.log(1. + friend_count),
+                         min_row['listed_count'], user_impact]
+            
+            # extract future features
+            future_vals = []
+            for horizon in tws:
+                future_idx_dts = [curr_dt + datetime.timedelta(days=delta) for delta in range(1, horizon+1)]
+                future_idxes   = [str((d.year, d.month, d.day)) for d in future_idx_dts]
+
+                fut_idx_dt = curr_dt + datetime.timedelta(days=horizon)
+                fut_idx = str((fut_idx_dt.year, fut_idx_dt.month, fut_idx_dt.day))
+                
+                try:
+                    fut_df = user_df.loc[fut_idx]
+                except Exception as ex:
+                    # we are missing samples for this day, insert null values
+                    future_vals += [None, None, None, None]
+                    continue
+                
+                # pick value closest to 12pm
+                if len(fut_df.shape) > 1:
+                    fut_df['distfrom12'] = (fut_df['curr_datetime'] -
+                                            fut_idx_dt).map(lambda x: abs(x.total_seconds()) )
+                    min_row = fut_df.iloc[fut_df['distfrom12'].values.argmin()]
+                else:
+                    min_row = fut_df
+                
+                follower_count = min_row['followers_count']
+                friend_count = min_row['friends_count']
+                user_impact = np.log( (1. + min_row['listed_count']) *
+                                      (1. + follower_count)**2. /
+                                       (1. + friend_count) )
+                
+                # add small value to avoid inf if user had zero followers previously
+                pct_follower_change = 100. * ((follower_count + 0.01) / (curr_vals[0] + 0.01) - 1.)
+                
+                future_vals += [follower_count,
+                                np.log(1. + follower_count),
+                                pct_follower_change,
+                                user_impact]
+            
+            # extract past features
+            for agg_window in tws:
+                tmp_row = [uid, curr_dt, agg_window] + curr_vals + future_vals
+                
+                past_idx_dt = curr_dt-datetime.timedelta(days=agg_window)
+                past_idx = str((past_idx_dt.year, past_idx_dt.month, past_idx_dt.day))
+                
+                try:
+                    past_df = user_df.loc[past_idx]
+                except Exception as ex:
+                    # we are missing samples for this day, insert null
+                    feature_rows.append( tmp_row + [None, None] )
+                    continue
+                
+                # pick value closest to 12pm
+                if len(past_df.shape) > 1:
+                    past_df['distfrom12'] = (past_df['curr_datetime'] - past_idx_dt).map(
+                            lambda x: abs(x.total_seconds())
+                    )
+                    min_row = past_df.iloc[past_df['distfrom12'].values.argmin()]
+                else:
+                    min_row = past_df
+                
+                follower_count = min_row['followers_count']
+                friend_count = min_row['friends_count']
+                
+                mean_followers_per_day = (curr_vals[0] - follower_count) / float(agg_window)
+                mean_friends_per_day = (curr_vals[2] - friend_count) / float(agg_window)
+                
+                # add another sample to the table
+                feature_rows.append( tmp_row + [mean_followers_per_day, mean_friends_per_day] )
+        
+        all_feature_rows += feature_rows
+        
+        print('({}s) Extracted total of {} samples for user {}/{}'.format(int(time.time() - start),
+                                                                          len(feature_rows),
+                                                                          uid_idx,
+                                                                          len(uid_uniq)))
+    
+    extracted_features = pd.DataFrame(all_feature_rows, columns=COLUMNS)
+    
+    extracted_features.to_csv(out_path, compression='gzip', sep='\t', header=True, index=False)
+
+
+def main(in_dir, out_dir, num_procs):
     static_info = pd.read_csv(os.path.join(in_dir, 'static_info/static_user_info.csv'))
+    promoting_users = static_info.loc[
+        static_info['classify_account-mace_label'] == 'promoting'
+        ]['user_id'].dropna().unique().tolist()
+    
+    promoting_user_subsets = [[p_user for i, p_user
+                               in enumerate(promoting_users)
+                               if ((i % num_procs) == j)] for j in range(num_procs)]
+    out_paths = [os.path.join(out_dir, 'net_features.{}.tsv.gz'.format(i)) for i in range(num_procs)]
+    
+    dynamic_info_path = os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz')
+    
+    # extract network features for each user and sample date
+    if num_procs == 1:
+        collect_dvs_from_user_info_table(dynamic_info_path,
+                                         set(promoting_users),
+                                         out_paths[0],
+                                         tws=[1, 2, 3, 4, 5, 6, 7, 14, 21, 28],
+                                         min_timestamp=datetime.datetime(2018, 10, 14, 12),
+                                         max_timestamp=datetime.datetime(2019, 4, 5, 12))
+    else:
+        procs = [mp.Process(target=collect_dvs_from_user_info_table,
+                            args=(dynamic_info_path, set(p_users), op))
+                 for p_users, op in zip(promoting_user_subsets, out_paths)]
+        
+        for p in procs:
+            p.start()
+        for p in procs:
+            p.join()
+    
+    import pdb; pdb.set_trace()
+    
     info = pd.read_table(os.path.join(in_dir, 'info/user_info_dynamic.tsv.gz'))
     t = gzip.open(os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz'), 'rt')
 
@@ -154,6 +416,7 @@ def main(in_dir, out_dir):
     ft = pd.DataFrame(rows, columns=COLUMNS)
     ft.to_csv(os.path.join(out_dir, 'feature_table.csv.gz'), compression='gzip')
 
+
 if __name__ == '__main__':
     """
     Build table of features calculated from user activity (independent variables) 
@@ -168,6 +431,8 @@ if __name__ == '__main__':
     parser.add_argument('--out_dir', required=True,
                         dest='out_dir', metavar='OUTPUT_PREFIX',
                         help='output directory')
+    parser.add_argument('--num_procs', required=True, type=int,
+                        default=1, help='number of processes working in parallel')
     args = parser.parse_args()
 
     in_dir = args.input_dir
@@ -176,4 +441,4 @@ if __name__ == '__main__':
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
     
-    main(in_dir, out_dir)
+    main(in_dir, out_dir, args.num_procs)
