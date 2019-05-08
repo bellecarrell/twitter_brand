@@ -310,7 +310,7 @@ def collect_features_from_user_timeline_table(timeline_path, tracked_uids, out_p
         uid = r['user_id'],
         cday = r['curr_day']
         
-        norm_day = r['NORM_DAY']
+        norm_day = r['DerivedFeature-NORM_DAY']
         #norm_day = datetime.datetime(year=cday[0], month=cday[1], day=cday[2], hour=12)
         if r['curr_datetime'].hour < 12:
             norm_day -= one_day
