@@ -230,7 +230,8 @@ def main():
         if args[0] == 'nmf':
             fit_nmf(train_max, heldout_max, rev_vocab, args[1], args[2])
         elif args[0] == 'lda':
-            fit_lda(onehot_train_max, onehot_heldout_max, rev_vocab, args[1], args[2], args[3])
+            pass
+            # fit_lda(onehot_train_max, onehot_heldout_max, rev_vocab, args[1], args[2], args[3])
         else:
             raise Exception('Do not recognize model "{}"'.format(args[0]))
         

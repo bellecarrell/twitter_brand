@@ -573,7 +573,8 @@ def extract_text_features(promoting_users, promoting_user_subsets, out_dir):
     num_procs = len(promoting_user_subsets)
     text_out_paths = [os.path.join(out_dir, 'text_features.{}.tsv.gz'.format(i)) for i in range(num_procs)]
     
-    timeline_path = os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz')
+    #timeline_path = os.path.join(in_dir, 'timeline/user_tweets.noduplicates.tsv.gz')
+    timeline_path = os.path.join(in_dir, 'timeline/user_tweets.noduplicates.withTopicAndSentiment.tsv.gz')
     
     # extract text features for each user and sample date
     if num_procs == 1:
