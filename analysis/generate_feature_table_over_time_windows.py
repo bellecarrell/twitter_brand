@@ -46,8 +46,8 @@ def tweets_by_user(f, users):
 - current follower count (raw + log-scaled) | +
 - user impact score (log[ (num_lists + 1) * (num_followers + 1)^(2) / (num_friends + 1) ]) | +
 - mean # followers gained/day in recent past (momentum over X previous days) | +
-- geo_enabled (binary)
-- main specialization domain (categorical)
+- geo_enabled (binary)  #TODO
+- main specialization domain (categorical) | +
 '''
 
 ### Hypotheses to extract ###
@@ -74,7 +74,7 @@ def tweets_by_user(f, users):
 - % messages with pointer to URL | +
 - % messages with URL to user's blog | +
 - Interactivity -- user falls in top 50% of for # of tweets/day, % replies,
-  mean # user mentions/tweets (binary)
+  mean # user mentions/tweets (binary) | +
 - % messages with positive sentiment ([0,1]) | +
 - mean sentiment (float) | +
 - median sentiment (float) | +
@@ -129,7 +129,7 @@ def extract_tweet_level_features_from_row(tweet_row):
     
     # topics
     topic_wts = json.loads(tweet_row['topics_per_tweet'])
-    if max(topic_wts):
+    if max(topic_wts) <= 0.:
         max_topic = None
     else:
         max_topic = np.argmax(topic_wts)
@@ -183,8 +183,12 @@ def aggregate_tweet_level_features(subset_df, day, tw):
 
     num_msgs = subset_df.shape[0]
     
-    # timing
-
+    # if they did not tweet at all, then ignore
+    if num_msgs == 0:
+        agg_row = [None for i in range(35)]
+        agg_row[0] = 0
+        return agg_row
+    
     ## friday features -- null if no preceding Friday
     has_tweet_last_friday = None
     pct_msgs_on_friday = None
@@ -196,14 +200,15 @@ def aggregate_tweet_level_features(subset_df, day, tw):
         pct_msgs_on_friday = subset_df[subset_df[pre + 'IS_FRIDAY']].shape[0] / float(num_msgs)
         pct_fridays_with_tweet = len(subset_df.loc[subset_df[pre + 'IS_FRIDAY'],
                                                    pre + 'NORM_DAY'].unique()) / float(num_fridays)
-
+    
     pct_msgs_9to12_utc = subset_df[pre + 'IS_9TO12_UTC'].sum() / float(num_msgs)
     pct_msgs_9to12_et = subset_df[pre + 'IS_9TO12_EST'].sum() / float(num_msgs)
     pct_msgs_9to12_local = subset_df[pre + 'IS_9TO12_LOCAL'].sum() / float(num_msgs)
     pct_days_with_some_msg = len(subset_df[pre + 'NORM_DAY'].unique()) / float(tw)
     mean_tweets_per_day = num_msgs / float(tw)
     
-    count_per_day_df = subset_df.groupby('NORM_DAY')['tweet_id'].count()
+    subset_df[pre + 'NORM_DAY_TUP'] = subset_df[pre + 'NORM_DAY'].map(lambda x: (x.year, x.month, x.day))
+    count_per_day_df = subset_df.groupby(pre + 'NORM_DAY')['tweet_id'].count()
     msg_count_per_day_dist = dict(zip(count_per_day_df.index, count_per_day_df.values))
     count_per_hour_df = subset_df.groupby(pre + 'CURR_HOUR')['tweet_id'].count()
     msg_count_per_hour_dist = dict(zip(count_per_hour_df.index, count_per_hour_df.values))
@@ -225,22 +230,30 @@ def aggregate_tweet_level_features(subset_df, day, tw):
     pct_msgs_with_personal_url = (subset_df[pre + 'NUM_PERSONAL_URLS'] > 0.).sum() / float(num_msgs)
     shared_personal_url = 1. * (subset_df[pre + 'NUM_PERSONAL_URLS'].sum() > 0.)
     
-    # sentiment
+    ## sentiment
     pct_msgs_with_positive_sentiment = subset_df[pre + 'IS_POSITIVE_SENTIMENT'].sum() / float(num_msgs)
     median_sentiment = subset_df['tweet_sentiment_score'].median()
     mean_sentiment = subset_df['tweet_sentiment_score'].mean()
     std_sentiment = subset_df['tweet_sentiment_score'].std()
     
-    # topic
+    ## topic
     num_topics = 50  # 50-dimensional NNMF model
     topic_count_df = subset_df.groupby(pre + 'MAX_TOPIC')['tweet_id'].count()
     count_per_topic = dict(zip(topic_count_df.index, topic_count_df.values))
-    topic_dist_entropy_add1 = entropy(topic_count_df.values, num_topics, delta=1.0)
-    topic_dist_entropy_add01 = entropy(topic_count_df.values, num_topics, delta=0.1)
-    plurality_topic = topic_count_df.idxmax()
-    pct_msgs_with_plurality_topic = topic_count_df.max() / float(num_msgs)
-    pct_msgs_with_plurality_topic_add1 = (topic_count_df.max()+1.) / (float(num_msgs) + 50.)
-
+    
+    if len(count_per_topic) == 0:
+        topic_dist_entropy_add1 = None
+        topic_dist_entropy_add01 = None
+        plurality_topic = None
+        pct_msgs_with_plurality_topic = None
+        pct_msgs_with_plurality_topic_add1 = None
+    else:
+        topic_dist_entropy_add1 = entropy(topic_count_df.values, num_topics, delta=1.0)
+        topic_dist_entropy_add01 = entropy(topic_count_df.values, num_topics, delta=0.1)
+        plurality_topic = topic_count_df.idxmax()
+        pct_msgs_with_plurality_topic = topic_count_df.max() / float(num_msgs)
+        pct_msgs_with_plurality_topic_add1 = (topic_count_df.max()+1.) / (float(num_msgs) + 50.)
+    
     agg_row = [num_msgs, has_tweet_last_friday, pct_msgs_on_friday, pct_fridays_with_tweet,
                pct_msgs_9to12_utc, pct_msgs_9to12_et, pct_msgs_9to12_local,
                pct_days_with_some_msg, mean_tweets_per_day, msg_count_per_day_dist,
@@ -310,24 +323,23 @@ def collect_features_from_user_timeline_table(timeline_path, tracked_uids, out_p
         uid = r['user_id'],
         cday = r['curr_day']
         
-        norm_day = r['DerivedFeature-NORM_DAY']
-        #norm_day = datetime.datetime(year=cday[0], month=cday[1], day=cday[2], hour=12)
+        norm_day = datetime.datetime(year=cday[0], month=cday[1], day=cday[2], hour=12)
         if r['curr_datetime'].hour < 12:
             norm_day -= one_day
         
         for tw in tws:
             for lag in range(1, tw+1):
                 day_bin = norm_day + (lag * one_day)
-                key = (uid, tw, day_bin)
+                key = (uid[0], tw, day_bin)
                 
                 if key not in key_to_rowindexes:
-                    key_to_rowindexes = []
+                    key_to_rowindexes[key] = []
                 
                 key_to_rowindexes[key].append(row_id)
     
     # join new columns with original dataframe
     new_col_df = pd.DataFrame(df_map, index=timeline_df.index)
-    timeline_df = pd.merge(timeline_df, new_col_df)
+    timeline_df = pd.merge(timeline_df, new_col_df, left_index=True, right_index=True)
     
     # aggregate hypotheses + control features over recent past
 
@@ -353,7 +365,7 @@ def collect_features_from_user_timeline_table(timeline_path, tracked_uids, out_p
                                                                 (key_index+1) / 1000.,
                                                                 len(key_to_rowindexes) / 1000.))
         
-        agg_row = list(key) + aggregate_tweet_level_features(timeline_df.iloc[indexes], key[2], key[1])
+        agg_row = list(key) + aggregate_tweet_level_features(timeline_df.loc[indexes], key[2], key[1])
         agg_rows.append(agg_row)
     
     agg_df = pd.DataFrame(agg_rows, columns=AGG_COLUMNS)
@@ -608,7 +620,7 @@ def extract_text_features(promoting_users, promoting_user_subsets, out_dir):
     # compute interactivity feature
     
     agg_pre = 'past-'
-    grped_by_tw = joined_df.groupby(['sampled_datetime', 'history_agg_window'], as_index=False)
+    grped_by_tw = joined_df.groupby(['sampled_datetime', 'history_agg_window'], as_index=True)
     # calculate mean tweets/day
     mean_tpd = grped_by_tw[agg_pre + 'MEAN_TWEETS_PER_DAY'].mean()
     # """" % replies
@@ -617,9 +629,19 @@ def extract_text_features(promoting_users, promoting_user_subsets, out_dir):
     mean_mpt = grped_by_tw[agg_pre + 'MEAN_MENTIONS_PER_TWEET'].mean()
     
     joined_df_twidx = joined_df.set_index(['sampled_datetime', 'history_agg_window'], drop=False)
+    
     joined_df_twidx['avgAcrossUsers-MEAN_TWEETS_PER_DAY'] = mean_tpd
     joined_df_twidx['avgAcrossUsers-MEAN_PCT_REPLIES'] = mean_pr
     joined_df_twidx['avgAcrossUsers-MEAN_MENTIONS_PER_TWEET'] = mean_mpt
+    
+    joined_df_twidx['past-top50_MEAN_TWEETS_PER_DAY'] = joined_df_twidx['past-MEAN_TWEETS_PER_DAY'] > joined_df_twidx['avgAcrossUsers-MEAN_TWEETS_PER_DAY']
+    joined_df_twidx['past-top50_MEAN_PCT_REPLIES'] = joined_df_twidx['past-PCT_MSGS_REPLIES'] > joined_df_twidx['avgAcrossUsers-MEAN_PCT_REPLIES']
+    joined_df_twidx['past-top50_MEAN_MENTIONS_PER_TWEET'] = joined_df_twidx['past-MEAN_MENTIONS_PER_TWEET'] > joined_df_twidx['avgAcrossUsers-MEAN_MENTIONS_PER_TWEET']
+    
+    # in top 50% of number of tweets, proportion replies, and mentions per tweet
+    joined_df_twidx['past-IS_INTERACTIVE'] = joined_df_twidx['past-top50_MEAN_TWEETS_PER_DAY'] & \
+                                             joined_df_twidx['past-top50_MEAN_PCT_REPLIES'] & \
+                                             joined_df_twidx['past-top50_MEAN_MENTIONS_PER_TWEET']
     
     joined_df_twidx.to_csv(joined_text_out_path, compression='gzip', sep='\t', header=True, index=False)
 
