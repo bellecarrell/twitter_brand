@@ -661,8 +661,7 @@ def main(in_dir, out_dir, num_procs, max_users):
     
     ## adrian : already extracted these features to here
     ## /exp/abenton/twitter_brand/TEST_OUTPUT/net_features.joined.tsv.gz
-    #extract_net_features(promoting_users, promoting_user_subsets, out_dir)
-
+    extract_net_features(promoting_users, promoting_user_subsets, out_dir)
     extract_text_features(promoting_users, promoting_user_subsets, out_dir)
 
 
