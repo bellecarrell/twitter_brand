@@ -3,9 +3,16 @@ Sanity checks to make sure features are generated properly.
 '''
 
 import pandas as pd
+import matplotlib
+matplotlib.use('agg')
+
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
+import seaborn as sns
 
 IN_PATH = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/joined_features.tsv.gz'
 DESC_STAT_PATH = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/feature_stats.tsv'
+DIST_PATH_FMT = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/tw-{}_dist.pdf'
 
 stat_features = ['past-NUM_MSGS', 'past-HAS_TWEET_LAST_FRIDAY', 'past-PCT_MSGS_ON_FRIDAY',
                  'past-PCT_FRIDAYS_WITH_TWEET', 'past-PCT_MSGS_9TO12_UTC',
@@ -28,18 +35,6 @@ stat_features = ['past-NUM_MSGS', 'past-HAS_TWEET_LAST_FRIDAY', 'past-PCT_MSGS_O
                  'current-follower_count', 'current-log_follower_count',
                  'current-friend_count', 'current-log_friend_count',
                  'current-list_count', 'current-user_impact_score',
-                 'future-horizon1-follower_count', 'future-horizon1-log_follower_count',
-                 'future-horizon1-pct_change_follower_count',
-                 'future-horizon1-user_impact_score', 'future-horizon2-follower_count',
-                 'future-horizon2-log_follower_count',
-                 'future-horizon2-pct_change_follower_count',
-                 'future-horizon2-user_impact_score', 'future-horizon3-follower_count',
-                 'future-horizon3-log_follower_count',
-                 'future-horizon3-pct_change_follower_count',
-                 'future-horizon3-user_impact_score', 'future-horizon4-follower_count',
-                 'future-horizon4-log_follower_count',
-                 'future-horizon4-pct_change_follower_count',
-                 'future-horizon4-user_impact_score', 'future-horizon5-follower_count',
                  'future-horizon1-follower_count', 'future-horizon1-log_follower_count',
                  'future-horizon1-pct_change_follower_count',
                  'future-horizon1-user_impact_score', 'future-horizon2-follower_count',
@@ -79,25 +74,39 @@ def compute_stats(df):
     for tw in [1, 2, 3, 4, 5, 6, 7, 14, 21, 28]:
         tw_df = df[df['history_agg_window'] == tw]
         
-        for f in stat_features:
-            new_row = [tw, f, tw_df.shape[0], tw_df[f].isna().sum()]
-            
-            try:
-                new_row += tw_df[f].quantile(q=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0]).tolist()
-            except Exception as ex:
-                import pdb; pdb.set_trace()
-            
-            rows.append(new_row)
+        with PdfPages(DIST_PATH_FMT.format(tw)) as pdf:
+            for f in stat_features:
+                new_row = [tw, f, tw_df.shape[0], tw_df[f].isna().sum()]
+                
+                try:
+                    new_row += tw_df[f].quantile(q=[0.0, 0.1, 0.2, 0.3, 0.4,
+                                                    0.5, 0.6, 0.7, 0.8, 0.9, 1.0]).tolist()
+                    new_row += [tw_df[f].mean(), tw_df[f].std()]
+                except Exception as ex:
+                    import pdb; pdb.set_trace()
+                
+                rows.append(new_row)
+                
+                ax = sns.distplot(tw_df[f])
+                plt.title('Dist. of "{}" with tw {}'.format(f, tw))
+                plt.xlabel('Feature: "{}"'.format(f))
+                pdf.savefig()
+                plt.close()
+        
         print('Finished window {}'.format(tw))
     
     stat_df = pd.DataFrame(rows, columns=['history_agg_window', 'feature_name',
-                                          'num_total', 'num_null', 'min', 'q02', 'q04',
-                                          'q06', 'q08', 'max'])
+                                          'num_total', 'num_null', 'min'] +
+                                         ['q01', 'q02', 'q03', 'q04',
+                                          'q05', 'q06', 'q07', 'q08',
+                                          'q09'] + ['max', 'mean', 'stdev'])
     stat_df.to_csv(DESC_STAT_PATH, header=True, index=False, sep='\t')
 
 
 def run_sanity_checks(df):
+    # make sure there are more messages for longer horizons
     
+    #
     
     pass
 
