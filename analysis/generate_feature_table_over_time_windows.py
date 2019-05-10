@@ -666,7 +666,7 @@ def main(in_dir, out_dir, num_procs, max_users):
     ## adrian : already extracted these features to here
     ## /exp/abenton/twitter_brand/TEST_OUTPUT/net_features.joined.tsv.gz
     #extract_net_features(promoting_users, promoting_user_subsets, out_dir)
-    extract_text_features(promoting_users, promoting_user_subsets, out_dir)
+    #extract_text_features(promoting_users, promoting_user_subsets, out_dir)
     
     # joined network + text + static features
     print('joining network + text + static features together')
@@ -696,6 +696,8 @@ def main(in_dir, out_dir, num_procs, max_users):
     
     net_df = pd.read_table(net_path)
     text_df = pd.read_table(text_path)
+    
+    import pdb; pdb.set_trace()
     joined_df = pd.merge(text_df, net_df, on=net_text_key, how='left')
     
     static_subset_df = static_info[['user_id'] + static_cols_to_add]
