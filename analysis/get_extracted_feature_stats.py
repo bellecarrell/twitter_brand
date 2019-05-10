@@ -81,7 +81,11 @@ def compute_stats(df):
         
         for f in stat_features:
             new_row = [tw, f, tw_df.shape[0], tw_df[f].isna().sum()]
-            new_row += tw_df[f].quantile(q=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0]).tolist()
+            
+            try:
+                new_row += tw_df[f].quantile(q=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0]).tolist()
+            except Exception as ex:
+                import pdb; pdb.set_trace()
             
             rows.append(new_row)
         print('Finished window {}'.format(tw))
