@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
 
-IN_PATH = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/joined_features.tsv.gz'
+IN_PATH = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/joined_features.with_domain.tsv.gz'
 DESC_STAT_PATH = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/feature_stats.tsv'
 DIST_PATH_FMT = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/tw-{}_dist.pdf'
 
