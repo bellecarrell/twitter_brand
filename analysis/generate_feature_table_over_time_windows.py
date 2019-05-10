@@ -204,11 +204,15 @@ def aggregate_tweet_level_features(subset_df, day, tw):
         if pct_fridays_with_tweet > 1:
             pct_fridays_with_tweet = 1.
         pct_fridays_with_tweet *= 100.
+        pct_msgs_on_friday *= 100.
     
     pct_msgs_9to12_utc = 100. * subset_df[pre + 'IS_9TO12_UTC'].sum() / float(num_msgs)
     pct_msgs_9to12_et = 100. * subset_df[pre + 'IS_9TO12_EST'].sum() / float(num_msgs)
     pct_msgs_9to12_local = 100. * subset_df[pre + 'IS_9TO12_LOCAL'].sum() / float(num_msgs)
     pct_days_with_some_msg = 100. * len(subset_df[pre + 'NORM_DAY'].unique()) / float(tw)
+    if pct_days_with_some_msg > 100.:
+        pct_days_with_some_msg = 100.
+    
     mean_tweets_per_day = num_msgs / float(tw)
     
     subset_df[pre + 'NORM_DAY_TUP'] = subset_df[pre + 'NORM_DAY'].map(lambda x: (x.year, x.month, x.day))
