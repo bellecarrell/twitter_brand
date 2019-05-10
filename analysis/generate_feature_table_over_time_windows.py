@@ -203,11 +203,12 @@ def aggregate_tweet_level_features(subset_df, day, tw):
         
         if pct_fridays_with_tweet > 1:
             pct_fridays_with_tweet = 1.
+        pct_fridays_with_tweet *= 100.
     
-    pct_msgs_9to12_utc = subset_df[pre + 'IS_9TO12_UTC'].sum() / float(num_msgs)
-    pct_msgs_9to12_et = subset_df[pre + 'IS_9TO12_EST'].sum() / float(num_msgs)
-    pct_msgs_9to12_local = subset_df[pre + 'IS_9TO12_LOCAL'].sum() / float(num_msgs)
-    pct_days_with_some_msg = len(subset_df[pre + 'NORM_DAY'].unique()) / float(tw)
+    pct_msgs_9to12_utc = 100. * subset_df[pre + 'IS_9TO12_UTC'].sum() / float(num_msgs)
+    pct_msgs_9to12_et = 100. * subset_df[pre + 'IS_9TO12_EST'].sum() / float(num_msgs)
+    pct_msgs_9to12_local = 100. * subset_df[pre + 'IS_9TO12_LOCAL'].sum() / float(num_msgs)
+    pct_days_with_some_msg = 100. * len(subset_df[pre + 'NORM_DAY'].unique()) / float(tw)
     mean_tweets_per_day = num_msgs / float(tw)
     
     subset_df[pre + 'NORM_DAY_TUP'] = subset_df[pre + 'NORM_DAY'].map(lambda x: (x.year, x.month, x.day))
@@ -220,21 +221,21 @@ def aggregate_tweet_level_features(subset_df, day, tw):
     max_msgs_per_hour = max(count_per_hour_df.values)
     
     # engagement features
-    pct_msgs_rt = subset_df[pre + 'IS_RT'].sum() / float(num_msgs)
+    pct_msgs_rt = 100. * subset_df[pre + 'IS_RT'].sum() / float(num_msgs)
     mean_rts_per_day = subset_df[pre + 'IS_RT'].sum() / float(tw)
-    pct_msgs_replies = subset_df[pre + 'IS_REPLY'].sum() / float(num_msgs)
+    pct_msgs_replies = 100. * subset_df[pre + 'IS_REPLY'].sum() / float(num_msgs)
     mean_replies_per_day = subset_df[pre + 'IS_REPLY'].sum() / float(tw)
     mean_mentions_per_tweet = subset_df[pre + 'NUM_MENTIONS'].sum() / float(num_msgs)
     mean_msgs_with_mention = (subset_df[pre + 'NUM_MENTIONS'] > 0.).sum() / float(num_msgs)
     
     # content
-    pct_msgs_with_url = (subset_df[pre + 'NUM_URLS'] > 0.).sum() / float(num_msgs)
+    pct_msgs_with_url = 100. * (subset_df[pre + 'NUM_URLS'] > 0.).sum() / float(num_msgs)
     shared_url = 1. * (subset_df[pre + 'NUM_URLS'].sum() > 0.)
-    pct_msgs_with_personal_url = (subset_df[pre + 'NUM_PERSONAL_URLS'] > 0.).sum() / float(num_msgs)
+    pct_msgs_with_personal_url = 100. * (subset_df[pre + 'NUM_PERSONAL_URLS'] > 0.).sum() / float(num_msgs)
     shared_personal_url = 1. * (subset_df[pre + 'NUM_PERSONAL_URLS'].sum() > 0.)
     
     ## sentiment
-    pct_msgs_with_positive_sentiment = subset_df[pre + 'IS_POSITIVE_SENTIMENT'].sum() / float(num_msgs)
+    pct_msgs_with_positive_sentiment = 100. * subset_df[pre + 'IS_POSITIVE_SENTIMENT'].sum() / float(num_msgs)
     median_sentiment = subset_df['tweet_sentiment_score'].median()
     mean_sentiment = subset_df['tweet_sentiment_score'].mean()
     std_sentiment = subset_df['tweet_sentiment_score'].std()
@@ -254,8 +255,8 @@ def aggregate_tweet_level_features(subset_df, day, tw):
         topic_dist_entropy_add1 = entropy(topic_count_df.values, num_topics, delta=1.0)
         topic_dist_entropy_add01 = entropy(topic_count_df.values, num_topics, delta=0.1)
         plurality_topic = topic_count_df.idxmax()
-        pct_msgs_with_plurality_topic = topic_count_df.max() / float(num_msgs)
-        pct_msgs_with_plurality_topic_add1 = (topic_count_df.max()+1.) / (float(num_msgs) + 50.)
+        pct_msgs_with_plurality_topic = 100. * topic_count_df.max() / float(num_msgs)
+        pct_msgs_with_plurality_topic_add1 = 100. * (topic_count_df.max()+1.) / (float(num_msgs) + 50.)
     
     agg_row = [num_msgs, has_tweet_last_friday, pct_msgs_on_friday, pct_fridays_with_tweet,
                pct_msgs_9to12_utc, pct_msgs_9to12_et, pct_msgs_9to12_local,
@@ -667,7 +668,41 @@ def main(in_dir, out_dir, num_procs, max_users):
     #extract_net_features(promoting_users, promoting_user_subsets, out_dir)
     extract_text_features(promoting_users, promoting_user_subsets, out_dir)
     
-    #
+    # joined network + text + static features
+    print('joining network + text + static features together')
+    static_cols_to_add = ['category_all_arts-mace_label',
+                          'category_all_beauty-mace_label',
+                          'category_all_books-mace_label',
+                          'category_all_business-mace_label',
+                          'category_all_family-mace_label',
+                          'category_all_finance-mace_label',
+                          'category_all_games-mace_label',
+                          'category_all_gastronomy-mace_label',
+                          'category_all_health-mace_label',
+                          'category_all_lifestyle-mace_label',
+                          'category_all_other-mace_label',
+                          'category_all_politics-mace_label',
+                          'category_all_religion-mace_label',
+                          'category_all_sports-mace_label',
+                          'category_all_style-mace_label',
+                          'category_all_travel-mace_label',
+                          'category_most_index-mace_label']
+    
+    net_path  = os.path.join(out_dir, 'net_features.joined.tsv.gz')
+    text_path = os.path.join(out_dir, 'text_features.joined.tsv.gz')
+    joined_path = os.path.join(out_dir, 'joined_features.with_domain.tsv.gz')
+    
+    net_text_key = ['user_id', 'sampled_datetime', 'history_agg_window']
+    
+    net_df = pd.read_table(net_path)
+    text_df = pd.read_table(text_path)
+    joined_df = pd.merge(text_df, net_df, on=net_text_key, how='left')
+    
+    static_subset_df = static_info[['user_id'] + static_cols_to_add]
+    joined_df = pd.merge(joined_df, static_subset_df, on='user_id', how='left')
+    
+    joined_df.to_csv(joined_path, compression='gzip', header=True, index=False, sep='\t')
+
 
 if __name__ == '__main__':
     """
