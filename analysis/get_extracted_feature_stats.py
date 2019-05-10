@@ -2,9 +2,7 @@
 Sanity checks to make sure features are generated properly.
 '''
 
-import os
 import pandas as pd
-from pandas import Timestamp
 
 IN_PATH = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/joined_features.tsv.gz'
 DESC_STAT_PATH = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/feature_stats.tsv'
@@ -76,8 +74,7 @@ stat_features = ['past-NUM_MSGS', 'past-HAS_TWEET_LAST_FRIDAY', 'past-PCT_MSGS_O
                  ]
 
 
-def compute_stats(df: pd.DataFrame):
-    
+def compute_stats(df):
     rows = []
     for tw in [1, 2, 3, 4, 5, 6, 7, 14, 21, 28]:
         tw_df = df[df['history_agg_window'] == tw]
@@ -86,8 +83,8 @@ def compute_stats(df: pd.DataFrame):
             new_row = [tw, f, tw_df.shape[0], tw_df[f].isna().sum()]
             new_row += tw_df[f].quantile(q=[0.0, 0.2, 0.4, 0.6, 0.8, 1.0]).tolist()
             
-            import pdb; pdb.set_trace()
             rows.append(new_row)
+        print('Finished window {}'.format(tw))
     
     stat_df = pd.DataFrame(rows, columns=['history_agg_window', 'feature_name',
                                           'num_total', 'num_null', 'min', 'q02', 'q04',
@@ -104,8 +101,8 @@ def run_sanity_checks(df):
 def main():
     df = pd.read_table(IN_PATH)
     
-    df['past-MSG_COUNT_PER_DAY_DIST'] = df['past-MSG_COUNT_PER_DAY_DIST'].map(eval)
-    df['past-MSG_COUNT_PER_HOUR_DIST'] = df['past-MSG_COUNT_PER_HOUR_DIST'].map(eval)
+    #df['past-MSG_COUNT_PER_DAY_DIST'] = df['past-MSG_COUNT_PER_DAY_DIST'].map(eval)
+    #df['past-MSG_COUNT_PER_HOUR_DIST'] = df['past-MSG_COUNT_PER_HOUR_DIST'].map(eval)
     
     compute_stats(df)
     run_sanity_checks(df)
