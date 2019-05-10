@@ -87,10 +87,11 @@ def compute_stats(df):
                 
                 rows.append(new_row)
                 
-                try:
-                    ax = sns.distplot(tw_df[f])
-                except Exception as ex:
-                    import pdb; pdb.set_trace()
+                if tw_df[f].dtype != tw_df['sampled_datetime'].dtype:
+                    try:
+                        sns.distplot(tw_df[f].dropna())
+                    except Exception as ex:
+                        print(f)
                 
                 plt.title('Dist. of "{}" with tw {}'.format(f, tw))
                 plt.xlabel('Feature: "{}"'.format(f))
