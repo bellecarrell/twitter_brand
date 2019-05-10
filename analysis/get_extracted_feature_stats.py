@@ -89,9 +89,9 @@ def compute_stats(df):
                 
                 if tw_df[f].dtype != tw_df['sampled_datetime'].dtype:
                     try:
-                        sns.distplot(tw_df[f].dropna())
+                        sns.distplot(tw_df[f].dropna(), kde=False)
                     except Exception as ex:
-                        print(f)
+                        print('Cannot plot:', f)
                 
                 plt.title('Dist. of "{}" with tw {}'.format(f, tw))
                 plt.xlabel('Feature: "{}"'.format(f))
