@@ -152,7 +152,7 @@ def get_num_past_fridays(day, tw):
     remainder = tw % 7
     
     if ((curr_weekday > 4) and ((curr_weekday - remainder) <= 4)) or \
-            ((tw > curr_weekday) and (((curr_weekday - tw) % 7) < 4)):
+            ((tw > curr_weekday) and (((curr_weekday - tw) % 7) <= 4)):
         num_fridays += 1
     last_friday = day - datetime.timedelta(days=(curr_weekday - 4) % 7)
     
@@ -200,6 +200,9 @@ def aggregate_tweet_level_features(subset_df, day, tw):
         pct_msgs_on_friday = subset_df[subset_df[pre + 'IS_FRIDAY']].shape[0] / float(num_msgs)
         pct_fridays_with_tweet = len(subset_df.loc[subset_df[pre + 'IS_FRIDAY'],
                                                    pre + 'NORM_DAY'].unique()) / float(num_fridays)
+        
+        if pct_fridays_with_tweet > 1:
+            pct_fridays_with_tweet = 1.
     
     pct_msgs_9to12_utc = subset_df[pre + 'IS_9TO12_UTC'].sum() / float(num_msgs)
     pct_msgs_9to12_et = subset_df[pre + 'IS_9TO12_EST'].sum() / float(num_msgs)
@@ -661,9 +664,10 @@ def main(in_dir, out_dir, num_procs, max_users):
     
     ## adrian : already extracted these features to here
     ## /exp/abenton/twitter_brand/TEST_OUTPUT/net_features.joined.tsv.gz
-    extract_net_features(promoting_users, promoting_user_subsets, out_dir)
+    #extract_net_features(promoting_users, promoting_user_subsets, out_dir)
     extract_text_features(promoting_users, promoting_user_subsets, out_dir)
-
+    
+    #
 
 if __name__ == '__main__':
     """
