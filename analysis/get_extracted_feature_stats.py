@@ -87,7 +87,11 @@ def compute_stats(df):
                 
                 rows.append(new_row)
                 
-                ax = sns.distplot(tw_df[f])
+                try:
+                    ax = sns.distplot(tw_df[f])
+                except Exception as ex:
+                    import pdb; pdb.set_trace()
+                
                 plt.title('Dist. of "{}" with tw {}'.format(f, tw))
                 plt.xlabel('Feature: "{}"'.format(f))
                 pdf.savefig()
