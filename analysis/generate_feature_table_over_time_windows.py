@@ -334,7 +334,7 @@ def collect_features_from_user_timeline_table(timeline_path, tracked_uids, out_p
         for tw in tws:
             for lag in range(1, tw+1):
                 day_bin = norm_day + (lag * one_day)
-                key = (uid[0], day_bin, tw)
+                key = (uid[0], tw, day_bin)
                 
                 if key not in key_to_rowindexes:
                     key_to_rowindexes[key] = []
@@ -360,7 +360,7 @@ def collect_features_from_user_timeline_table(timeline_path, tracked_uids, out_p
                    'PCT_MSGS_WITH_PLURALITY_TOPIC_ADD1']
     agg_pre = 'past-'
     AGG_COLUMNS = [agg_pre + c for c in AGG_COLUMNS]
-    AGG_COLUMNS = ['user_id', 'sampled_datetime', 'history_agg_window'] + AGG_COLUMNS
+    AGG_COLUMNS = ['user_id', 'history_agg_window', 'sampled_datetime'] + AGG_COLUMNS
     
     agg_rows = []
     for key_index, (key, indexes) in enumerate(key_to_rowindexes.items()):
