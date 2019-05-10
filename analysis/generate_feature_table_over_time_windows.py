@@ -686,10 +686,30 @@ def main(in_dir, out_dir, num_procs, max_users):
                           'category_all_sports-mace_label',
                           'category_all_style-mace_label',
                           'category_all_travel-mace_label',
-                          'category_most_index-mace_label']
-    
-    net_path  = os.path.join(out_dir, 'net_features.joined.tsv.gz')
-    text_path = os.path.join(out_dir, 'text_features.joined.tsv.gz')
+                          'category_most_index-mace_label',
+                          'geo_enabled']
+    new_col_names = ['user_id',
+                     'arts-mace_label',
+                     'beauty-mace_label',
+                     'books-mace_label',
+                     'business-mace_label',
+                     'family-mace_label',
+                     'finance-mace_label',
+                     'games-mace_label',
+                     'gastronomy-mace_label',
+                     'health-mace_label',
+                     'lifestyle-mace_label',
+                     'other-mace_label',
+                     'politics-mace_label',
+                     'religion-mace_label',
+                     'sports-mace_label',
+                     'style-mace_label',
+                     'travel-mace_label',
+                     'primary_domain-mace_label',
+                     'geo_enabled']
+
+    net_path    = os.path.join(out_dir, 'net_features.joined.tsv.gz')
+    text_path   = os.path.join(out_dir, 'text_features.joined.tsv.gz')
     joined_path = os.path.join(out_dir, 'joined_features.with_domain.tsv.gz')
     
     net_text_key = ['user_id', 'sampled_datetime', 'history_agg_window']
@@ -700,6 +720,7 @@ def main(in_dir, out_dir, num_procs, max_users):
     joined_df = pd.merge(text_df, net_df, on=net_text_key, how='left')
     
     static_subset_df = static_info[['user_id'] + static_cols_to_add]
+    static_subset_df.columns = new_col_names
     joined_df = pd.merge(joined_df, static_subset_df, on='user_id', how='inner')
     
     joined_df.to_csv(joined_path, compression='gzip', header=True, index=False, sep='\t')
