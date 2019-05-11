@@ -9,6 +9,7 @@ matplotlib.use('agg')
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
+sns.set_style('whitegrid')
 
 IN_PATH = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/joined_features.with_domain.tsv.gz'
 DESC_STAT_PATH = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/feature_stats.tsv'
