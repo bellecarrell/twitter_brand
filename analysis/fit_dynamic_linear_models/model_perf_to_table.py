@@ -75,7 +75,7 @@ def main():
                     df_map[k].append(None)
         
         if not (pidx % 200):
-            print('{}/{} paths read'.format(pidx, len(p)))
+            print('{}/{} paths read'.format(pidx, len(ps)))
     
     df = pd.DataFrame(df_map)
     df.drop_duplicates(subset=['dv', 'iv',
