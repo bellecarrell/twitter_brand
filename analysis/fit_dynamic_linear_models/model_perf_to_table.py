@@ -12,6 +12,98 @@ import numpy as np
 MODEL_RUN_DIR = '/exp/abenton/twitter_brand_workspace_20190417/dynamic_models_baseline_strategies/'
 TABLE_DIR = '/exp/abenton/twitter_brand_workspace_20190417/dynamic_models_baseline_tables/'
 
+PRIMARY_DOMAINS = ['arts', 'travel', 'other', 'health', 'business', 'politics',
+                   'style', 'beauty', 'books', 'gastronomy', 'sports',
+                   'science and technology', 'family', 'games']
+
+
+def get_pvalue_marker(pval):
+    if pval >= 0.05:
+        return ''
+    elif pval >= 0.01:
+        return r'^{*}'
+    elif pval >= 0.001:
+        return r'^{\dagger}'
+    else:
+        return r'^{\ddagger}'
+    
+
+def collect_tables_per_key(df_path):
+    df = pd.read_table(df_path)
+    
+    # collect rows by model class, horizon, and history and build "table 3" for each
+    metric_to_report = {'logreg': 'f1', 'ols': 'r2', 'qr': 'r2'}
+    
+    row_labels = ['[]', 'current-log_follower_count',
+                  'current-user_impact_score',
+                  'geo_enabled',
+                  'past-PCT_MSGS_ON_FRIDAY',
+                  'past-PCT_FRIDAYS_WITH_TWEET',
+                  'past-HAS_TWEET_LAST_FRIDAY',
+                  'past-PCT_MSGS_9TO12_ET',
+                  'past-PCT_DAYS_WITH_SOME_MSG',
+                  'past-MEAN_TWEETS_PER_DAY',
+                  'past-MSG_PER_DAY_ENTROPY_ADD1',
+                  'past-MSG_PER_HOUR_ENTROPY_ADD01',
+                  'past-MAX_MSGS_PER_HOUR',
+                  'past-PCT_MSGS_RT',
+                  'past-MEAN_RTS_PER_DAY',
+                  'past-PCT_MSGS_REPLIES',
+                  'past-MEAN_REPLIES_PER_DAY',
+                  'past-MEAN_MENTIONS_PER_TWEET',
+                  'past-MEAN_MSGS_WITH_MENTION',
+                  'past-IS_INTERACTIVE',
+                  'past-PCT_MSGS_WITH_URL',
+                  'past-SHARED_URL',
+                  'past-PCT_MSGS_WITH_POSITIVE_SENTIMENT',
+                  'past-MEDIAN_SENTIMENT',
+                  'past-MEAN_SENTIMENT',
+                  'past-STD_SENTIMENT',
+                  'past-TOPIC_DIST_ENTROPY_ADD1',
+                  'past-TOPIC_DIST_ENTROPY_ADD01',
+                  'past-PCT_MSGS_WITH_PLURALITY_TOPIC',
+                  'past-PCT_MSGS_WITH_PLURALITY_TOPIC_ADD1',
+                  'sqrt[past-TOPIC_DIST_ENTROPY_ADD01]',
+                  'sqrt[past-TOPIC_DIST_ENTROPY_ADD1]',
+                  'sqrt[past-PCT_MSGS_WITH_PLURALITY_TOPIC_ADD1]',
+                  'log1p[past-PCT_MSGS_WITH_PLURALITY_TOPIC_ADD1]']  # hypothesis
+    col_labels = ['[]', 'current-log_follower_count']
+    
+    for m in df['model'].unique():
+        metric = metric_to_report[m]
+        for horizon in df['horizon'].unique():
+            for history in df['history'].unique():
+                sub_df = df[(df['model'] == m) &
+                            (df['horizon'] == horizon) &
+                            (df['history'] == history)]
+                
+                fixed_perf_tbl = pd.DataFrame(index=row_labels, columns=col_labels)
+                
+                for r in row_labels:
+                    for c in col_labels:
+                        row_df = sub_df[(sub_df['ctrl'] == c) & (sub_df['iv'] == r)]
+                        
+                        if row_df.shape[0] > 0:
+                            entry = '{:.2e}{} ({:.3f})'.format(row_df['iv_wt'],
+                                                               get_pvalue_marker(row_df['iv_pvalue']),
+                                                               row_df['dev_' + metric],
+                                                              )
+                            
+                            fixed_perf_tbl.loc[r, c] = entry
+                
+                fixed_perf_tbl.to_csv(os.path.join(TABLE_DIR,
+                                                   'table_model-{}_horizon-{}_history-{}.tsv'.format(
+                                                           m, horizon, history)
+                                                   ), sep='\t', header=True, index=True
+                                      )
+                fixed_perf_tbl.to_latex(os.path.join(TABLE_DIR,
+                                                     'table_model-{}_horizon-{}_history-{}.tex'.format(
+                                                             m, horizon, history)
+                                                     ), header=True, index=True
+                                       )
+
+                print('Saved table for {} {} {}'.format(m, horizon, history))
+
 
 def main():
     ps = [os.path.join(MODEL_RUN_DIR, p) for p in os.listdir(MODEL_RUN_DIR) if p.endswith('.npz')]
@@ -76,8 +168,6 @@ def main():
         
         if not (pidx % 200):
             print('{}/{} paths read; {} rows'.format(pidx, len(ps), len(df_map['model'])))
-        if pidx > 1000:
-            break
     
     df = pd.DataFrame(df_map)
     df['iv_str'] = df['iv'].map(str)
@@ -89,29 +179,7 @@ def main():
               sep='\t', header=True,
               index=False, compression='gzip')
     
-    # collect rows by model class, horizon, and history and build "table 3" for each
-    metric_to_report = {'logreg': 'f1', 'ols': 'r2', 'qr': 'r2'}
-    
-    rows = []
-    
-    for m in df['model'].unique():
-        metric = metric_to_report[m]
-        for horizon in df['horizon'].unique():
-            for history in df['history'].unique():
-                sub_df = df[(df['model'] == m) &
-                            (df['horizon'] == horizon) &
-                            (df['history'] == history)]
-                
-                
-                fixed_perf_tbl = pd.DataFrame(rows)
-                
-                fixed_perf_tbl.to_csv(os.path.join(TABLE_DIR,
-                                                   'table_model-{}_horizon-{}_history-{}'.format(
-                                                           m, horizon, history)
-                                                   ), sep='\t', header=True, index=False,
-                                      )
-                
-                print('Saved table for {} {} {}'.format(m, horizon, history))
+    #collect_tables_per_key(os.path.join(TABLE_DIR, 'all_model_runs.tsv.gz'))
 
 
 if __name__ == '__main__':
