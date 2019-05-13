@@ -18,6 +18,8 @@ import statsmodels.formula.api as smf
 HISTORY_WINDOWS = [1, 2, 3, 4, 5, 6, 7, 14, 21, 28]
 HORIZON_WINDOWS = [1, 2, 3, 4, 5, 6, 7, 14, 21, 28]
 
+IN_DIR = '/exp/abenton/twitter_brand_workspace_20190417/extracted_features_20190508/'
+
 #### TODO: need to update variable columns once table is generated ####
 
 # what to control for
@@ -103,11 +105,11 @@ def main(train_path, dev_path, test_path, horizon, model_class, out_dir, args_ob
     else:
         dep_vars = [dvf.format(horizon) for dvf in REGRESSION_DEP_VARS_FMT]
     
-    tr_df = pd.read_table(train_path, sep=',')
+    tr_df = pd.read_table(train_path, sep='\t')
     tr_df = sm.tools.tools.add_constant(tr_df)
-    dev_df = pd.read_table(dev_path, sep=',')
+    dev_df = pd.read_table(dev_path, sep='\t')
     dev_df = sm.tools.tools.add_constant(dev_df)
-    tst_df = pd.read_table(test_path, sep=',')
+    tst_df = pd.read_table(test_path, sep='\t')
     tst_df = sm.tools.tools.add_constant(tst_df)
     
     # TODO: need to step through this by hand to figure out how to estimate error on heldout set
@@ -147,15 +149,17 @@ if __name__ == '__main__':
             description='test which hypotheses lead to network growth'
     )
     parser.add_argument('--train_path', required=True,
-                        default='/.../dynamic_feature_table_{}-history.train.csv.gz',
+                        default=IN_DIR + 'joined_features.with_domain.train.tsv.gz',
                         help='path to the training set')
     parser.add_argument('--dev_path', required=True,
-                        default='/.../dynamic_feature_table_{}-history.train.csv.gz',
-                        help='path to the training set')
+                        default=IN_DIR + 'joined_features.with_domain.dev.dev.gz',
+                        help='path to the dev set')
     parser.add_argument('--test_path', required=True,
-                        default='/.../dynamic_feature_table_{}-history.test.csv.gz',
+                        default=IN_DIR + 'joined_features.with_domain.test.test.gz',
                         help='path to the test set')
-    parser.add_argument('--horizon_window', required=True, type=int,
+    parser.add_argument('--history_agg_window', required=True, type=int, default=1,
+                        help='number of days in the past to aggregate features by')
+    parser.add_argument('--horizon_window', required=True, type=int, default=1,
                         help='number of days in the future to predict follower count change')
     parser.add_argument('--model_class', required=True,
                         choices=['ols', 'qr', 'logreg'],
@@ -163,7 +167,7 @@ if __name__ == '__main__':
                              'median regression (minimize l1 loss), or logistic regression ' +
                              'predicting whether followers will be gained or lost')
     parser.add_argument('--out_dir', required=True,
-                        default='/exp/abenton/twitter_brand_workspace04252019/dynamic_models_baseline_strategies/',
+                        default='/exp/abenton/twitter_brand_workspace_20190417/dynamic_models_baseline_strategies/',
                         help='where to save models and model performance')
     
     args = parser.parse_args()
