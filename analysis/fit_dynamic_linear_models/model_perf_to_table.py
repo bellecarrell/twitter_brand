@@ -67,8 +67,11 @@ def collect_tables_per_key(df_path):
                   'sqrt[past-TOPIC_DIST_ENTROPY_ADD1]',
                   'sqrt[past-PCT_MSGS_WITH_PLURALITY_TOPIC_ADD1]',
                   'log1p[past-PCT_MSGS_WITH_PLURALITY_TOPIC_ADD1]']  # hypothesis
-    col_labels = ['[]', 'current-log_follower_count']
-    
+    col_labels = ['[]', 'current-log_follower_count',
+                  "['current-log_follower_count', 'current-user_impact_score']",
+                  "['current-log_follower_count', 'current-user_impact_score', 'geo_enabled']",
+                  "['current-log_follower_count', 'current-user_impact_score', 'geo_enabled', 'primary_domain-mace_label[arts]', 'primary_domain-mace_label[travel]', 'primary_domain-mace_label[other]', 'primary_domain-mace_label[health]', 'primary_domain-mace_label[business]', 'primary_domain-mace_label[politics]', 'primary_domain-mace_label[style]', 'primary_domain-mace_label[beauty]', 'primary_domain-mace_label[books]', 'primary_domain-mace_label[gastronomy]', 'primary_domain-mace_label[sports]', 'primary_domain-mace_label[science and technology]', 'primary_domain-mace_label[family]', 'primary_domain-mace_label[games]']"]
+
     for m in df['model'].unique():
         metric = metric_to_report[m]
         for horizon in df['horizon'].unique():
@@ -167,7 +170,7 @@ def main():
                     df_map[k].append(None)
         
         if not (pidx % 200):
-            print('{}/{} paths read; {} rows'.format(pidx, len(ps), len(df_map['model'])))
+            print('{}/{} paths read'.format(pidx, len(ps)))
     
     df = pd.DataFrame(df_map)
     df['iv_str'] = df['iv'].map(str)
@@ -178,12 +181,11 @@ def main():
     df.to_csv(os.path.join(TABLE_DIR, 'all_model_runs.tsv.gz'),
               sep='\t', header=True,
               index=False, compression='gzip')
-    
-    #collect_tables_per_key(os.path.join(TABLE_DIR, 'all_model_runs.tsv.gz'))
 
 
 if __name__ == '__main__':
     if not os.path.exists(TABLE_DIR):
         os.mkdir(TABLE_DIR)
     
-    main()
+    #main()
+    collect_tables_per_key(os.path.join(TABLE_DIR, 'all_model_runs.tsv.gz'))
