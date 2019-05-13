@@ -76,6 +76,10 @@ def main():
         
         if not (pidx % 200):
             print('{}/{} paths read; {} rows'.format(pidx, len(ps), len(df_map['model'])))
+        if pidx > 1000:
+            break
+    
+    import pdb; pdb.set_trace()
     
     df = pd.DataFrame(df_map)
     df.drop_duplicates(subset=['dv', 'iv',
