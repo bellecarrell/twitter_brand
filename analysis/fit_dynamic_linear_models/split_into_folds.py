@@ -3,6 +3,7 @@ Split by user set and time range into train and test folds.
 '''
 
 import datetime
+import os
 import pandas as pd
 import random
 
@@ -16,7 +17,7 @@ TRAIN_PATH = IN_DIR + 'joined_features.with_domain.train.tsv.gz'
 DEV_PATH = IN_DIR + 'joined_features.with_domain.dev.tsv.gz'
 TEST_PATH = IN_DIR + 'joined_features.with_domain.test.tsv.gz'
 
-PROP_USERS_IN_TRAIN = 0.8  # proportion of users selected for the training set
+PROP_USERS_IN_TRAIN = 0.6  # proportion of users selected for the training set
 
 TEST_THRESH_DATE = datetime.datetime(year=2019, month=3, day=1)
 
@@ -51,4 +52,7 @@ def main(inp, trp, devp, tstp, prop_users, test_thresh_date):
 if __name__ == '__main__':
     main(IN_PATH, TRAIN_PATH, DEV_PATH, TEST_PATH,
          PROP_USERS_IN_TRAIN, TEST_THRESH_DATE)
-    print('Finished splitting {} to {} and {}'.format(IN_PATH, TRAIN_PATH, DEV_PATH, TEST_PATH))
+    print('Finished splitting {} to {}, {}, {}'.format(os.path.basename(IN_PATH),
+                                                       os.path.basename(TRAIN_PATH),
+                                                       os.path.basename(DEV_PATH),
+                                                       os.path.basename(TEST_PATH)))
