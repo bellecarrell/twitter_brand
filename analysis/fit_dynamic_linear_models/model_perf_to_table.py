@@ -79,11 +79,11 @@ def main():
         if pidx > 1000:
             break
     
-    import pdb; pdb.set_trace()
-    
     df = pd.DataFrame(df_map)
-    df.drop_duplicates(subset=['dv', 'iv',
-                               'ctrl', 'model',
+    df['iv_str'] = df['iv'].map(str)
+    df['ctrl_str'] = df['ctrl'].map(str)
+    df.drop_duplicates(subset=['dv', 'iv_str',
+                               'ctrl_str', 'model',
                                'horizon', 'history'], inplace=True)
     df.to_csv(os.path.join(TABLE_DIR, 'all_model_runs.tsv.gz'),
               sep='\t', header=True,
