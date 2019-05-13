@@ -261,11 +261,18 @@ def main(train_path, dev_path, test_path, horizon, model_class, out_dir, args_ob
                         if model_class in ['logreg']:
                             for eval_key, eval_fn in zip(['accuracy', 'f1', 'precision', 'recall'],
                                                          [accuracy_score, f1_score, precision_score, recall_score]):
-                                payload[fold + '_' + eval_key] = eval_fn(true, [0. if p < 0.5 else 1. for p in preds])
+                                if len(true) > 0:
+                                    payload[fold + '_' + eval_key] = eval_fn(true, [0. if p < 0.5 else 1. for p in preds])
+                                else:
+                                    payload[fold + '_' + eval_key] = None
                         else:
                             for eval_key, eval_fn in zip(['mse', 'mae', 'r2'],
                                                          [mean_squared_error, mean_absolute_error, r2_score]):
-                                payload[fold + '_' + eval_key] = eval_fn(true, preds)
+                                
+                                if len(true) > 1:
+                                    payload[fold + '_' + eval_key] = eval_fn(true, preds)
+                                else:
+                                    payload[fold + '_' + eval_key] = None
                     out_path = os.path.join(out_dir,
                                             'dynamic_model.{}.{}.{}.npz'.format(run_key,
                                                                                 int(curr_time),
