@@ -32,4 +32,4 @@ pdf.close()
 
 old_labels = ['Fridays (%)', '9-12 (%)', 'days 1 tweet (%)', 'tweets/day (mean)', 'replies (%)', 'replies/day (mean)', 'is interactive', 'has url (%)', 'sentiment (% positive)', 'topic dist. (entropy)', 'sentiment (mean)', 'topic dist. (% plurality topic)', 'topic dist. (sqrt % plurality topic)']
 
-kept_labels = ['Fridays (%)', 9-12 (%)', 'tweets/day (mean)', 'replies (%)', 'is interactive', 'has url (%)', 'sentiment (mean)', 'topic dist. (entropy)', 'topic dist. (% plurality topic)']
+kept_labels = ['Fridays (%)', '9-12 (%)', 'tweets/day (mean)', 'replies (%)', 'is interactive', 'has url (%)', 'sentiment (mean)', 'topic dist. (entropy)', 'topic dist. (% plurality topic)']
