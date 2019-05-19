@@ -187,9 +187,9 @@ def prep_dfs(tr_df, dev_df, tst_df):
                 )
 
             # mean-normalize dependent variable in each fold
-            df['future-horizon{}-direction_follower_count_change'.format(h)] = \
-                df['future-horizon{}-direction_follower_count_change'.format(h)] -\
-                np.nanmean(df['future-horizon{}-direction_follower_count_change'.format(h)])
+            df['future-horizon{}-pct_change_follower_count'.format(h)] = \
+                df['future-horizon{}-pct_change_follower_count'.format(h)] -\
+                np.nanmean(df['future-horizon{}-pct_change_follower_count'.format(h)])
 
     return tr_df, dev_df, tst_df
 

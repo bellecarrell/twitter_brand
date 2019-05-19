@@ -107,7 +107,10 @@ def prep_dfs(tr_df, dev_df, tst_df):
             
             for t, d in enumerate(dist):
                 topic_key_to_props[topic_dist_key_fmt.format(t)].append(d)
-
+        
+        for key in topic_key_to_props:
+            df[key] = topic_key_to_props[key]
+    
     interaction_key_fmt = 'past-INTERACTION_PROP_TOPIC_ADD01_{}_DOMAIN_{}'
     for df in all_dfs:
         # map columns from bool to float
@@ -136,12 +139,12 @@ def prep_dfs(tr_df, dev_df, tst_df):
             df[pct_change_col] = df[pct_change_col].map(lambda x: None if (pd.isna(x) or
                                                                            x < neg_thresh or
                                                                            x > pos_thresh) else x)
-
+        
         # mean-normalize dependent variable in each fold
         for h in HORIZON_WINDOWS:
-            df['future-horizon{}-direction_follower_count_change'.format(h)] = \
-                df['future-horizon{}-direction_follower_count_change'.format(h)] -\
-                np.nanmean(df['future-horizon{}-direction_follower_count_change'.format(h)])
+            df['future-horizon{}-pct_change_follower_count'.format(h)] = \
+                df['future-horizon{}-pct_change_follower_count'.format(h)] -\
+                np.nanmean(df['future-horizon{}-pct_change_follower_count'.format(h)])
     
     return tr_df, dev_df, tst_df
 
@@ -180,18 +183,13 @@ def main(train_path, dev_path, test_path, horizon, out_dir, args_obj):
                     payload = {'args': args_obj}
                     
                     payload['params'] = res.params
-                    payload['tvalues'] = res.tvalues
-                    payload['pvalues'] = res.pvalues
-                    payload['bic'] = res.bic
                     
                     payload['history'] = history
                     payload['features'] = feature_set
                     payload['dv'] = dv
-                    payload['model_class'] = 'ols'
+                    payload['model_class'] = 'ridge'
                     payload['alpha'] = alpha
                     payload['name_to_param'] = dict(zip(['const'] + list(feature_set), res.params))
-                    payload['name_to_pvalue'] = dict(zip(['const'] + list(feature_set), res.pvalues))
-                    payload['name_to_tvalue'] = dict(zip(['const'] + list(feature_set), res.tvalues))
                     
                     for fold, df in [('train', tr_df), ('dev', dev_df), ('test', tst_df)]:
                         true = df.loc[df['history_agg_window']==history, dv]

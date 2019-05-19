@@ -20,7 +20,7 @@ PRIMARY_DOMAINS = ['arts', 'travel', 'other', 'health', 'business', 'politics',
 def main():
     ps = [os.path.join(MODEL_RUN_DIR, p) for p in os.listdir(MODEL_RUN_DIR) if p.endswith('.npz')]
     
-    df_map = {'dv': [], 'alpha': [], 'weights': [],
+    df_map = {'dv': [], 'features': [], 'alpha': [], 'weights': [],
               'horizon': [], 'history': []}
     
     for metric in ['r2', 'mae', 'mse']:
@@ -28,12 +28,12 @@ def main():
             df_map['{}_{}'.format(fold, metric)] = []
     
     for pidx, p in enumerate(ps):
-        d = np.load(p)
+        d = np.load(p, allow_pickle=True)
         
-        model = d['model_class'].item().encode('ascii')
+        model = d['model_class'].item()
         
-        dv = d['dv'].item().encode('ascii')
-        features = [v.encode('ascii') for v in d['features']]
+        dv = d['dv'].item()
+        features = [v for v in d['features']]
         
         params  = d['name_to_param'].item()
         
@@ -43,7 +43,7 @@ def main():
         df_map['horizon'].append(int(dv.split('-')[1].replace('horizon', '')))
         
         df_map['weights'].append([params[v] for v in features])
-        df_map['alpha'] = d['alpha']
+        df_map['alpha'].append(d['alpha'].item())
         
         for metric in ['r2', 'mae', 'mse']:
             for fold in ['train', 'dev', 'test']:
@@ -59,7 +59,7 @@ def main():
     df = pd.DataFrame(df_map)
     df['feature_str'] = df['features'].map(str)
     df.drop_duplicates(subset=['dv', 'feature_str',
-                               'horizon', 'history'], inplace=True)
+                               'horizon', 'history', 'alpha'], inplace=True)
     df.to_csv(os.path.join(TABLE_DIR, 'all_model_runs.tsv.gz'),
               sep='\t', header=True,
               index=False, compression='gzip')
