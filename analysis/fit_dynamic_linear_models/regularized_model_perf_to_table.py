@@ -33,40 +33,19 @@ def main():
         model = d['model_class'].item().encode('ascii')
         
         dv = d['dv'].item().encode('ascii')
-        ivs = [v.encode('ascii') for v in d['ivs']]
-        ctrls = [v.encode('ascii') for v in d['controls']]
+        features = [v.encode('ascii') for v in d['features']]
         
         params  = d['name_to_param'].item()
-        pvalues = d['name_to_pvalue'].item()
-        tvalues = d['name_to_tvalue'].item()
         
         df_map['dv'].append(dv)
-        df_map['iv'].append(ivs[0] if len(ivs) == 1 else ivs)
-        df_map['ctrl'].append(ctrls[0] if len(ctrls) == 1 else ctrls)
-        df_map['model'].append(model)
-        df_map['bic'].append(d['bic'].item())
+        df_map['features'].append(features[0] if len(features) == 1 else features)
         df_map['history'].append(d['history'].item())
         df_map['horizon'].append(int(dv.split('-')[1].replace('horizon', '')))
         
-        if len(ivs) == 1:
-            df_map['iv_wt'].append(params[ivs[0]])
-            df_map['iv_pvalue'].append(pvalues[ivs[0]])
-            df_map['iv_tvalue'].append(tvalues[ivs[0]])
-        else:
-            df_map['iv_wt'].append([params[v] for v in ivs])
-            df_map['iv_pvalue'].append([pvalues[v] for v in ivs])
-            df_map['iv_tvalue'].append([tvalues[v] for v in ivs])
+        df_map['weights'].append([params[v] for v in features])
+        df_map['alpha'] = d['alpha']
         
-        if len(ctrls) == 1:
-            df_map['ctrl_wt'].append(params[ctrls[0]])
-            df_map['ctrl_pvalue'].append(pvalues[ctrls[0]])
-            df_map['ctrl_tvalue'].append(tvalues[ctrls[0]])
-        else:
-            df_map['ctrl_wt'].append([params[v] for v in ctrls])
-            df_map['ctrl_pvalue'].append([pvalues[v] for v in ctrls])
-            df_map['ctrl_tvalue'].append([tvalues[v] for v in ctrls])
-        
-        for metric in ['r2', 'mae', 'mse', 'accuracy', 'f1', 'precision', 'recall']:
+        for metric in ['r2', 'mae', 'mse']:
             for fold in ['train', 'dev', 'test']:
                 k = '{}_{}'.format(fold, metric)
                 if k in d:
@@ -78,10 +57,8 @@ def main():
             print('{}/{} paths read'.format(pidx, len(ps)))
     
     df = pd.DataFrame(df_map)
-    df['iv_str'] = df['iv'].map(str)
-    df['ctrl_str'] = df['ctrl'].map(str)
-    df.drop_duplicates(subset=['dv', 'iv_str',
-                               'ctrl_str', 'model',
+    df['feature_str'] = df['features'].map(str)
+    df.drop_duplicates(subset=['dv', 'feature_str',
                                'horizon', 'history'], inplace=True)
     df.to_csv(os.path.join(TABLE_DIR, 'all_model_runs.tsv.gz'),
               sep='\t', header=True,
