@@ -8,15 +8,17 @@ from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
 sns.set_style('whitegrid')
 
-ivs_to_plot = {'past-PCT_FRIDAYS_WITH_TWEET': 'Fridays (%)', 'past-PCT_MSGS_9TO12_ET': 'posted 9-12 (%)', 'past-MEAN_TWEETS_PER_DAY': 'tweets/day (mean)', 'past-PCT_MSGS_REPLIES': 'replies (%)', 'past-IS_INTERACTIVE': 'is interactive', 'past-PCT_MSGS_WITH_URL': 'has url (%)', 'past-MEDIAN_SENTIMENT': 'sentiment (median)', 'past-TOPIC_DIST_ENTROPY_ADD1': 'topic dist. $\delta=1$ (entropy)', 'past-PCT_MSGS_WITH_PLURALITY_TOPIC_ADD1': 'topic dist. $\delta=1$ (% plurality topic)'}
+sns.set_context("notebook", font_scale=1.2, rc={"lines.linewidth": 5.0})
+
+ivs_to_plot = {'past-PCT_FRIDAYS_WITH_TWEET': 'Fridays (%)', 'past-PCT_MSGS_9TO12_ET': 'Posted 9-12 (%)', 'past-MEAN_TWEETS_PER_DAY': 'Tweets/day (mean)', 'past-PCT_MSGS_REPLIES': 'Replies (%)', 'past-IS_INTERACTIVE': 'Is interactive', 'past-PCT_MSGS_WITH_URL': 'Has URL (%)', 'past-MEDIAN_SENTIMENT': 'Sentiment (median)', 'past-TOPIC_DIST_ENTROPY_ADD1': 'Topic dist. $\delta=1$ (entropy)', 'past-PCT_MSGS_WITH_PLURALITY_TOPIC_ADD1': 'Topic dist. $\delta=1$ (% plurality topic)'}
 
 bottom_df = pd.read_table('/Users/abenton10/additional_projects/twitter_brand/dynamic_models_baseline_tables_bottom80pct/all_model_runs.tsv.gz')
 top_df = pd.read_table('/Users/abenton10/additional_projects/twitter_brand/dynamic_models_baseline_tables_top10pct/all_model_runs.tsv.gz')
 
-kept_labels = ['Fridays (%)', 'posted 9-12 (%)', 'tweets/day (mean)',
-               'replies (%)', 'is interactive', 'has url (%)',
-               'sentiment (median)', 'topic dist. $\delta=1$ (entropy)',
-               'topic dist. $\delta=1$ (% plurality topic)']
+kept_labels = ['Fridays (%)', 'Posted 9-12 (%)', 'Tweets/day (mean)',
+               'Replies (%)', 'Is interactive', 'Has URL (%)',
+               'Sentiment (median)', 'Topic dist. $\delta=1$ (entropy)',
+               'Topic dist. $\delta=1$ (% plurality topic)']
 
 bottom_df['Popularity Percentile'] = '$\leq$ 80%'
 top_df['Popularity Percentile'] = '$\geq$ 90%'
@@ -50,17 +52,19 @@ with PdfPages('/Users/abenton10/Desktop/pop_vs_unpop_weights_fn_horizon.pdf') as
         
         ax = sns.lineplot(x='horizon', y='iv_wt', hue='Popularity Percentile',
                           data=subset_df,
-                          dashes=False, legend='brief' if (i==0) else False,
-                          alpha=0.6)
+                          dashes=False, legend='brief' if (i==2) else False,
+                          #legend = 'brief' if (i == 0) else False,
+                          alpha=0.8)
         
         sns.scatterplot(x='horizon', y='iv_wt', hue='Popularity Percentile',
                         style='p < 0.01', markers={1.0: '.', 0.05: '^', 0.01: 'p', 0.001: '*'},
-                        data=subset_df, ax=ax, legend=False, s=600.)
+                        data=subset_df, ax=ax, legend=False, s=1000., alpha=0.8)
         
-        ax.set_title('{}'.format(l), fontsize=30)
+        ax.set_title('{}'.format(l), fontsize=25)
 
-        if i == 0:
-            plt.legend()
+        #if i == 2:
+        #    plt.legend()
+        
         if i == 3 or i == 2:
             ax.set_ylabel('Strategy Weight', fontsize=20)
         else:
@@ -83,16 +87,19 @@ with PdfPages('/Users/abenton10/Desktop/pop_vs_unpop_weights_fn_history.pdf') as
         
         ax = sns.lineplot(x='history', y='iv_wt', hue='Popularity Percentile',
                           data=subset_df, dashes=False,
-                          legend='brief' if (i==0) else False, alpha=0.5)
+                          legend='brief' if (i==2) else False,
+                          # legend = 'brief' if (i == 0) else False,
+                          alpha=0.8)
         
         sns.scatterplot(x='history', y='iv_wt', hue='Popularity Percentile',
                         style='p < 0.01', markers={1.0: '.', 0.05: '^', 0.01: 'p', 0.001: '*'},
-                        data=subset_df, ax=ax, legend=False, s=600.)
+                        data=subset_df, ax=ax, legend=False, s=1000., alpha=0.8)
         
-        ax.set_title('{}'.format(l), fontsize=30)
+        ax.set_title('{}'.format(l), fontsize=25)
 
-        if i == 0:
-            plt.legend()
+        #if i == 0:
+        #    plt.legend()
+        
         if i == 3 or i == 2:
             ax.set_ylabel('Strategy Weight', fontsize=20)
         else:
