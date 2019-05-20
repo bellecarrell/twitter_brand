@@ -8,15 +8,15 @@ from matplotlib.backends.backend_pdf import PdfPages
 import seaborn as sns
 sns.set_style('whitegrid')
 
-ivs_to_plot = {'past-PCT_FRIDAYS_WITH_TWEET': 'Fridays (%)', 'past-PCT_MSGS_9TO12_ET': '9-12 (%)', 'past-MEAN_TWEETS_PER_DAY': 'tweets/day (mean)', 'past-PCT_MSGS_REPLIES': 'replies (%)', 'past-IS_INTERACTIVE': 'is interactive', 'past-PCT_MSGS_WITH_URL': 'has url (%)', 'past-MEDIAN_SENTIMENT': 'sentiment (median)', 'past-TOPIC_DIST_ENTROPY_ADD1': 'topic dist. (entropy)', 'past-PCT_MSGS_WITH_PLURALITY_TOPIC_ADD1': 'topic dist. (% plurality topic)'}
+ivs_to_plot = {'past-PCT_FRIDAYS_WITH_TWEET': 'Fridays (%)', 'past-PCT_MSGS_9TO12_ET': 'posted 9-12 (%)', 'past-MEAN_TWEETS_PER_DAY': 'tweets/day (mean)', 'past-PCT_MSGS_REPLIES': 'replies (%)', 'past-IS_INTERACTIVE': 'is interactive', 'past-PCT_MSGS_WITH_URL': 'tweet has url (%)', 'past-MEDIAN_SENTIMENT': 'sentiment (median)', 'past-TOPIC_DIST_ENTROPY_ADD1': 'topic dist. $\delta=1$ (entropy)', 'past-PCT_MSGS_WITH_PLURALITY_TOPIC_ADD1': 'topic dist. $\delta=1$ (% plurality topic)'}
 
 bottom_df = pd.read_table('/Users/abenton10/additional_projects/twitter_brand/dynamic_models_baseline_tables_bottom80pct/all_model_runs.tsv.gz')
 top_df = pd.read_table('/Users/abenton10/additional_projects/twitter_brand/dynamic_models_baseline_tables_top10pct/all_model_runs.tsv.gz')
 
-kept_labels = ['Fridays (%)', '9-12 (%)', 'tweets/day (mean)',
-               'replies (%)', 'is interactive', 'has url (%)',
-               'sentiment (median)', 'topic dist. (entropy)',
-               'topic dist. (% plurality topic)']
+kept_labels = ['Fridays (%)', 'posted 9-12 (%)', 'tweets/day (mean)',
+               'replies (%)', 'is interactive', 'tweet has url (%)',
+               'sentiment (median)', 'topic dist. $\delta=1$ (entropy)',
+               'topic dist. $\delta=1$ (% plurality topic)']
 
 bottom_df['Popularity Percentile'] = '$\leq$ 80%'
 top_df['Popularity Percentile'] = '$\geq$ 90%'
