@@ -55,19 +55,19 @@ with PdfPages('/Users/abenton10/Desktop/pop_vs_unpop_weights_fn_horizon.pdf') as
         
         sns.scatterplot(x='horizon', y='iv_wt', hue='Popularity Percentile',
                         style='p < 0.01', markers={1.0: '.', 0.05: '^', 0.01: 'p', 0.001: '*'},
-                        data=subset_df, ax=ax, legend=False, s=200.)
+                        data=subset_df, ax=ax, legend=False, s=600.)
         
-        ax.set_title('{}'.format(l), fontsize=15)
+        ax.set_title('{}'.format(l), fontsize=30)
 
         if i == 0:
             plt.legend()
-        if i == 3:
-            ax.set_ylabel('Strategy Weight', fontsize=12)
+        if i == 3 or i == 2:
+            ax.set_ylabel('Strategy Weight', fontsize=20)
         else:
             plt.ylabel('')
         
         if i == 7:
-            ax.set_xlabel('Horizon', fontsize=12)
+            ax.set_xlabel('Horizon', fontsize=20)
         else:
             plt.xlabel('')
         
@@ -87,19 +87,19 @@ with PdfPages('/Users/abenton10/Desktop/pop_vs_unpop_weights_fn_history.pdf') as
         
         sns.scatterplot(x='history', y='iv_wt', hue='Popularity Percentile',
                         style='p < 0.01', markers={1.0: '.', 0.05: '^', 0.01: 'p', 0.001: '*'},
-                        data=subset_df, ax=ax, legend=False, s=200.)
+                        data=subset_df, ax=ax, legend=False, s=600.)
         
-        ax.set_title('{}'.format(l), fontsize=15)
+        ax.set_title('{}'.format(l), fontsize=30)
 
         if i == 0:
             plt.legend()
-        if i == 3:
-            ax.set_ylabel('Strategy Weight', fontsize=12)
+        if i == 3 or i == 2:
+            ax.set_ylabel('Strategy Weight', fontsize=20)
         else:
             plt.ylabel('')
         
         if i == 7:
-            ax.set_xlabel('History', fontsize=12)
+            ax.set_xlabel('History', fontsize=20)
         else:
             plt.xlabel('')
         

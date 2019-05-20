@@ -19,10 +19,10 @@ features_to_collect = {"['current-log_follower_count', 'current-user_impact_scor
 horizons_to_eval = [1, 2, 3, 4, 5, 6, 7, 14, 21, 28]
 
 df = pd.read_table('/Users/abenton10/additional_projects/twitter_brand/dynamic_full_tables/all_model_runs.full_regularized.tsv.gz')
-df['feature_set'] = df['features'].map(lambda x: features_to_collect[x])
+df['Feature Set'] = df['features'].map(lambda x: features_to_collect[x])
 
 # for each feature set and horizon, select the best R^{2} out of history agg window and regularization term
-grped = df.groupby(['horizon', 'feature_set'])
+grped = df.groupby(['horizon', 'Feature Set'])
 max_idx_per_grp = grped['dev_r2'].idxmax()
 
 best_perf_df = df.loc[max_idx_per_grp]
@@ -32,15 +32,15 @@ del best_perf_df['feature_str']
 best_perf_df.to_csv('/Users/abenton10/Desktop/best_dev_r2.full_regularized.tsv', sep='\t', header=True, index=False)
 
 hues = ['controls', 'strategies', 'controls+strategies', 'controls+strategies+topics']
-subset_best_df = best_perf_df[best_perf_df['feature_set'].isin(hues)]
+subset_best_df = best_perf_df[best_perf_df['Feature Set'].isin(hues)]
 
 with PdfPages('/Users/abenton10/Desktop/controls_and_strategies_best_r2.pdf') as pdf:
-    sns.barplot(x='horizon', y='dev_r2', hue='feature_set', data=subset_best_df, alpha=0.9, hue_order=hues)
+    sns.barplot(x='horizon', y='dev_r2', hue='Feature Set', data=subset_best_df, alpha=0.9, hue_order=hues)
     plt.xlabel('Horizon (days)'); plt.ylabel('Dev $R^{2}$')
     pdf.savefig()
     plt.close()
 
-    sns.barplot(x='horizon', y='test_r2', hue='feature_set', data=subset_best_df, alpha=0.9, hue_order=hues)
+    sns.barplot(x='horizon', y='test_r2', hue='Feature Set', data=subset_best_df, alpha=0.9, hue_order=hues)
     plt.xlabel('Horizon (days)'); plt.ylabel('Test $R^{2}$')
     pdf.savefig()
     plt.close()
