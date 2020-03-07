@@ -1,0 +1,14 @@
+Notes on applying temporal word2vec to 
+
+Idea:
+- Fit word embeddings on full dataset with Skipgram objective, and use these as the "context embeddings", the target embeddings.
+- Update word embeddings on different subsets of the data, while holding target embeddings fixed.  This means that we will learn an embedding for "bank" that is close to "investment" and "asset" when adapted to a financial domain and close to "river" and "picnic" when adapted to Wind in the Willows.
+- Clever idea, makes use of target embeddings which are usually discarded, target embeddings learned on a different dataset from the original.
+
+Depends on TWEC: https://github.com/valedica/twec
+
+```
+for K in 25 50 100; do
+  python twec_analysis.py --input_path /Users/abenton10/additional_projects/twitter_brand/twitter_brand_workspace_20190417/promoting_user_tweets.merged_with_user_info.noduplicates.tsv.gz --slice_dir tweetText_by_mainCategory --model_dir twec_models_${K} --category_to_split category_most_index-mace_label -k ${K} --training_objective cbow --dynamic_iterations 10 --static_iterations 10 --negative_samples 10 --window 5 --alpha 0.025 --workers 3 --min_token_count 10;
+done;
+```
